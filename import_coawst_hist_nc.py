@@ -14,6 +14,8 @@ Updated: 2014-06-10
 @author: mbiddle
 """
 #%tb
+import os
+os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -53,7 +55,8 @@ def haversine(lon1, lat1, lon2, lat2):
 #inputfile = 'https://data.nodc.noaa.gov/thredds/dodsC/testdata/mbiddle/veg_test_his_compressed.nc'
 #inputfile = 'https://data.nodc.noaa.gov/thredds/dodsC/testdata/mbiddle/upper_ches_his.nc'
 #inputfile = '/Users/mbiddle/Documents/thesis/working_directory/upper_ches_his_translated.nc'
-inputfile = 'H:\Graduate School\University of Maryland\Thesis\upper_ches_his.nc'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
+inputfile = dir+'/upper_ches_his.nc'
 #inputfile = '\\USERS\mbiddle\umd\thesis\data'
 ## -------netcdf file processing------#
 f = netCDF4.Dataset(inputfile,'r') # open the netcdf file
@@ -63,14 +66,14 @@ f = netCDF4.Dataset(inputfile,'r') # open the netcdf file
 #      print f.variables[v].long_name,';',f.variables[v].units
 #   elif hasattr(f.variables[v],'long_name'):
 #      print f.variables[v].long_name
-#obs = 'h'#'plant_diameter'#'plant_thickness'#'plant_height'#'Dissip_veg'#'Dissip_fric'#'zeta'#'Hwave'#'Lwave'#'Pwave_bot'#'Pwave_top'#'Dissip_break'#'plant_height'#'h'#'temp'#'zeta'#'temp' # the name of the variable
+obs = 'zeta'#'plant_diameter'#'plant_thickness'#'plant_height'#'Dissip_veg'#'Dissip_fric'#'zeta'#'Hwave'#'Lwave'#'Pwave_bot'#'Pwave_top'#'Dissip_break'#'plant_height'#'h'#'temp'#'zeta'#'temp' # the name of the variable
 #ocn_time = 'ocean_time'
-#plt_type = 'contour'#'cross-shore'
+plt_type = 'contour'#'cross-shore'
 #time_var = f.variables[ocn_time]
 time_data = f.variables['ocean_time'][:]
-#obs_var = f.variables[obs]
-#x = obs_var.shape[-1] # xi_rho
-#y = obs_var.shape[-2] # eta_rho
+obs_var = f.variables[obs]
+x = obs_var.shape[-1] # xi_rho
+y = obs_var.shape[-2] # eta_rho
 
 ## Do some date conversions ##
 epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2],f.variables['ocean_time'].units.split(' ')[-1])
@@ -95,11 +98,11 @@ time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970,1
 ## Create tide timeseries
 #H = np.float(0.5)
 #tide=[]
-#datetime_list=[]
-#for sec in time_data:
-#   ts = sec/(12*3600)
-#   tide.append(-H*np.sin(2*np.pi*ts))
-#   datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+datetime_list=[]
+for sec in time_data:
+   ts = sec/(12*3600)
+   #tide.append(-H*np.sin(2*np.pi*ts))
+   datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 lat = f.variables['lat_rho'][:][:]
 lon = f.variables['lon_rho'][:][:]
 #data = f.variables['tke'][24][20][:][:]
@@ -107,7 +110,7 @@ lon = f.variables['lon_rho'][:][:]
 veg = f.variables['plant_height'][0][0][:][:]
 mask_veg = np.zeros(veg.shape)
 mask_veg[:] = np.NAN
-veg_idx = np.where(veg==10)
+veg_idx = np.where(veg==0.3048)
 mask_veg[veg_idx]=1
 veg_lat = lat[veg_idx]
 veg_lon = lon[veg_idx]
@@ -134,15 +137,15 @@ grid_distance_meters_x = haversine(np.min(lon),np.max(lat),np.max(lon),np.max(la
 veg_distance_meters_y = haversine(np.min(veg_lon),np.max(veg_lat),np.min(veg_lon),np.min(veg_lat))
 veg_distance_meters_x = haversine(np.min(veg_lon),np.max(veg_lat),np.max(veg_lon),np.max(veg_lat))
 
-print "Grid distances (km):"
-print 'x =',grid_distance_meters_x/1000 #km
-print 'y =',grid_distance_meters_y/1000 #km
-print "Vegetation distances (km):"
-print 'x =',veg_distance_meters_x/1000 #km
-print 'y =',veg_distance_meters_y/1000 #km
+print("Grid distances (km):")
+print('x =',grid_distance_meters_x/1000) #km
+print('y =',grid_distance_meters_y/1000) #km
+print("Vegetation distances (km):")
+print('x =',veg_distance_meters_x/1000) #km
+print('y =',veg_distance_meters_y/1000) #km
 
 m = Basemap(projection='merc',llcrnrlat=min_lat,urcrnrlat=max_lat,\
-            llcrnrlon=min_lon,urcrnrlon=max_lon,resolution='c')
+            llcrnrlon=min_lon,urcrnrlon=max_lon,resolution='l')
 
 m.plot(np.min(veg_lon),np.max(veg_lat),'o',latlon=True)
 m.plot(np.min(veg_lon),np.min(veg_lat),'o',latlon=True)
@@ -184,12 +187,13 @@ m.fillcontinents(color='grey',zorder=0)
 #plt.gca().add_patch(patch)
 #ax.grid(True, which='minor', axis='both', linestyle='-', color='k')
 plt.show()
-
-sys.exit()
+print("Done")
+#sys.exit()
 ## Create surface plot and tide timeseries
+#obs='zeta'
 for t in range(len(time_data)):
-   obs_data = f.variables[obs][:][:] # @ time=t,get all (y,x)
-   print obs_data.shape
+   obs_data = f.variables[obs][t][:][:] # @ time=t,get all (y,x)
+   print(obs_data.shape)
 ## Top subplot ##
    fig = plt.figure(figsize=(10,15))
    ax = fig.add_subplot(2,1,1)#2,1,1)
@@ -228,7 +232,7 @@ for t in range(len(time_data)):
 
 #   plt.show()
    fig.clf()
-   print t
+   print(t)
 #   if t == 20:
    sys.exit()
 sys.exit()
@@ -236,14 +240,14 @@ sys.exit()
 
 
 
-print 'Coordinates:',obs_var.coordinates
+print('Coordinates:',obs_var.coordinates)
 i=0
 for coord in obs_var.coordinates.split(' '):
-   print coord
+   print(coord)
    string_meta = 'coord_%s = f.variables[\'%s\']' %(i,coord)
    exec(string_meta)
    string_data = 'coord_%s_data = f.variables[\'%s\'][:]' %(i,coord)
-   print string_data
+   print(string_data)
    shape = 'print coord_%s.shape' %i
    exec(shape)
    exec(string_data)
@@ -257,9 +261,9 @@ for coord in obs_var.coordinates.split(' '):
 #print len(obs_data[1,:,1]) # 16 = all depth at one time
 #print len(obs_data[1,1,:]) # 62 = ?
 #sys.exit()
-print coord_0_data[1,:].shape
-print coord_1_data.shape
-print obs_data[:,:].shape
+print(coord_0_data[1,:].shape)
+print(coord_1_data.shape)
+print(obs_data[:,:].shape)
 #print np.transpose(obs_data[1,:,1,:]).shape
 
 for i in range(0,obs_data.shape[0]): # plot going by ocean_time
@@ -312,9 +316,9 @@ dist = np.zeros([len(stations),len(cs_r)])
 #from vincenty import vincenty
 for s in range(len(stations)):
    depth[s,:] = (h[s] + zeta[s]) * cs_r[:]
-   print h[s].shape
-   print zeta[s].shape
-   print cs_r[:].shape
+   print(h[s].shape)
+   print(zeta[s].shape)
+   print(cs_r[:].shape)
 #   depth[s,:] = h[s]
 #   depth = h[s]
    if s == 0:
@@ -442,14 +446,14 @@ y_rho = f.variables['lat_rho']
 y_rho_data = f.variables['lat_rho'][:]
 #print '\ntime:\n', time_data,'\nbath:\n',bath_data,'\nx:\n',x_rho_data,'\ny:\n',y_rho_data
 
-print'\n'
-print bath_data[0,:]
-print '\n'
-print bath_data[1,:]
-print np.min(bath_data)
-print time_data[3]
-print time_data.shape
-print bath_data.shape[0]
+print('\n')
+print(bath_data[0,:])
+print('\n')
+print(bath_data[1,:])
+print(np.min(bath_data))
+print(time_data[3])
+print(time_data.shape)
+print(bath_data.shape[0])
 #for i in range(0,bath_data.shape[0]):
 #   fig = plt.figure()
 #   ax = Axes3D(fig)
@@ -488,7 +492,7 @@ sys.exit()
 
 resume='n'
 while resume.lower()=='n':
-   print 'What variables would you like to plot?\nLeave z empty if you do not want to plot a third variable.'
+   print('What variables would you like to plot?\nLeave z empty if you do not want to plot a third variable.')
    var1 = raw_input('X variable: ') # User selected data to plot
    var2 = raw_input('Y variable: ')
    var3 = raw_input('z variable: ')
@@ -497,28 +501,28 @@ while resume.lower()=='n':
    var2_var = f.variables[var2]
 
    dim1 = [str(x) for x in f.variables[var1].dimensions] # convert unicode tuple to tuple
-   print '\n******* %s %s attributes:' %(var1,dim1)
+   print('\n******* %s %s attributes:' %(var1,dim1))
    var1_shape = var1_var.shape
    for att in var1_var.ncattrs():
-      print '%s = %s' % (att,getattr(var1_var,att)) # printing the attribute information for each selected variable
+      print('%s = %s' % (att,getattr(var1_var,att))) # printing the attribute information for each selected variable
 
    dim2 = [str(x) for x in f.variables[var2].dimensions] # convert unicode tuple to tuple
-   print '\n******* %s %s attributes:' %(var2,dim2)
+   print('\n******* %s %s attributes:' %(var2,dim2))
    var2_shape = var2_var.shape
    for att in var2_var.ncattrs():
-      print '%s = %s' % (att,getattr(var2_var,att))
+      print('%s = %s' % (att,getattr(var2_var,att)))
 
 
    if var3:
       var3_var = f.variables[var3]
       dim3 = [str(x) for x in f.variables[var3].dimensions] # convert unicode tuple to tuple
-      print '\n******* %s %s attributes:' %(var3,dim3)
+      print('\n******* %s %s attributes:' %(var3,dim3))
       var3_shape = var3_var.shape
       for att in var3_var.ncattrs():
-         print '%s = %s' % (att,getattr(var3_var,att))
+         print('%s = %s' % (att,getattr(var3_var,att)))
 
 
-   print '----------------------\n'
+   print('----------------------\n')
    resume = raw_input('Are these the variables you would like to plot? (y/n) ') # verify variables
 var1_data = f.variables[var1][:].flatten()
 var2_data = f.variables[var2][:].flatten()
@@ -532,13 +536,13 @@ if var3:
 #plt.show()
 #sys.exit()
 
-print var1_data,var2_data
+print(var1_data,var2_data)
 l = raw_input('What depth level [0-%i]?\nLeave depth level empty if you do not want to plot a surface variable.\n'%(len(var2_data)-1))
 if l:
    var2_data_full=var2_data
    var2_data=[]
-   print l,len(var2_data_full)-1
-   print var2_data_full[int(l):int(len(var2_data_full)-1):4]
+   print(l,len(var2_data_full)-1)
+   print(var2_data_full[int(l):int(len(var2_data_full)-1):4])
    var2_data=var2_data_full[int(l):int(len(var2_data_full)-1):4]
 
 
@@ -600,7 +604,7 @@ if l:
 
 ## Plot geographic loaction
 if hasattr(var1_var,'standard_name') and "longitude" in f.variables[var1].standard_name.lower():
-   print "generating map..."
+   print("generating map...")
    #print np.min(var2_data)
    m = Basemap(projection='merc',llcrnrlat=np.min(var2_data)-5,urcrnrlat=np.max(var2_data)+5,\
             llcrnrlon=np.min(var1_data)-10,urcrnrlon=np.max(var1_data)+10,lat_ts=20,resolution='i')
