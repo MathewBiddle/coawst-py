@@ -53,8 +53,8 @@ m.arcgisimage(service="Canvas/World_Light_Gray_Base",xpixels = 3000)
 
 #dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110906_20110926'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+#dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
 #inputfile = dir+'/upper_ches_his.nc'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110714201800_20111031231800'
 inputfile = dir+'/upper_ches_his.nc'
@@ -69,9 +69,11 @@ plant_height = f.variables['plant_height'][0, 0, :, :]
 plant_height = np.ma.masked_outside(plant_height,0.3,1)
 #plant_height = np.ma.masked_greater(plant_height, 1)
 #plant_height = np.ma.masked_less(plant_height, 0.3)
-m.pcolormesh(lon, lat, h, latlon=True, cmap='ocean')
-m.colorbar()
-m.pcolormesh(lon, lat, plant_height*10, latlon=True, cmap='Greens',vmin=0,vmax=10)
+m.pcolormesh(lon, lat, h, latlon=True, cmap='viridis_r')
+cbar = m.colorbar()
+cbar.ax.set_ylabel('NOS MLLW bathymetry [meters]', rotation=270, fontdict=dict(size=5))
+cbar.ax.tick_params(labelsize=5)
+m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
 
 lon=list(locs['lon'])
 lat=list(locs['lat'])
@@ -80,5 +82,15 @@ x,y = m(lon,lat)
 
 plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
 for label, xpt, ypt in zip(locs['Site'], x, y):
-     if label != 'Lee5':
-         plt.text(xpt+500, ypt, label, size='x-small', bbox=dict(facecolor='white', alpha=0.5))
+    if label not in ['Lee5','Lee2.5','Lee2','Lee0','LeeS2']:
+        if label == 'Tripod':
+            plt.text(xpt+500,ypt-200, label, fontdict=dict(size=5))
+        else:
+            plt.text(xpt+500, ypt, label, fontdict=dict(size=5))
+
+
+plt.title('Site locations and SAV distribution',fontdict=dict(size=5))
+
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
+
+plt.savefig(outfile, bbox_inches='tight', dpi = 1000)

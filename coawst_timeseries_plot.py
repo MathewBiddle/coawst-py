@@ -37,7 +37,7 @@ locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
                    'CBIBS Susquehanna Flats','Larry tripod site']
 
 # get coords for Site of choice
-site = 'Lee7'
+site = 'Lee6'
 lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
 ## Using point location idx
@@ -46,15 +46,15 @@ lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
 #dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110906_20110926'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+#dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
 #inputfile = dir+'/upper_ches_his.nc'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110714201800_20111031231800'
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
-roms_in_dir = '/Volumes/Documents/ROMS_INPUT_FILES'
-river_frc = roms_in_dir+'/river_frc.nc'
+#roms_in_dir = '/Volumes/Documents/ROMS_INPUT_FILES'
+river_frc = dir+'/river_frc.nc'
 
 f_river = netCDF4.Dataset(river_frc, 'r')
 river_time = f_river.variables['river_time'][:]
