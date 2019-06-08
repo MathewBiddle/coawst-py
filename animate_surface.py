@@ -41,16 +41,16 @@ cax = ax.pcolormesh(lon, lat, mud_01[0, :-1, :-1],
                     vmin=0, vmax=1, cmap='BrBG_r')
 fig.colorbar(cax)
 
-Writer = animation.writers['gif']
-writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+#Writer = animation.writers['gif']
+#writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
 
 def animate(i):
     cax.set_array(mud_01[i, :-1, :-1].flatten())
     plt.title('%s %s'% (dvar, datetime_list[i]))
 
 
-anim = animation.FuncAnimation(fig, animate)
-plt.draw()
-plt.show()
+anim = animation.FuncAnimation(fig, animate, frames=len(datetime_list))
+#plt.draw()
+#plt.show()
 
-anim.save('out.gif', writer='imagemagick')
+anim.save('out.gif', writer='imagemagick', fps=10)
