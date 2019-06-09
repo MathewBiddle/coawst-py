@@ -37,14 +37,20 @@ epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variable
 dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
 time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
+#datevar=[]
 for sec in ocean_time:
-    ts = sec/(12*3600)
-    datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+    #ts = sec/(12*3600)
+    #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+    datetime_list.append(netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
+#sys.exit()
 
+cbibs_u = fcbibs.variables['eastward_water_velocity'][:, 2] # time,depth
+cbibs_v = fcbibs.variables['northward_water_velocity'][:, 2] # time,depth
+cbibs_mag = np.sqrt(cbibs_u**2 + cbibs_v**2)
 
-cbibs_turb = fcbibs.variables['turbidity'][:]
-cbibs_time = fcbibs.variables['time2'][:]
+#cbibs_turb = np.ma.masked_equal(cbibs_turb, cbibs_turb.min())
+cbibs_time = fcbibs.variables['time3'][:]
 #Geolocation is 39.5404, -76.0736
 cbibs_lon = -76.0736
 cbibs_lat = 39.5404
@@ -52,9 +58,11 @@ cbibs_lat = 39.5404
 #cbibs_lon = fcbibs.variables['longitude'][:]
 
 cbibs_date=[]
-for i in range(len(cbibs_time)):
-    cbibs_date.append(datetime.datetime.fromordinal(int(cbibs_time[i])) + datetime.timedelta(days=cbibs_time[i]%1) - datetime.timedelta(days = 366))
-
+for days in cbibs_time:
+    #cbibs_date.append(
+    #    netCDF4.num2date(days, units=fcbibs.variables['time3'].units))
+    cbibs_date.append(datetime.datetime.fromordinal(int(days)) + datetime.timedelta(days=days%1) - datetime.timedelta(days = 366))
+#cbibs_date = cbibs_date + datetime.timedelta(days=1)
 # epoch_date = '%s %s'%(fcbibs.variables['time2'].units.split(' ')[-3], fcbibs.variables['time2'].units.split(' ')[-2])
 # dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
 # time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
@@ -66,6 +74,8 @@ for i in range(len(cbibs_time)):
 lat_pt = cbibs_lat
 lon_pt = cbibs_lon
 
+#x=36
+#y=17
 try:
     lat_pt
     lon_pt
@@ -77,21 +87,47 @@ else:
     y = np.abs(f.variables['lat_rho'][1, :]-lat_pt).argmin()
 
 
-plant_height = f.variables['plant_height'][0, 0, :, :]
-plant_height = np.ma.masked_greater(plant_height, 1)
-plant_height[x, y] = 1
+#plant_height = f.variables['plant_height'][0, 0, :, :]
+#plant_height = np.ma.masked_greater(plant_height, 1)
+#plant_height[x, y] = 1
 #plt.figure(1)
 #plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
 
 
-mud_tot = f.variables['mud_01'][:, :, x, y]
-mud = np.sum(mud_tot, axis=1)
-sand_tot = f.variables['sand_01'][:, :, x, y]
-sand = np.sum(sand_tot, axis=1)
+ubar = f.variables['ubar_eastward'][:, x, y]
+#mud = mud_tot
+#mud = np.mean(mud_tot, axis=1)
+vbar = f.variables['vbar_northward'][:, x, y]
+#sand = sand_tot
+#sand = np.mean(sand_tot, axis=1)
 
-SSC = mud + sand
-plt.figure(2)
-plt.plot_date(datetime_list,SSC,label='COAWST SSC')
-plt.plot_date(cbibs_date,cbibs_turb, label='CBIBS')
-plt.legend(loc='upper left')
+mag_vel = np.sqrt(ubar**2 + vbar**2)
+#SSC = mud + sand
+fig, (ax) = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(12, 8))
+ax.plot_date(datetime_list,mag_vel,label='COAWST',
+              xdate=True, linestyle='-', linewidth=1,
+              marker='', markersize=1, color='r')
+#ax.spines['left'].set_color('red')
+#ax.tick_params(axis='y', colors='red')
+#ax.set_ylabel('COAWST vbar [m/s]')
+#ax.yaxis.label.set_color('red')
+
+xlim = ax.get_xlim()
+#ax.grid(True)
+#ax2v = ax.twinx()
+ax.plot_date(cbibs_date,cbibs_mag, label='CBIBS',
+              xdate=True, linestyle='-', linewidth=1,
+              marker='.', markersize=1, color='b')
+#ax2v.set_ylabel('CBIBS v [m/s]')
+#ax2v.tick_params(axis='y', colors='blue')
+#ax2v.yaxis.label.set_color('blue')
+#ax2v.grid(True)
+#ax2v.set_ylim([-2, 0.25])
+#ax2v.set_xlim(xlim)
+ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+
+ax.set_ylim([0, 2.5])
+ax.set_xlim(xlim)
+ax.legend(loc='upper left')
 

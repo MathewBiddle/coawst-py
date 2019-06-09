@@ -23,13 +23,15 @@ ocean_time = f.variables['ocean_time'][:]
 #lon = f.variables['lon_rho'][:][:]
 
 ## Do some date conversions ##
-epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
-dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
-time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
+#epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
+#dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
+#time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
 for sec in ocean_time:
-    ts = sec/(12*3600)
-    datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+    #ts = sec/(12*3600)
+    datetime_list.append(
+        netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
+    #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
 dvar = 'mud_01'
 mud_01 = f.variables[dvar][:, 0, :, :]

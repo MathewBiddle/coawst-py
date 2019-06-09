@@ -62,13 +62,15 @@ river_time = f_river.variables['river_time'][:]
 river_transport = f_river.variables['river_transport'][:, 0]
 
 ## Do some date conversions ##
-epoch_date = '%s %s'%(f_river.variables['river_time'].units.split(' ')[-2], f_river.variables['river_time'].units.split(' ')[-1])
-dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
-time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
+#epoch_date = '%s %s'%(f_river.variables['river_time'].units.split(' ')[-2], f_river.variables['river_time'].units.split(' ')[-1])
+#dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
+#time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 river_datetime_list=[]
 for sec in river_time:
     ts = sec/(12*3600)
-    river_datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+    river_datetime_list.append(
+        netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
+    #river_datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
 try:
     lat_pt
@@ -85,13 +87,15 @@ ocean_time = f.variables['ocean_time'][:]
 #lon = f.variables['lon_rho'][:][:]
 
 ## Do some date conversions ##
-epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
-dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
-time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
+#epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
+#dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
+#time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
 for sec in ocean_time:
-    ts = sec/(12*3600)
-    datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
+    #ts = sec/(12*3600)
+    datetime_list.append(
+        netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
+    #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
 # Verify point location
 plant_height = f.variables['plant_height'][0, 0, :, :]
