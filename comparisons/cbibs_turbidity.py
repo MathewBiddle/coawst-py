@@ -89,10 +89,10 @@ else:
 
 mud_tot = f.variables['mud_01'][:, :, x, y]
 #mud = mud_tot
-mud = np.mean(mud_tot, axis=1)
+mud = np.mean(mud_tot, axis=1)  # integrate w/ depth
 sand_tot = f.variables['sand_01'][:, :, x, y]
 #sand = sand_tot
-sand = np.mean(sand_tot, axis=1)
+sand = np.mean(sand_tot, axis=1)  # integrate w/ depth
 
 SSC = mud + sand
 fig, (ax) = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(12, 8))

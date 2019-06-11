@@ -116,7 +116,7 @@ xlim = ax.get_xlim()
 #ax.grid(True)
 #ax2v = ax.twinx()
 ax.plot_date(cbibs_date,cbibs_mag, label='CBIBS',
-              xdate=True, linestyle='-', linewidth=1,
+              xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1, color='b')
 #ax2v.set_ylabel('CBIBS v [m/s]')
 #ax2v.tick_params(axis='y', colors='blue')

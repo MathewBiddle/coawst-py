@@ -33,23 +33,13 @@ lat_max = locs.loc[locs['Site'] == '3','lat']+.08
 lat_min = locs.loc[locs['Site'] == '3','lat']-.16
 lon_min = locs.loc[locs['Site'] == '3','lon']-.1
 lon_max = locs.loc[locs['Site'] == '3','lon']+.1
-#m = Basemap(llcrnrlon=lon_min,llcrnrlat=lat_min,urcrnrlon=lon_max,urcrnrlat=lat_max,
-#             resolution='i', projection='merc', lat_ts=locs['lat'].mean())
+
+# build map
 m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=lat_max,
     resolution='i', projection='merc', lat_ts=locs.loc[locs['Site'] == '3', 'lat'], epsg=3395)
 
-#lon=list(locs['lon'])
-#lat=list(locs['lat'])
-
-#x,y = m(lon,lat)
-# draw coastlines.
+# add background
 m.arcgisimage(service="Canvas/World_Light_Gray_Base",xpixels = 3000)
-
-#,5,color='r',edgecolors='k',latlon=True,linewidths=0.3)
-
-# for label, xpt, ypt in zip(locs['Site'], locs['lon'], locs['lat']):
-#     if label != 'Lee5':
-#         plt.annotate(xpt, ypt, label, size='x-small')
 
 #dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110906_20110926'
@@ -63,23 +53,29 @@ lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
 h = f.variables['h'][:][:]
 mask = f.variables['mask_rho'][:][:]
-mask = np.ma.masked_equal(mask,0)
-h.mask = mask.mask
+mask = np.ma.masked_equal(mask, 0)
+h.mask = mask.mask # apply mask
 plant_height = f.variables['plant_height'][0, 0, :, :]
 plant_height = np.ma.masked_outside(plant_height,0.3,1)
 #plant_height = np.ma.masked_greater(plant_height, 1)
 #plant_height = np.ma.masked_less(plant_height, 0.3)
+
+# plot bathymetry
 m.pcolormesh(lon, lat, h, latlon=True, cmap='viridis_r')
 cbar = m.colorbar()
 cbar.ax.set_ylabel('NOS MLLW bathymetry [meters]', rotation=270, fontdict=dict(size=5))
 cbar.ax.tick_params(labelsize=5)
+
+# plot pant height
 m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
 
+## Do mapping for points
 lon=list(locs['lon'])
 lat=list(locs['lat'])
 
 x,y = m(lon,lat)
 
+# plot stations
 plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
 for label, xpt, ypt in zip(locs['Site'], x, y):
     if label not in ['Lee5','Lee2.5','Lee2','Lee0','LeeS2']:
@@ -89,7 +85,32 @@ for label, xpt, ypt in zip(locs['Site'], x, y):
             plt.text(xpt+500, ypt, label, fontdict=dict(size=5))
 
 
-plt.title('Site locations and SAV distribution',fontdict=dict(size=5))
+# Transects
+# identify the points to extract data
+# Susquehanna River mouth
+t1_name = 'S.R. Mouth'
+t1x = np.array([29, 33])
+t1y = np.array([13, 9])
+t1lon=[f.variables['lon_rho'][t1x[0], t1y[0]], f.variables['lon_rho'][t1x[1], t1y[1]]]
+t1lat=[f.variables['lat_rho'][t1x[0], t1y[0]], f.variables['lat_rho'][t1x[1], t1y[1]]]
+
+t1xm, t1ym = m(t1lon, t1lat)
+m.plot(t1xm, t1ym, '-', color='k', linewidth=2)
+plt.text(np.max(t1xm)+100, np.max(t1ym)+100, 'T1', fontdict=dict(size=5))
+
+# Turkey Point to Sandy Point
+t2_name = 'Turkey Pt to Sandy Pt'
+t2x = np.array([42,67])  #
+t2y = np.array([58, 58])
+t2lon=[f.variables['lon_rho'][t2x[0], t2y[0]], f.variables['lon_rho'][t2x[1], t2y[1]]]
+t2lat=[f.variables['lat_rho'][t2x[0], t2y[0]], f.variables['lat_rho'][t2x[1], t2y[1]]]
+
+t2xm, t2ym = m(t2lon, t2lat)
+m.plot(t2xm, t2ym, '-', color='k', linewidth=2)
+plt.text(np.min(t2xm)-1000, np.mean(t2ym), 'T2', fontdict=dict(size=5))
+
+
+plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
 
