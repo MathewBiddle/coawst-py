@@ -13,7 +13,7 @@ import datetime
 import time
 import netCDF4
 import coawstpy
-#import pandas as pd
+import pandas as pd
 
 # bring in the data
 #dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
@@ -25,57 +25,47 @@ dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
-CBIBS_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc'
-fcbibs = netCDF4.Dataset(CBIBS_file, 'r')
+eotb_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/Eyes_on_the_bay/EOTBData_Susquehanna_01Jul11_TO_01Nov11.csv'
+feotb = pd.read_csv(eotb_file, header=0, parse_dates=['DateTime'], infer_datetime_format=True)
 
 ocean_time = f.variables['ocean_time'][:]
 lat = f.variables['lat_rho'][:][:]
 lon = f.variables['lon_rho'][:][:]
 
 ## Do some date conversions ##
-epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
-dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
-time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
+#epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
+#dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
+#time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
-#datevar=[]
 for sec in ocean_time:
+    datetime_list.append(
+        netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
     #ts = sec/(12*3600)
     #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
-    datetime_list.append(netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
+
 
 #sys.exit()
-
-cbibs_u = fcbibs.variables['eastward_water_velocity'][:, 2] # time,depth
-cbibs_v = fcbibs.variables['northward_water_velocity'][:, 2] # time,depth
-cbibs_mag = np.sqrt(cbibs_u**2 + cbibs_v**2)
-
-#cbibs_turb = np.ma.masked_equal(cbibs_turb, cbibs_turb.min())
-cbibs_time = fcbibs.variables['time3'][:]
+eotb_turb = feotb['Turb_NTU'].values
+#eotb_turb = np.ma.masked_equal(eotb_turb, eotb_turb.min())
+feotb['DateTimeUTC'] = feotb['DateTime'] #+pd.DateOffset(hours=4)
+eotb_date = feotb['DateTimeUTC'].values
 #Geolocation is 39.5404, -76.0736
-cbibs_lon = -76.0736
-cbibs_lat = 39.5404
-#cbibs_lat = fcbibs.variables['latitude'][:]
-#cbibs_lon = fcbibs.variables['longitude'][:]
+eotb_lon = -76.0848
+eotb_lat = 39.5478
+#eotb_lat = feotb.variables['latitude'][:]
+#eotb_lon = feotb.variables['longitude'][:]
 
-cbibs_date=[]
-for days in cbibs_time:
-    #cbibs_date.append(
-    #    netCDF4.num2date(days, units=fcbibs.variables['time3'].units))
-    cbibs_date.append(datetime.datetime.fromordinal(int(days)) + datetime.timedelta(days=days%1) - datetime.timedelta(days = 366))
-#cbibs_date = cbibs_date + datetime.timedelta(days=1)
-# epoch_date = '%s %s'%(fcbibs.variables['time2'].units.split(' ')[-3], fcbibs.variables['time2'].units.split(' ')[-2])
+# epoch_date = '%s %s'%(feotb.variables['time2'].units.split(' ')[-3], feotb.variables['time2'].units.split(' ')[-2])
 # dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
 # time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
-# cbibs_date=[]
-# for sec in cbibs_time:
+#eotb_date=feotb['DateTime'].values
+# for sec in eotb_time:
 #     ts = sec/(12*3600)
-#     cbibs_date.append(datetime.datetime.fromtimestamp(sec+time_diff))
+#     eotb_date.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
-lat_pt = cbibs_lat
-lon_pt = cbibs_lon
+lat_pt = eotb_lat
+lon_pt = eotb_lon
 
-#x=36
-#y=17
 try:
     lat_pt
     lon_pt
@@ -94,44 +84,37 @@ else:
 #plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
 
 
-ubar = f.variables['ubar_eastward'][:, x, y]
+mud_tot = f.variables['mud_01'][:, :, x, y]
 #mud = mud_tot
-#mud = np.mean(mud_tot, axis=1)
-vbar = f.variables['vbar_northward'][:, x, y]
+mud = np.mean(mud_tot, axis=1)  # integrate w/ depth
+sand_tot = f.variables['sand_01'][:, :, x, y]
 #sand = sand_tot
-#sand = np.mean(sand_tot, axis=1)
+sand = np.mean(sand_tot, axis=1)  # integrate w/ depth
 
-mag_vel = np.sqrt(ubar**2 + vbar**2)
-#SSC = mud + sand
+SSC = mud + sand
 fig, (ax) = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(12, 8))
-ax.plot_date(datetime_list,mag_vel,label='COAWST',
+ax.plot_date(datetime_list,sand,label='COAWST sand',
               xdate=True, linestyle='-', linewidth=1,
               marker='', markersize=1, color='r')
+ax.plot_date(datetime_list,mud,label='COAWST mud',
+              xdate=True, linestyle='-', linewidth=1,
+              marker='', markersize=1, color='g')
 #ax.spines['left'].set_color('red')
-#ax.tick_params(axis='y', colors='red')
-#ax.set_ylabel('COAWST vbar [m/s]')
-#ax.yaxis.label.set_color('red')
-
+ax.tick_params(axis='y', colors='red')
+ax.set_ylabel('COAWST SSC [kg/m3]')
+ax.yaxis.label.set_color('red')
 xlim = ax.get_xlim()
 #ax.grid(True)
-#ax2v = ax.twinx()
-ax.plot_date(cbibs_date,cbibs_mag, label='CBIBS',
+ax2v = ax.twinx()
+ax2v.plot_date(eotb_date,eotb_turb, label='Havre de Grace',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1, color='b')
-#ax2v.set_ylabel('CBIBS v [m/s]')
-#ax2v.tick_params(axis='y', colors='blue')
-#ax2v.yaxis.label.set_color('blue')
+ax2v.set_ylabel('Havre de Grace Turbidity [NTU]')
+ax2v.tick_params(axis='y', colors='blue')
+ax2v.yaxis.label.set_color('blue')
 #ax2v.grid(True)
-#ax2v.set_ylim([-2, 0.25])
-#ax2v.set_xlim(xlim)
+ax2v.set_xlim(xlim)
 ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax.xaxis.set_major_formatter(DateFormatter("%m/%d"))
-
-ax.set_ylim([0, 2.5])
-ax.set_xlim(xlim)
-ax.set_ylabel('Water Velocity [m/s]')
 ax.legend(loc='upper left')
 
-#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/CBIBS_Velocity_comparison.png'
-
-#plt.savefig(outfile, bbox_inches='tight', dpi = 1000)

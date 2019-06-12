@@ -2,10 +2,11 @@ import scipy.io as sio
 import numpy as np
 import pandas as pd
 
+# Get observational data
 obs_file = str('/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/'
                'Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat')
 
-obs_data=sio.loadmat(obs_file, struct_as_record=False, squeeze_me=True)
+obs_data = sio.loadmat(obs_file, struct_as_record=False, squeeze_me=True)
 
 ldf = pd.DataFrame(columns=obs_data['DWV']._fieldnames)
 

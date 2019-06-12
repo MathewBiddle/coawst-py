@@ -25,6 +25,7 @@ def stick_plot(time, u, v, **kw):
                   headlength=headlength, headaxislength=headaxislength,
                   **kw)
 
-    ax.axes.get_yaxis().set_visible(False)
+    ax.axes.get_yaxis().set_ticks([])
+    #ax.axes.get_yaxis().set_visible(False)
     ax.xaxis_date()
     return q

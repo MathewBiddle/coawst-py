@@ -38,9 +38,10 @@ locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
                    'CBIBS Susquehanna Flats','Larry tripod site']
 
 # get coords for Site of choice
-site = 'Lee6'
+site = 'CBIBS'
 lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
+z_pt = 4 # 0=bottom 4=surface
 ## Using point location idx
 #x = 56   # 57
 #y = 27      #
@@ -92,9 +93,13 @@ ocean_time = f.variables['ocean_time'][:]
 #time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
 for sec in ocean_time:
-    #ts = sec/(12*3600)
-    datetime_list.append(
-        netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
+    if sec == 0.0:
+        datetime_list.append(
+            netCDF4.num2date(sec + 0.0000000000000001, units=f.variables['ocean_time'].units,
+                             calendar=f.variables['ocean_time'].calendar))
+    else:
+        datetime_list.append(
+            netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
     #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
 # Verify point location
@@ -106,10 +111,29 @@ plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_hei
 plt.title('Site %s' % site)
 
 
+ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+ptsfile = ptsdir+"/tripod_wave.pts"
+#file='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/SWAN_20130705_20130715_FRICTION_NOVEG_30SEC_JANSSEN_pt4+Bathy/tripod_wave.pts'
+
+
+ptsdf = pd.read_fwf(ptsfile, header=4)#,widths=[18,16,16,16,16,16,16,16,16])#,skiprows=range(0,5))
+
+ptsdf.drop([0,1],axis=0,inplace=True)
+ptsdf.rename(columns={'%       Time':'Time'},inplace=True)
+ptsdf['Yp'] = ptsdf['Yp            Hsig'].astype(str).str.split("    ",expand=True)[0].astype(float)
+ptsdf['Hsig'] = ptsdf['Yp            Hsig'].astype(str).str.split("    ",expand=True)[1].astype(float)
+ptsdf.drop(columns=['Yp            Hsig'],inplace=True)
+
+ptsdf['Time']=pd.to_datetime(ptsdf['Time'],format='%Y%m%d.%H%M%S',utc=True)
+ptsdf['Hsig']=ptsdf['Hsig'].astype(float)
+ptsdf['X-Windv']=ptsdf['X-Windv'].astype(float)
+ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
+
+
 # plot variables as time series
 myFmt = DateFormatter("%m/%d")
 
-var2plot = ['depth','velocity','Hwave','tke','mud+sand','bed_thickness','river_transport']
+var2plot = ['depth','velocity','Hwave','tke','mud+sand','bed_thickness','river_transport','wind']
 
 fig, (ax) = plt.subplots(nrows=len(var2plot), ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.05)
@@ -117,26 +141,26 @@ dayint = 10
 for i, ax in enumerate(fig.axes):
     if (var2plot[i] == 'rho') or (var2plot[i] == 'salt') or (var2plot[i] == 'tke') or (var2plot[i] == 'mud_01') or \
             (var2plot[i] == 'sand_01') or (var2plot[i] == 'temp'):
-        ax.plot_date(datetime_list, f.variables[var2plot[i]][:, 0, x, y], xdate=True, linestyle='-', linewidth=0.5,
+        ax.plot_date(datetime_list, f.variables[var2plot[i]][:, z_pt, x, y], xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
-        ax.set_ylabel('%s' % (f.variables[var2plot[i]].name))  # , f.variables[var2plot[i]].units))
+        ax.set_ylabel('%s_%s' % (f.variables[var2plot[i]].name,(z_pt+1)))  # , f.variables[var2plot[i]].units))
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
         xlim = ax.get_xlim()
 
     elif var2plot[i] == 'mud+sand':
-        ax.plot_date(datetime_list, f.variables['mud_01'][:, 0, x, y], xdate=True, linestyle='-',linewidth=0.5,
-                     marker='',markersize=1,color='b')
-        ax.set_ylabel('mud_SSC',color='b')  #
+        ax.plot_date(datetime_list, f.variables['mud_01'][:, z_pt, x, y], xdate=True, linestyle='-',linewidth=0.5,
+                     marker='', markersize=1, color='b')
+        ax.set_ylabel('mud_SSC_%s' % (z_pt+1), color='b')  #
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
-
+        ax.set_ylim(0, 0.5)
         ylims = ax.get_ylim()
         ax2v = ax.twinx()
-        ax2v.plot_date(datetime_list, f.variables['sand_01'][:, 0, x, y], xdate=True, linestyle='-', linewidth=0.5,
-                     marker='',markersize=1,color='r')
-        ax2v.set_ylabel('%s' % ('sand_SSC'),color='r')
+        ax2v.plot_date(datetime_list, f.variables['sand_01'][:, z_pt, x, y], xdate=True, linestyle='-', linewidth=0.5,
+                     marker='', markersize=1, color='r')
+        ax2v.set_ylabel('sand_SSC_%s' % (z_pt+1), color='r')
         ax2v.set_ylim(ylims)
         ax2v.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax2v.xaxis.set_major_formatter(myFmt)
@@ -193,7 +217,13 @@ for i, ax in enumerate(fig.axes):
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
-
+    elif var2plot[i] == 'wind':
+        coawstpy.stick_plot(ptsdf['Time'], ptsdf['X-Windv'], ptsdf['Y-Windv'], ax=ax)
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+        ax.xaxis.set_major_formatter(myFmt)
+        ax.xaxis.grid(True)
+        #ax.get_yaxis().set_ticks([])
+        ax.set_ylabel('Wind')
     else:
         ax.plot_date(datetime_list, f.variables[var2plot[i]][:, x, y], xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
@@ -204,4 +234,3 @@ for i, ax in enumerate(fig.axes):
 fig.suptitle('Site %s @ %fN %fE' % (site, f.variables['lat_rho'][x, y], f.variables['lon_rho'][x, y]))
 #fig.axes[0].title('test')
 
-#q = coawstpy.stick_plot(datetime_list, f.variables['ubar_eastward'][:,x,y], f.variables['vbar_northward'][:,x,y])
