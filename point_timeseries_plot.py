@@ -38,7 +38,7 @@ locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
                    'CBIBS Susquehanna Flats','Larry tripod site']
 
 # get coords for Site of choice
-site = 'CBIBS'
+site = 'Lee7'
 lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
 z_pt = 4 # 0=bottom 4=surface
@@ -109,7 +109,8 @@ plant_height[x, y] = 1
 plt.figure(1)
 plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
 plt.title('Site %s' % site)
-
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/%s_map.png' % site
+#plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
 
 ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
 ptsfile = ptsdir+"/tripod_wave.pts"
@@ -133,7 +134,7 @@ ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
 # plot variables as time series
 myFmt = DateFormatter("%m/%d")
 
-var2plot = ['depth','velocity','Hwave','tke','mud+sand','bed_thickness','river_transport','wind']
+var2plot = ['depth','Hwave','velocity','mud+sand','bed_thickness','river_transport','wind']
 
 fig, (ax) = plt.subplots(nrows=len(var2plot), ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.05)
@@ -150,80 +151,98 @@ for i, ax in enumerate(fig.axes):
         xlim = ax.get_xlim()
 
     elif var2plot[i] == 'mud+sand':
-        ax.plot_date(datetime_list, f.variables['mud_01'][:, z_pt, x, y], xdate=True, linestyle='-',linewidth=0.5,
+        ax.plot_date(datetime_list, f.variables['mud_01'][:, z_pt, x, y], label='mud', xdate=True, linestyle='-',linewidth=0.5,
                      marker='', markersize=1, color='b')
-        ax.set_ylabel('mud_SSC_%s' % (z_pt+1), color='b')  #
+        ax.plot_date(datetime_list, f.variables['sand_01'][:, z_pt, x, y], label='sand', xdate=True, linestyle='-', linewidth=0.5,
+                     marker='', markersize=1, color='r')
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
+
         ax.set_ylim(0, 0.5)
-        ylims = ax.get_ylim()
-        ax2v = ax.twinx()
-        ax2v.plot_date(datetime_list, f.variables['sand_01'][:, z_pt, x, y], xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1, color='r')
-        ax2v.set_ylabel('sand_SSC_%s' % (z_pt+1), color='r')
-        ax2v.set_ylim(ylims)
-        ax2v.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
-        ax2v.xaxis.set_major_formatter(myFmt)
+#        ax.yaxis.tick_right()
+#        ax.yaxis.set_label_position("right")
+        ax.set_ylabel('SSC [kg/m3]')
         ax.grid(True)
+        ax.legend(loc="upper left")
+        xlim = ax.get_xlim()
 
     elif var2plot[i] == 'velocity':
-        #ax.plot_date(datetime_list,
-        #             np.sqrt(np.add(f.variables['ubar_eastward'][:, x, y]**2, f.variables['vbar_northward'][:, x, y]**2)),
-        #             xdate=True, linestyle='-', linewidth=1, marker='', markersize=1)
-        ax.plot_date(datetime_list,f.variables['ubar_eastward'][:, x, y],
+        ax.plot_date(datetime_list,f.variables['ubar_eastward'][:, x, y], label='u',
                      xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1, color='b')
-        ax.set_ylabel('%s' % (f.variables['ubar_eastward'].name), color='b')  #
+        ax.plot_date(datetime_list,f.variables['vbar_northward'][:, x, y], label='v',
+                       xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1, color='r')
+
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
         ax.xaxis.set_major_formatter(myFmt)
-
-        ax2v = ax.twinx()
-        ax2v.plot_date(datetime_list,f.variables['vbar_northward'][:, x, y],
-                       xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1, color='r')
-        ax2v.set_ylabel('%s' % (f.variables['vbar_northward'].name), color='r')  # , f.variables[var2plot[i]].units))
-        ax2v.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
-        #ylim = max(np.abs([np.min(ax2v.get_ylim()), np.max(ax.get_ylim())]))
-        #ax2v.set_ylim(-1*ylim, ylim)
-        ax2v.set_ylim(-0.6, 0.6)
-        #ylims = ax2v.get_ylim()
-        #ax.set_ylim(-1*ylim, ylim)
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
+        ax.set_ylabel('Current [m/s]')
         ax.set_ylim(-0.6, 0.6)
-        ax2v.xaxis.set_major_formatter(myFmt)
+        ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
+        ax.legend(loc="upper left")
+        xlim = ax.get_xlim()
 
     elif var2plot[i] == 'bed_thickness':
         ax.stackplot(datetime_list,f.variables[var2plot[i]][:, 2, x, y],
                      f.variables[var2plot[i]][:, 1, x, y],
                      f.variables[var2plot[i]][:, 0, x, y])
-        ax.set_ylabel('%s' % (f.variables[var2plot[i]].name))
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
+        ax.set_ylabel('bed [m]')
         ax.set_ylim(0.8, 1.1)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
+        xlim = ax.get_xlim()
 
     elif var2plot[i] == 'river_transport':
-        ax.plot_date(river_datetime_list, river_transport * f_river.variables['river_transport'].shape[1],
+        # river trnasport had 20% reduction and destributed across cells. Need to back calculate
+        ax.plot_date(river_datetime_list, (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
                      xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
-        ax.set_ylabel('river_trans')
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
         ax.set_xlim(xlim)
+        #ax.yaxis.tick_right()
+        #ax.yaxis.set_label_position("right")
+        ax.set_ylabel('Q [m3/s]')
+
     elif var2plot[i] == 'depth':
         ax.plot_date(datetime_list, f.variables['zeta'][:, x, y]+f.variables['h'][x,y], xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
-        ax.set_ylabel('water_depth')
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
+        ax.set_ylabel('Depth [m]')
         ax.set_ylim(0,6)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
+        xlim = ax.get_xlim()
+
     elif var2plot[i] == 'wind':
         coawstpy.stick_plot(ptsdf['Time'], ptsdf['X-Windv'], ptsdf['Y-Windv'], ax=ax)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.xaxis.grid(True)
         #ax.get_yaxis().set_ticks([])
+        ax.yaxis.tick_right()
+        ax.yaxis.set_label_position("right")
         ax.set_ylabel('Wind')
+        xlim = ax.get_xlim()
+
+    elif var2plot[i] == 'Hwave':
+        ax.plot_date(datetime_list, f.variables[var2plot[i]][:, x, y], xdate=True, linestyle='-', linewidth=0.5,
+                     marker='', markersize=1)
+        #ax.yaxis.tick_right()
+        #ax.yaxis.set_label_position("right")
+        ax.set_ylabel('Sig. Wave H. [m]')
+        ax.set_ylim(0,0.4)
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+        ax.xaxis.set_major_formatter(myFmt)
+        ax.grid(True)
+        xlim = ax.get_xlim()
     else:
         ax.plot_date(datetime_list, f.variables[var2plot[i]][:, x, y], xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
@@ -231,6 +250,12 @@ for i, ax in enumerate(fig.axes):
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
+        xlim = ax.get_xlim()
+
 fig.suptitle('Site %s @ %fN %fE' % (site, f.variables['lat_rho'][x, y], f.variables['lon_rho'][x, y]))
 #fig.axes[0].title('test')
+
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/site_%s_timeseries_lowres.png' % site
+#print("Saving to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
 
