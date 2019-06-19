@@ -55,10 +55,16 @@ h = f.variables['h'][:][:]
 mask = f.variables['mask_rho'][:][:]
 mask = np.ma.masked_equal(mask, 0)
 h.mask = mask.mask # apply mask
-plant_height = f.variables['plant_height'][0, 0, :, :]
-plant_height = np.ma.masked_outside(plant_height,0.3,1)
+plant_height_orig = f.variables['plant_height'][0, 0, :, :]
+plant_height_orig = np.ma.masked_outside(plant_height_orig,0.3,1)
 #plant_height = np.ma.masked_greater(plant_height, 1)
 #plant_height = np.ma.masked_less(plant_height, 0.3)
+
+# shift plant distribution to right by one cell
+zeroes = np.zeros((1, 100))
+plant_height = np.concatenate((zeroes,plant_height_orig),0)
+plant_height = np.delete(plant_height, 100, 0)
+plant_height = np.ma.masked_outside(plant_height,0.3,1)
 
 # plot bathymetry
 m.pcolormesh(lon, lat, h, latlon=True, cmap='viridis_r')
@@ -68,6 +74,7 @@ cbar.ax.tick_params(labelsize=5)
 
 # plot pant height
 m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
+#m.pcolormesh(lon, lat, plant_height_orig, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
 
 ## Do mapping for points
 lon=list(locs['lon'])
