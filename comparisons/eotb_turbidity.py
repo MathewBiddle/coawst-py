@@ -16,12 +16,7 @@ import coawstpy
 import pandas as pd
 
 # bring in the data
-#dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110906_20110926'
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-#dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
-#inputfile = dir+'/upper_ches_his.nc'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110714201800_20111031231800'
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
@@ -33,25 +28,17 @@ lat = f.variables['lat_rho'][:][:]
 lon = f.variables['lon_rho'][:][:]
 
 ## Do some date conversions ##
-#epoch_date = '%s %s'%(f.variables['ocean_time'].units.split(' ')[-2], f.variables['ocean_time'].units.split(' ')[-1])
-#dt_obj = datetime.datetime.strptime(epoch_date, '%Y-%m-%d %H:%M:%S')
-#time_diff = time.mktime(dt_obj.timetuple())-time.mktime(datetime.datetime(1970, 1, 1, 0, 0, 0).timetuple())
 datetime_list=[]
 for sec in ocean_time:
     datetime_list.append(
         netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
-    #ts = sec/(12*3600)
-    #datetime_list.append(datetime.datetime.fromtimestamp(sec+time_diff))
 
-
-#sys.exit()
 eotb_turb = feotb['Turb_NTU'].values
-#eotb_turb = np.ma.masked_equal(eotb_turb, eotb_turb.min())
-feotb['DateTimeUTC'] = feotb['DateTime'] #+pd.DateOffset(hours=4)
+feotb['DateTimeUTC'] = feotb['DateTime']+pd.DateOffset(hours=4)
 eotb_date = feotb['DateTimeUTC'].values
-#Geolocation is 39.5404, -76.0736
 eotb_lon = -76.0848
 eotb_lat = 39.5478
+eotb_depth = 1.0# 3.5 m Station Depth; 0.3 m above bottom; 1 m below surface before 2013.
 #eotb_lat = feotb.variables['latitude'][:]
 #eotb_lon = feotb.variables['longitude'][:]
 
