@@ -33,9 +33,13 @@ for sec in ocean_time:
     datetime_list.append(
         netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
-eotb_turb = feotb['Turb_NTU'].values
-feotb['DateTimeUTC'] = feotb['DateTime']+pd.DateOffset(hours=4)
-eotb_date = feotb['DateTimeUTC'].values
+# eotb_turb = feotb['Turb_NTU'].values
+tshift = pd.DateOffset(hours=0)
+feotb['DateTimeUTC'] = feotb['DateTime']-tshift
+
+# get only the data from out simulation
+eotb_turb = feotb.loc[(feotb['DateTimeUTC'] < datetime_list[-1]) & (feotb['DateTimeUTC'] > datetime_list[0]), ['Turb_NTU']].values
+eotb_date = feotb.loc[(feotb['DateTimeUTC'] < datetime_list[-1]) & (feotb['DateTimeUTC'] > datetime_list[0]), ['DateTimeUTC']].values
 eotb_lon = -76.0848
 eotb_lat = 39.5478
 eotb_depth = 1.0# 3.5 m Station Depth; 0.3 m above bottom; 1 m below surface before 2013.
@@ -70,38 +74,53 @@ else:
 #plt.figure(1)
 #plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
 
-
-mud_tot = f.variables['mud_01'][:, :, x, y]
+s_rho = 3
+mud = f.variables['mud_01'][:, s_rho, x, y]
 #mud = mud_tot
-mud = np.mean(mud_tot, axis=1)  # integrate w/ depth
-sand_tot = f.variables['sand_01'][:, :, x, y]
+#mud = np.mean(mud_tot, axis=1)  # integrate w/ depth
+sand = f.variables['sand_01'][:, s_rho, x, y]
 #sand = sand_tot
-sand = np.mean(sand_tot, axis=1)  # integrate w/ depth
+#sand = np.mean(sand_tot, axis=1)  # integrate w/ depth
 
 SSC = mud + sand
 fig, (ax) = plt.subplots(nrows=1, ncols=1, sharex=True, figsize=(12, 8))
-ax.plot_date(datetime_list,sand,label='COAWST sand',
-              xdate=True, linestyle='-', linewidth=1,
-              marker='', markersize=1, color='r')
-ax.plot_date(datetime_list,mud,label='COAWST mud',
-              xdate=True, linestyle='-', linewidth=1,
-              marker='', markersize=1, color='g')
-#ax.spines['left'].set_color('red')
-ax.tick_params(axis='y', colors='red')
+#ax.plot_date(datetime_list[0:-1], sand[0:-1], label='COAWST sand',
+#             xdate=True, linestyle='-', linewidth=1,
+#             marker='', markersize=1, color='r')
+#ax.plot_date(datetime_list[0:-1], mud[0:-1], label='COAWST mud',
+#             xdate=True, linestyle='-', linewidth=1,
+#             marker='', markersize=1, color='g')
+ax.plot_date(datetime_list[0:-1],SSC[0:-1],
+             xdate=True, linestyle='-', linewidth=1,
+             marker='', markersize=1,color='r')
+#ax.tick_params(axis='y', colors='red')
 ax.set_ylabel('COAWST SSC [kg/m3]')
 ax.yaxis.label.set_color('red')
+ax.tick_params(axis='y', colors='red')
 xlim = ax.get_xlim()
-#ax.grid(True)
 ax2v = ax.twinx()
-ax2v.plot_date(eotb_date,eotb_turb, label='Havre de Grace',
-              xdate=True, linestyle='', linewidth=1,
-              marker='.', markersize=1, color='b')
+ax2v.plot_date(eotb_date[range(0,len(eotb_date),4)], eotb_turb[range(0,len(eotb_date),4)], label='Havre de Grace',
+               xdate=True, linestyle='', linewidth=1,
+               marker='.', markersize=1, color='b')
 ax2v.set_ylabel('Havre de Grace Turbidity [NTU]')
 ax2v.tick_params(axis='y', colors='blue')
 ax2v.yaxis.label.set_color('blue')
-#ax2v.grid(True)
 ax2v.set_xlim(xlim)
 ax.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax.xaxis.set_major_formatter(DateFormatter("%m/%d"))
-ax.legend(loc='upper left')
+plt.title('%s' % tshift)
+#ax.legend(loc='upper left')
+
+
+## create turbidity-SSC scatter plot
+# x = turbidity
+# y = SSC
+
+fig2, (ax2) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+
+ax2.plot(eotb_turb[range(0,len(eotb_date),4)], SSC[0:-1], linestyle='', linewidth=1,
+        marker='.', markersize=2)
+ax2.set_xlabel('Havre de Grace Turbidity [NTU]')
+ax2.set_ylabel('COAWST total SSC [kg/m3]')
+plt.title('%s' % tshift)
 

@@ -57,11 +57,11 @@ plant_height[x_sr, y_sr] = 1
 # sum over depth
 mud_01 = f.variables['mud_01'][:]#, :, x, y]
 mud_01_trans_sr = mud_01[:, :, x_sr, y_sr]
-mud_sr = np.sum(mud_01_trans_sr, axis=1)
+mud_sr = np.sum(mud_01_trans_sr, axis=1) # integrate over depth
 
 sand_01 = f.variables['sand_01'][:]
 sand_01_trans_sr = sand_01[:, :, x_sr, y_sr]
-sand_sr = np.sum(sand_01_trans_sr, axis=1)
+sand_sr = np.sum(sand_01_trans_sr, axis=1) # integrate over depth
 
 # calculate water column volume for points x and y
 h = f.variables['h'][:]
