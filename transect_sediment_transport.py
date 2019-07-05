@@ -20,9 +20,21 @@ dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
+# Get the data we want
 ocean_time = f.variables['ocean_time'][:]
-lat = f.variables['lat_rho'][:][:]
-lon = f.variables['lon_rho'][:][:]
+lat = f.variables['lat_rho'][:]
+lon = f.variables['lon_rho'][:]
+h = f.variables['h'][:]
+zeta = f.variables['zeta'][:]
+mud_01 = f.variables['mud_01'][:]
+sand_01 = f.variables['sand_01'][:]
+ubar = f.variables['ubar_eastward'][:]
+vbar = f.variables['vbar_northward'][:]
+u = f.variables['u_eastward'][:]
+v = f.variables['v_northward'][:]
+pm = f.variables['pm'][:] #XI --> cell width in x dir.
+pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
+s_rho = f.variables['s_rho'][:] # depth levels
 
 ## Do some date conversions ##
 datetime_list=[]
@@ -40,29 +52,106 @@ x_sr = np.array([29,30,31,32])
 y_sr = np.array([13,12,11,10])
 
 # Turkey Point to Sandy Point
-#trans_name = 'Turkey Pt to Sandy Pt'
-#x = np.array(list(range(42,67)))  #
-#y = np.array([58]*len(x))
+trans_name_t2p = 'T2'
+x_t2p = np.array(list(range(42,67)))  #
+y_t2p = np.array([58]*len(x_sr))
 
 # Verify point location
 plant_height = f.variables['plant_height'][0, 0, :, :]
 plant_height = np.ma.masked_greater(plant_height, 1)
-plant_height[x_sr, y_sr] = 1
-# plt.figure(1)
-# plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
-# plt.title('%s Transect' % trans_name)
+for i in range(len(x_sr)):
+    plant_height[x_sr[i], y_sr[i]] = i
+
+#plt.figure()
+#plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
+#plt.title('%s Transect' % trans_name_sr)
 
 # calculate the total concentration at each time step for the transect (x,y) and depth.
-# (h+zeta)/(pm*pn) * mud_01_depth_sum(time,x,y)
-# sum over depth
-mud_01 = f.variables['mud_01'][:]#, :, x, y]
+#
+# For the transect comparisons, you should be using axial velocity instead of volume to compare the fluxes. 
+# So the flux through T1 is the axial component of the velocity in each cell times the predicted SSC in that
+# cell times the cross-sectional area of the cell, summed across all cells in the transect.  This calculation
+# is done at each time step.  The total sediment load delivered during the storm is then the time integral of
+# the flux over the duration of the storm.  Sometimes the fluxes will be negative, during flood tide before
+# or after the storm (especially at T2). 
+#
+#  rotate the components into along and cross channel?
+#   YES.  It is a pretty simple calculation, especially if you know the angle from geometrical considerations. 
+# The best way to do this when you are not sure of the angle is to find the major axis of the current ellipse. 
+# Which is essentially the same thing as doing a least squares fit to the scatter plot of the E-N (or x-y) velocities. 
+# You want one angle for the entire cross-section, not for each cell.
+
+# Gather subset data
 mud_01_trans_sr = mud_01[:, :, x_sr, y_sr]
-mud_sr = np.sum(mud_01_trans_sr, axis=1) # integrate over depth
-
-sand_01 = f.variables['sand_01'][:]
 sand_01_trans_sr = sand_01[:, :, x_sr, y_sr]
-sand_sr = np.sum(sand_01_trans_sr, axis=1) # integrate over depth
+ubar_trans_sr = ubar[:, x_sr, y_sr]
+vbar_trans_sr = vbar[:, x_sr, y_sr]
+v_trans_sr = v[:, :, x_sr, y_sr]
+u_trans_sr = u[:, :, x_sr, y_sr]
 
+angle=[]
+ux = np.empty(ubar_trans_sr.shape)
+vy = np.empty(ubar_trans_sr.shape)
+for t in range(0,ubar_trans_sr.shape[0]):  # time
+    angle.append(coawstpy.maj_ax(ubar_trans_sr[t, :], vbar_trans_sr[t, :])) # angle for entire cross-section
+    #  ux, uy = coawstpy.rot2xy(ubar_trans_sr[t, :], vbar_trans_sr[t, :], angle)
+    for xy in range(0, ubar_trans_sr.shape[1]):  # cell in xy
+        # ux - along channel velocity
+        # vy - cross channel velocity (positive to the left of the along channel
+        ux[t, xy], vy[t, xy] = coawstpy.rot2xy(ubar_trans_sr[t, xy], vbar_trans_sr[t, xy], angle[t])
+
+
+# plotting
+myFmt = DateFormatter("%m/%d")
+dayint = 30
+
+fig, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+
+ax1.plot_date(datetime_list, angle, marker='.', linestyle='', markersize=1)
+ax1.set_title('Calculated angle for cross-section at %s' % trans_name_sr)
+ax1.set_ylabel('Angle')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+ax1.xaxis.set_major_formatter(myFmt)
+
+axpos = int(np.sqrt(ubar_trans_sr.shape[1]))
+
+fig, (ax2) = plt.subplots(nrows=axpos, ncols=axpos, sharex=True, sharey=True, figsize=(12, 8),
+                         gridspec_kw={'hspace': 0, 'wspace': 0})
+ax2 = ax2.ravel()
+for i in range(ubar_trans_sr.shape[1]):
+    ax2[i].plot(ubar_trans_sr[:, i], vbar_trans_sr[:, i], marker='.', linestyle='', markersize=1)
+    ax2[i].set_title('cell %i' % i)
+plt.suptitle('Depth average velocity at %s (mean angle = %f)' % (trans_name_sr, np.mean(angle[1:])))
+fig.text(0.5, 0.04, 'Eastward (m/s)', ha='center', va='center')
+fig.text(0.06, 0.5, 'Northward (m/s)', ha='center', va='center', rotation='vertical')
+
+
+fig, (ax3) = plt.subplots(nrows=axpos, ncols=axpos, sharex=True, sharey=True, figsize=(12, 8),
+                         gridspec_kw={'hspace': 0, 'wspace': 0})
+ax3 = ax3.ravel()
+for i in range(ux.shape[1]):
+    ax3[i].plot_date(datetime_list, ux[:, i], marker='.', linestyle='', label='ux', markersize=1)
+    ax3[i].plot_date(datetime_list, vy[:, i], marker='.', linestyle='', label='vy', markersize=1)
+    ax3[i].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+    ax3[i].xaxis.set_major_formatter(myFmt)
+    ax3[i].set_title('cell %i' % i)
+ax3[i].legend(loc='lower right')
+plt.suptitle('Along (ux) and Cross (vy) channel depth avg. velocities at %s' % trans_name_sr)
+
+
+sys.exit()
+u = f.variables['u_eastward'][:]
+u_trans_sr = u[:, :, x_sr, y_sr]
+
+v = f.variables['v_northward'][:]
+v_trans_sr = v[:, :, x_sr, y_sr]
+
+for t in range(0,u_trans_sr.shape[0]):  # time
+    for z in range(0,u_trans_sr.shape[1]):  # depth
+        for xy in range(0,u_trans_sr.shape[2]):  # cell in xy
+            angle = coawstpy.maj_ax(u_trans_sr[t, z, xy], v_trans_sr[t, z, xy])
+
+sys.exit()
 # calculate water column volume for points x and y
 h = f.variables['h'][:]
 zeta = f.variables['zeta'][:]
