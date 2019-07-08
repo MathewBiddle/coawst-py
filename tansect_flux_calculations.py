@@ -89,19 +89,19 @@ for i in range(mud_01_trans.shape[1]):  # for each depth level
     t1_SSC_flux_xe[:, i, :] = t1_u_trans[:, i, :]*flux_face_y*SSC
 
 # variable initialize
-angle = []
+t1_angle = []
 t1_SSC_flux_ux_rot = np.empty(t1_SSC_flux_yn.shape)
 t1_SSC_flux_vy_rot = np.empty(t1_SSC_flux_xe.shape)
 
 # compute angle and rotate
 for t in range(0,t1_SSC_flux_yn.shape[0]):  # time
-    angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, 2, :], t1_SSC_flux_yn[t, 2, :])) # angle for entire cross-section, pick a depth
+    t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, 3, :], t1_SSC_flux_yn[t, 3, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
     for xy in range(0, t1_SSC_flux_yn.shape[2]):  # cell in xy
         for z in range(0,t1_SSC_flux_yn.shape[1]):
             # ux - along channel velocity
             # vy - cross channel velocity (positive to the left of the along channel
-            t1_SSC_flux_ux_rot[t, z, xy], t1_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t1_SSC_flux_xe[t, z, xy], t1_SSC_flux_yn[t, z, xy], angle[t])
+            t1_SSC_flux_ux_rot[t, z, xy], t1_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t1_SSC_flux_xe[t, z, xy], t1_SSC_flux_yn[t, z, xy], t1_angle[t])
 
 
 
@@ -113,10 +113,9 @@ x = np.array(list(range(42,67)))  #
 y = np.array([58]*len(x))
 
 # Verify point location
-plant_height = f.variables['plant_height'][0, 0, :, :]
-plant_height = np.ma.masked_greater(plant_height, 1)
 for i in range(len(x)):
-    plant_height[x[i], y[i]] = i
+    l = i/5
+    plant_height[x[i], y[i]] = l
 
 # calculate the total concentration at each time step for the transect (x,y) and depth.
 #
@@ -156,51 +155,67 @@ for i in range(mud_01_trans.shape[1]):  # for each depth level
     t2_SSC_flux_xe[:, i, :] = t2_u_trans[:, i, :]*flux_face_y*SSC
 
 # variable initialize
-angle = []
+t2_angle = []
 t2_SSC_flux_ux_rot = np.empty(t2_SSC_flux_yn.shape)
 t2_SSC_flux_vy_rot = np.empty(t2_SSC_flux_xe.shape)
 
 # compute angle and rotate
 for t in range(0,t2_SSC_flux_yn.shape[0]):  # time
-    angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, 2, :], t2_SSC_flux_yn[t, 2, :])) # angle for entire cross-section, pick a depth
+    t2_angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, 2, :], t2_SSC_flux_yn[t, 2, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
     for xy in range(0, t2_SSC_flux_yn.shape[2]):  # cell in xy
         for z in range(0,t2_SSC_flux_yn.shape[1]):
             # ux - along channel velocity
             # vy - cross channel velocity (positive to the left of the along channel
-            t2_SSC_flux_ux_rot[t, z, xy], t2_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t2_SSC_flux_xe[t, z, xy], t2_SSC_flux_yn[t, z, xy], angle[t])
+            t2_SSC_flux_ux_rot[t, z, xy], t2_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t2_SSC_flux_xe[t, z, xy], t2_SSC_flux_yn[t, z, xy], t2_angle[t])
 
+# magnitude of the rotated flux
+t1_mag_ssc = np.sqrt(t1_SSC_flux_ux_rot**2 + t1_SSC_flux_vy_rot**2)
+t2_mag_ssc = np.sqrt(t2_SSC_flux_ux_rot**2 + t2_SSC_flux_vy_rot**2)
+
+# sum of magnitude of rotated flux across transect and depth
+t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2))
+t2_SSC_ts_sum = np.sum(t2_mag_ssc, axis=(1,2))
+
+# cumulative sum
+t1_cumsum_ssc = np.nancumsum(t1_SSC_ts_sum, axis=0)
+t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)
 
 ## Create some plots
+# pick a depth and cell for investigation
+# srho = depth coordinate
+# c_* cell number along transect (t1 and t2).
+srho = 3
+c_t1 = 1
+c_t2 = 12
+
+
 # map of transect
 plt.figure()
 plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
-plt.title('%s Transect' % trans_name)
+plt.title('Transects')
 
-
-# plot raw velocity
-srho = 3
-c = 1
+#  plot raw velocity
 fig, (axd) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), sharex=True)
 fig.subplots_adjust(hspace=0.25)
-axd[0].plot_date(datetime_list, t1_v_trans[:, srho, c], label='vn',
+axd[0].plot_date(datetime_list, t1_v_trans[:, srho, c_t1], label='vn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axd[0].plot_date(datetime_list, t1_u_trans[:, srho, c], label='ue',
+axd[0].plot_date(datetime_list, t1_u_trans[:, srho, c_t1], label='ue',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axd[0].set_ylabel('velocity (m/s)')
-axd[0].set_title('Raw velocity at s-rho=%i, cell=%i, Transect T1' % (srho, c))
+axd[0].set_title('Raw velocity at s-rho=%i, cell=%i, Transect T1' % (srho, c_t1))
 
-c = 12
-axd[1].plot_date(datetime_list, t2_v_trans[:, srho, c], label='vn',
+
+axd[1].plot_date(datetime_list, t2_v_trans[:, srho, c_t2], label='vn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axd[1].plot_date(datetime_list, t2_u_trans[:, srho, c], label='ue',
+axd[1].plot_date(datetime_list, t2_u_trans[:, srho, c_t2], label='ue',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axd[1].set_ylabel('velocity (m/s)')
-axd[1].set_title('Raw velocity at s-rho=%i, cell=%i, Transect T2' % (srho, c))
+axd[1].set_title('Raw velocity at s-rho=%i, cell=%i, Transect T2' % (srho, c_t2))
 axd[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axd[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axd[1].legend()
@@ -208,68 +223,112 @@ axd[1].legend()
 
 # plot non-rotated flux
 srho = 3
-c = 1
 fig, (axa) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 fig.subplots_adjust(hspace=0.25)
-axa[0].plot_date(datetime_list, t1_SSC_flux_yn[:, srho, c], label='yn',
+axa[0].plot_date(datetime_list, t1_SSC_flux_yn[:, srho, c_t1], label='yn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[0].plot_date(datetime_list, t1_SSC_flux_xe[:, srho, c], label='xe',
+axa[0].plot_date(datetime_list, t1_SSC_flux_xe[:, srho, c_t1], label='xe',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axa[0].set_ylabel('Total SSC flux (kg/s)')
-axa[0].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T1' % (srho, c))
+axa[0].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T1' % (srho, c_t1))
 
-c = 12
-axa[1].plot_date(datetime_list, t2_SSC_flux_yn[:, srho, c], label='yn',
+axa[1].plot_date(datetime_list, t2_SSC_flux_yn[:, srho, c_t2], label='yn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[1].plot_date(datetime_list, t2_SSC_flux_xe[:, srho, c], label='xe',
+axa[1].plot_date(datetime_list, t2_SSC_flux_xe[:, srho, c_t2], label='xe',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axa[1].set_ylabel('Total SSC flux (kg/s)')
-axa[1].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T2' % (srho, c))
+axa[1].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T2' % (srho, c_t2))
 axa[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axa[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axa[1].legend()
 
 
 # plot angle calculation
-# fig, (axb) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
-# axb.plot_date(datetime_list, angle,
-#               xdate=True, linestyle='', linewidth=1,
-#               marker='.', markersize=1)
-# axb.set_title('Calculated angle from SSC flux N-E at %s' % trans_name)
-# axb.set_ylabel('Angle')
-# axb.xaxis.set_major_locator(mdates.DayLocator(interval=30))
-# axb.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+fig, (axb) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
+axb[0].plot_date(datetime_list, t1_angle, label='T1',
+               xdate=True, linestyle='', linewidth=1,
+               marker='.', markersize=1)
+axb[0].set_title('Calculated angle from SSC flux N-E at Transect T1')
+axb[0].set_ylabel('Angle')
+axb[1].plot_date(datetime_list, t2_angle, label='T2',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axb[1].set_title('Calculated angle from SSC flux N-E at Transect T2')
+axb[1].set_ylabel('Angle')
+axb[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axb[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 
-# plot rotated flux values
+# plot rotated flux values at a specific depth and cell
 fig, (axc) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 fig.subplots_adjust(hspace=0.25)
 
-c = 1
-axc[0].plot_date(datetime_list, t1_SSC_flux_ux_rot[:, srho, c], label='ux',
+axc[0].plot_date(datetime_list, t1_SSC_flux_ux_rot[:, srho, c_t1], label='ux',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axc[0].plot_date(datetime_list,t1_SSC_flux_vy_rot[:, srho, c],label='vy',
+axc[0].plot_date(datetime_list,t1_SSC_flux_vy_rot[:, srho, c_t1],label='vy',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axc[0].set_title('Along (ux) and Cross (vy) channel total SSC flux at T1, s-rho=%i, cell=%i,' % (srho,c))
+axc[0].set_title('Along (ux) and Cross (vy) channel total SSC flux at s-rho=%i, cell=%i, Transect T1' % (srho,c_t1))
 axc[0].set_ylabel('Total SSC flux (kg/s)')
 
-
-c = 12
-axc[1].plot_date(datetime_list, t2_SSC_flux_ux_rot[:, srho, c], label='ux',
+# plot along and cross channel fluxes at a depth and cell
+axc[1].plot_date(datetime_list, t2_SSC_flux_ux_rot[:, srho, c_t2], label='ux',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axc[1].plot_date(datetime_list,t2_SSC_flux_vy_rot[:, srho, c],label='vy',
+axc[1].plot_date(datetime_list,t2_SSC_flux_vy_rot[:, srho, c_t2],label='vy',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axc[1].set_title('Along (ux) and Cross (vy) channel total SSC flux at T2, s-rho=%i, cell=%i,' % (srho,c))
+axc[1].set_title('Along (ux) and Cross (vy) channel total SSC flux at s-rho=%i, cell=%i, Transect T2' % (srho,c_t2))
 axc[1].set_ylabel('Total SSC flux (kg/s)')
-
 axc[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axc[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axc[1].legend()
 
+
+## Plot magnitude of rotated flux
+fig, (axe) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+axe.plot_date(datetime_list, t1_mag_ssc[:, srho, c_t1], label='T1 cell %i' % c_t1,
+                 xdate=True, linestyle='', linewidth=1,
+                 marker='.', markersize=1)
+axe.plot_date(datetime_list, t2_mag_ssc[:, srho, c_t2], label='T2 cell %i' % c_t2,
+                 xdate=True, linestyle='', linewidth=1,
+                 marker='.', markersize=1)
+axe.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axe.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axe.legend()
+axe.set_title('Magnitude of the rotated flux at s-rho=%i' % srho)
+axe.set_ylabel('SSC flux (kg/s)')
+
+
+# plot the sum of the magnitude of the rotated flux for each transect
+fig, (axf) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+axf.plot_date(datetime_list, t1_SSC_ts_sum, label='T1',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axf.plot_date(datetime_list, t2_SSC_ts_sum, label='T2',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axf.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axf.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axf.legend()
+axf.set_title('Sum (depth and transect) of the magnitude of the rotated flux for each transect')
+axf.set_ylabel('SSC flux (kg/s)')
+
+
+# plot cumulative sum of SSC for transect
+fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+axg.plot_date(datetime_list, t1_cumsum_ssc, label='T1',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axg.plot_date(datetime_list, t2_cumsum_ssc, label='T2',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axg.legend()
+axg.set_title('Cumulative sum of the rotated flux for transects')
+axg.set_ylabel('Cumulative sum of SSC flux (kg/s)')
