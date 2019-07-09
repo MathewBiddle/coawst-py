@@ -94,8 +94,9 @@ t1_SSC_flux_ux_rot = np.empty(t1_SSC_flux_yn.shape)
 t1_SSC_flux_vy_rot = np.empty(t1_SSC_flux_xe.shape)
 
 # compute angle and rotate
+srho_angle = 3 # decide on s-rho coordinate for angle computation
 for t in range(0,t1_SSC_flux_yn.shape[0]):  # time
-    t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, 3, :], t1_SSC_flux_yn[t, 3, :])) # angle for entire cross-section, pick a depth
+    t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, srho_angle, :], t1_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
     for xy in range(0, t1_SSC_flux_yn.shape[2]):  # cell in xy
         for z in range(0,t1_SSC_flux_yn.shape[1]):
@@ -161,7 +162,7 @@ t2_SSC_flux_vy_rot = np.empty(t2_SSC_flux_xe.shape)
 
 # compute angle and rotate
 for t in range(0,t2_SSC_flux_yn.shape[0]):  # time
-    t2_angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, 2, :], t2_SSC_flux_yn[t, 2, :])) # angle for entire cross-section, pick a depth
+    t2_angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, srho_angle, :], t2_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
     for xy in range(0, t2_SSC_flux_yn.shape[2]):  # cell in xy
         for z in range(0,t2_SSC_flux_yn.shape[1]):
@@ -252,7 +253,7 @@ fig, (axb) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 axb[0].plot_date(datetime_list, t1_angle, label='T1',
                xdate=True, linestyle='', linewidth=1,
                marker='.', markersize=1)
-axb[0].set_title('Calculated angle from SSC flux N-E at Transect T1')
+axb[0].set_title('Calculated angle from SSC flux N-E at Transect T1 from s-rho=%i'% srho_angle)
 axb[0].set_ylabel('Angle')
 axb[1].plot_date(datetime_list, t2_angle, label='T2',
               xdate=True, linestyle='', linewidth=1,
