@@ -1,41 +1,58 @@
-from mpl_toolkits.basemap import Basemap
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
-#from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-#from matplotlib.ticker import LinearLocator, FormatStrFormatter
-#import warnings
 import numpy as np
-import datetime
-import time
 import netCDF4
 import pandas as pd
 import coawstpy
-#import sys
-#import os
-
-## point location geo
-#lat_pt = 39.516345
-#lon_pt = -76.034109
 
 # Cindy's locations
-locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
-locs['Site'] = ['1','2','3','4','5',
-                'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
-                'CBIBS','Tripod']
-locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
-               39.414,39.380,39.346,39.197,39.135,39.061,38.757,
-               39.5396,39.4931]
-locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
-               -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
-               -76.0741,-76.0341]
-locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
-                   '','','','','','','',
-                   'CBIBS Susquehanna Flats','Larry tripod site']
+locs = pd.DataFrame(columns=['Site', 'lat', 'lon','comment'])
+
+#locs.loc[0]=['1',39.527,-76.061,'Russ and Palinkas 2018']
+#locs.loc[1]=['2',]
+#locs.loc[2]=[]
+#locs.loc[3]=[]
+#locs.loc[4]=[]
+#locs.loc[5]=[]
+
+locations = [
+    ['1', 39.527, -76.061, 'Russ and Palinkas 2018'],
+    ['2', 39.533, -76.061, ''],
+    ['3', 39.515, -76.051, 'Middle of bed'],
+    ['4', 39.505, -76.039, ''],
+    ['5', 39.497, -76.036, ''],
+    ['Lee7', 39.414, -76.079, ''],
+    ['Lee6', 39.38, -76.088, ''],
+    ['Lee5', 39.346, -76.197, ''],
+    ['Lee2.5', 39.197, -76.311, ''],
+    ['Lee2', 39.135, -76.328, ''],
+    ['Lee0', 39.061, -76.328, ''],
+    ['LeeS2', 38.757, -76.473, ''],
+    ['CBIBS', 39.5396, -76.0741, 'CBIBS Susquehanna Flats'],
+    ['Tripod', 39.4931, -76.0341, 'Larry tripod site']
+    ]
+
+i = 0
+for location in locations:
+    locs.loc[i] = location
+    i += 1
+
+# locs['Site'] = ['1','2','3','4','5',
+#                 'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
+#                 'CBIBS','Tripod']
+# locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
+#                39.414,39.380,39.346,39.197,39.135,39.061,38.757,
+#                39.5396,39.4931]
+# locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
+#                -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
+#                -76.0741,-76.0341]
+# locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
+#                    '','','','','','','',
+#                    'CBIBS Susquehanna Flats','Larry tripod site']
 
 # get coords for Site of choice
-site = 'Tripod'
+site = 'Lee7'
 lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
 z_pt = 4 # 0=bottom 4=surface
@@ -123,31 +140,34 @@ dayint = 10
 for i, ax in enumerate(fig.axes):
     if (var2plot[i] == 'rho') or (var2plot[i] == 'salt') or (var2plot[i] == 'tke') or (var2plot[i] == 'mud_01') or \
             (var2plot[i] == 'sand_01') or (var2plot[i] == 'temp'):
-        ax.plot_date(datetime_list, f_veg.variables[var2plot[i]][:, z_pt, x, y], xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
+        ax.plot_date(datetime_list, f_veg.variables[var2plot[i]][:, z_pt, x, y], xdate=True, linestyle='-',
+                     linewidth=0.5, label='veg', marker='', markersize=1)
+        ax.plot_date(datetime_list, f_noveg.variables[var2plot[i]][:, z_pt, x, y], xdate=True, linestyle='-',
+                     label='no veg', linewidth=0.5, marker='', markersize=1)
         ax.set_ylabel('%s_%s' % (f_veg.variables[var2plot[i]].name,(z_pt+1)))  # , f_veg.variables[var2plot[i]].units))
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
         xlim = ax.get_xlim()
+        #ax.legend(loc="lower left")
 
     elif var2plot[i] == 'mud+sand':
-        ax.plot_date(datetime_list, f_veg.variables['mud_01'][:, z_pt, x, y]+f_veg.variables['sand_01'][:, z_pt, x, y],
-                     label='veg @ s_rho=%i' % z_pt, xdate=True, linestyle='-', linewidth=0.5,
+        ax.plot_date(datetime_list, np.sum(f_veg.variables['mud_01'][:, :, x, y]+f_veg.variables['sand_01'][:, :, x, y], axis=1),
+                     label='veg', xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
         ax.plot_date(datetime_list,
-                     f_noveg.variables['mud_01'][:, z_pt, x, y] + f_noveg.variables['sand_01'][:, z_pt, x, y],
-                     label='no veg @ s_rho=%i' % z_pt, xdate=True, linestyle='-', linewidth=0.5,
+                     np.sum(f_noveg.variables['mud_01'][:, :, x, y] + f_noveg.variables['sand_01'][:, :, x, y], axis=1),
+                     label='no veg', xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
 
-        ax.set_ylim(0, 3)
+        #ax.set_ylim(0, 15)
 #        ax.yaxis.tick_right()
 #        ax.yaxis.set_label_position("right")
         ax.set_ylabel('Total SSC [kg/m3]')
         ax.grid(True)
-        ax.legend(loc="upper left")
+        #ax.legend(loc="upper left")
         xlim = ax.get_xlim()
 
     elif var2plot[i] == 'velocity':
@@ -162,11 +182,11 @@ for i, ax in enumerate(fig.axes):
         ax.xaxis.set_major_formatter(myFmt)
         ax.yaxis.tick_right()
         ax.yaxis.set_label_position("right")
-        ax.set_ylabel('Magnitude of velocity [m/s]')
-        ax.set_ylim(0, 2.5)
+        ax.set_ylabel('|v| [m/s]')
+        #ax.set_ylim(0, 2.5)
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
-        ax.legend(loc="upper left")
+        #ax.legend(loc="upper left")
         xlim = ax.get_xlim()
 
     elif var2plot[i] == 'bed_thickness':
@@ -179,18 +199,18 @@ for i, ax in enumerate(fig.axes):
         ax.yaxis.tick_right()
         ax.yaxis.set_label_position("right")
         ax.set_ylabel('bed [m]')
-        ax.set_ylim(0.8, 1.1)
+        #ax.set_ylim(0.8, 1.1)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
-        ax.legend(loc="lower left")
+        #ax.legend(loc="lower left")
         xlim = ax.get_xlim()
 
     elif var2plot[i] == 'river_transport':
-        # river trnasport had 20% reduction and destributed across cells. Need to back calculate
+        # river transport had 20% reduction and destributed across cells. Need to back calculate
         ax.plot_date(river_datetime_list, (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
                      xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
+                     marker='', markersize=1, color='k')
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
@@ -200,16 +220,19 @@ for i, ax in enumerate(fig.axes):
         ax.set_ylabel('Q [m3/s]')
 
     elif var2plot[i] == 'depth':
-        ax.plot_date(datetime_list, f_veg.variables['zeta'][:, x, y]+f_veg.variables['h'][x,y], xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
+        ax.plot_date(datetime_list, f_veg.variables['zeta'][:, x, y]+f_veg.variables['h'][x,y], xdate=True, label='veg',
+                     linestyle='-', linewidth=0.5, marker='', markersize=1)
+        ax.plot_date(datetime_list, f_noveg.variables['zeta'][:, x, y] + f_veg.variables['h'][x, y], xdate=True,
+                     label='no veg', linestyle='-', linewidth=0.5, marker='', markersize=1)
         ax.yaxis.tick_right()
         ax.yaxis.set_label_position("right")
         ax.set_ylabel('Depth [m]')
-        ax.set_ylim(0,6)
+        #ax.set_ylim(0,6)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
         xlim = ax.get_xlim()
+        ax.legend(bbox_to_anchor=(0.4, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, ncol=2)
 
     elif var2plot[i] == 'wind':
         coawstpy.stick_plot(ptsdf['Time'], ptsdf['X-Windv'], ptsdf['Y-Windv'], ax=ax)
@@ -230,11 +253,11 @@ for i, ax in enumerate(fig.axes):
         #ax.yaxis.tick_right()
         #ax.yaxis.set_label_position("right")
         ax.set_ylabel('Sig. Wave H. [m]')
-        ax.set_ylim(0,0.4)
+        #ax.set_ylim(0,0.4)
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
         ax.xaxis.set_major_formatter(myFmt)
         ax.grid(True)
-        ax.legend(loc="upper left")
+        #ax.legend(loc="upper left")
         xlim = ax.get_xlim()
     else:
         ax.plot_date(datetime_list, f_veg.variables[var2plot[i]][:, x, y], xdate=True, linestyle='-', linewidth=0.5,

@@ -22,8 +22,8 @@ mud_01 = f.variables['mud_01'][:]
 sand_01 = f.variables['sand_01'][:]
 ubar = f.variables['ubar_eastward'][:]
 vbar = f.variables['vbar_northward'][:]
-u = f.variables['u_eastward'][:]
-v = f.variables['v_northward'][:]
+ue = f.variables['u_eastward'][:]
+vn = f.variables['v_northward'][:]
 pm = f.variables['pm'][:] #XI --> cell width in x dir.
 pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
 s_rho = f.variables['s_rho'][:] # depth levels
@@ -71,8 +71,8 @@ mud_01_trans = mud_01[:, :, x, y]  # kg/m3
 sand_01_trans = sand_01[:, :, x, y]  # kg/m3
 ubar_trans = ubar[:, x, y]  # m/s
 vbar_trans = vbar[:, x, y]  # m/s
-t1_v_trans = v[:, :, x, y]  # m/s
-t1_u_trans = u[:, :, x, y]  # m/s
+t1_vn_trans = vn[:, :, x, y]  # m/s
+t1_ue_trans = ue[:, :, x, y]  # m/s
 
 water_col_depth = h[x, y]+zeta[:, x, y]  # m
 cell_thick = water_col_depth/s_rho.shape[0]  # m
@@ -80,33 +80,30 @@ cell_thick = water_col_depth/s_rho.shape[0]  # m
 flux_face_y = cell_thick/pn[x, y]  # m^2
 flux_face_x = cell_thick/pm[x, y]  # m^2
 
+t1_angle = []
+t1_vel_ux_rot = np.empty(t1_ue_trans.shape)
+t1_vel_vy_rot = np.empty(t1_vn_trans.shape)
+# compute angle and rotate using velocity
+srho_angle = 3 # decide on s-rho coordinate for angle computation
+for t in range(0,t1_vn_trans.shape[0]): # time
+    t1_angle.append(coawstpy.maj_ax(t1_ue_trans[t, srho_angle, :], t1_vn_trans[t, srho_angle, :]))
+    for xy in range(0, t1_vn_trans.shape[2]):  # cell in xy
+        for z in range(0,t1_vn_trans.shape[1]):
+            t1_vel_ux_rot[t, z, xy], t1_vel_vy_rot[t, z, xy] = coawstpy.rot2xy(t1_ue_trans[t, z, xy],
+                                                                                         t1_vn_trans[t, z, xy],
+                                                                                         t1_angle[t])
+
+# compute flux
 t1_SSC_flux_yn = np.empty(mud_01_trans.shape)
 t1_SSC_flux_xe = np.empty(mud_01_trans.shape)
 for i in range(mud_01_trans.shape[1]):  # for each depth level
-    # compute flux before rotating axially.
+    # compute flux after rotating axially.
     SSC = mud_01_trans[:, i, :]+sand_01_trans[:, i, :] # kg m^-3
-    t1_SSC_flux_yn[:, i, :] = t1_v_trans[:, i, :]*flux_face_x*SSC # (m s^-1) * (m^2) * (kg m^-3) = kg s^-1
-    t1_SSC_flux_xe[:, i, :] = t1_u_trans[:, i, :]*flux_face_y*SSC
+    t1_SSC_flux_yn[:, i, :] = t1_vel_vy_rot[:, i, :]*flux_face_x*SSC # (m s^-1) * (m^2) * (kg m^-3) = kg s^-1
+    t1_SSC_flux_xe[:, i, :] = t1_vel_ux_rot[:, i, :]*flux_face_y*SSC
 
-# variable initialize
-t1_angle = []
-t1_SSC_flux_ux_rot = np.empty(t1_SSC_flux_yn.shape)
-t1_SSC_flux_vy_rot = np.empty(t1_SSC_flux_xe.shape)
-
-# compute angle and rotate
-srho_angle = 3 # decide on s-rho coordinate for angle computation
-for t in range(0,t1_SSC_flux_yn.shape[0]):  # time
-    t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, srho_angle, :], t1_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
-    #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
-    for xy in range(0, t1_SSC_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,t1_SSC_flux_yn.shape[1]):
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            t1_SSC_flux_ux_rot[t, z, xy], t1_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t1_SSC_flux_xe[t, z, xy], t1_SSC_flux_yn[t, z, xy], t1_angle[t])
-
-
-
-
+t1_SSC_flux_ux_rot = t1_SSC_flux_xe
+t1_SSC_flux_vy_rot = t1_SSC_flux_yn
 
 # Turkey Point to Sandy Point
 trans_name = 'T2'
@@ -138,8 +135,8 @@ mud_01_trans = mud_01[:, :, x, y]  # kg/m3
 sand_01_trans = sand_01[:, :, x, y]  # kg/m3
 ubar_trans = ubar[:, x, y]  # m/s
 vbar_trans = vbar[:, x, y]  # m/s
-t2_v_trans = v[:, :, x, y]  # m/s
-t2_u_trans = u[:, :, x, y]  # m/s
+t2_vn_trans = vn[:, :, x, y]  # m/s
+t2_ue_trans = ue[:, :, x, y]  # m/s
 
 water_col_depth = h[x, y]+zeta[:, x, y]  # m
 cell_thick = water_col_depth/s_rho.shape[0]  # m
@@ -147,41 +144,48 @@ cell_thick = water_col_depth/s_rho.shape[0]  # m
 flux_face_y = cell_thick/pn[x, y]  # m^2
 flux_face_x = cell_thick/pm[x,y]  # m^2
 
+t2_angle = []
+t2_vel_ux_rot = np.empty(t2_ue_trans.shape)
+t2_vel_vy_rot = np.empty(t2_vn_trans.shape)
+# compute angle and rotate using velocity
+for t in range(0,t2_vn_trans.shape[0]): # time
+    t2_angle.append(coawstpy.maj_ax(t2_ue_trans[t, srho_angle, :], t2_vn_trans[t, srho_angle, :]))
+    for xy in range(0, t2_vn_trans.shape[2]):  # cell in xy
+        for z in range(0,t2_vn_trans.shape[1]):
+            t2_vel_ux_rot[t, z, xy], t2_vel_vy_rot[t, z, xy] = coawstpy.rot2xy(t2_ue_trans[t, z, xy],
+                                                                                         t2_vn_trans[t, z, xy],
+                                                                                         t2_angle[t])
+
+# compute flux
 t2_SSC_flux_yn = np.empty(mud_01_trans.shape)
 t2_SSC_flux_xe = np.empty(mud_01_trans.shape)
 for i in range(mud_01_trans.shape[1]):  # for each depth level
-    # compute flux before rotating axially.
+    # compute flux after rotating axially.
     SSC = mud_01_trans[:, i, :]+sand_01_trans[:, i, :] # kg m^-3
-    t2_SSC_flux_yn[:, i, :] = t2_v_trans[:, i, :]*flux_face_x*SSC # (m s^-1) * (m^2) * (kg m^-3) = kg s^-1
-    t2_SSC_flux_xe[:, i, :] = t2_u_trans[:, i, :]*flux_face_y*SSC
+    t2_SSC_flux_yn[:, i, :] = t2_vel_vy_rot[:, i, :]*flux_face_x*SSC # (m s^-1) * (m^2) * (kg m^-3) = kg s^-1
+    t2_SSC_flux_xe[:, i, :] = t2_vel_ux_rot[:, i, :]*flux_face_y*SSC
 
-# variable initialize
-t2_angle = []
-t2_SSC_flux_ux_rot = np.empty(t2_SSC_flux_yn.shape)
-t2_SSC_flux_vy_rot = np.empty(t2_SSC_flux_xe.shape)
-
-# compute angle and rotate
-for t in range(0,t2_SSC_flux_yn.shape[0]):  # time
-    t2_angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, srho_angle, :], t2_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
-    #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
-    for xy in range(0, t2_SSC_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,t2_SSC_flux_yn.shape[1]):
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            t2_SSC_flux_ux_rot[t, z, xy], t2_SSC_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(t2_SSC_flux_xe[t, z, xy], t2_SSC_flux_yn[t, z, xy], t2_angle[t])
+t2_SSC_flux_ux_rot = t2_SSC_flux_xe
+t2_SSC_flux_vy_rot = t2_SSC_flux_yn
 
 # magnitude of the rotated flux
 t1_mag_ssc = np.sqrt(t1_SSC_flux_ux_rot**2 + t1_SSC_flux_vy_rot**2)
 t2_mag_ssc = np.sqrt(t2_SSC_flux_ux_rot**2 + t2_SSC_flux_vy_rot**2)
 
 # sum of magnitude of rotated flux across transect and depth
-t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2))
+t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2)) ##TODO review this. use t1_mag_ssc?
 t2_SSC_ts_sum = np.sum(t2_mag_ssc, axis=(1,2))
 
 # cumulative sum
 t1_cumsum_ssc = np.nancumsum(t1_SSC_ts_sum, axis=0)
-t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)
+t1_total_sed = t1_cumsum_ssc[-1]*(datetime_list[-1]-datetime_list[1]).total_seconds() #kg
 
+t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)
+t2_total_sed = t2_cumsum_ssc[-1]*(datetime_list[-1]-datetime_list[1]).total_seconds()
+
+print('Total Sediment across transect over %s seconds\nT1 = %e kg = %e tons\nT2 = %e kg = %e tons' %
+      ((datetime_list[-1]-datetime_list[1]).total_seconds(), t1_total_sed, t1_total_sed/1000, t2_total_sed, t2_total_sed/1000))
+sys.exit()
 ## Create some plots
 # pick a depth and cell for investigation
 # srho = depth coordinate
@@ -199,20 +203,20 @@ plt.title('Transects')
 #  plot raw velocity
 fig, (axd) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), sharex=True)
 fig.subplots_adjust(hspace=0.25)
-axd[0].plot_date(datetime_list, t1_v_trans[:, srho, c_t1], label='vn',
+axd[0].plot_date(datetime_list, t1_vn_trans[:, srho, c_t1], label='vn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axd[0].plot_date(datetime_list, t1_u_trans[:, srho, c_t1], label='ue',
+axd[0].plot_date(datetime_list, t1_ue_trans[:, srho, c_t1], label='ue',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axd[0].set_ylabel('velocity (m/s)')
 axd[0].set_title('Raw velocity at s-rho=%i, cell=%i, Transect T1' % (srho, c_t1))
 
 
-axd[1].plot_date(datetime_list, t2_v_trans[:, srho, c_t2], label='vn',
+axd[1].plot_date(datetime_list, t2_vn_trans[:, srho, c_t2], label='vn',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axd[1].plot_date(datetime_list, t2_u_trans[:, srho, c_t2], label='ue',
+axd[1].plot_date(datetime_list, t2_ue_trans[:, srho, c_t2], label='ue',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
 axd[1].set_ylabel('velocity (m/s)')
@@ -222,27 +226,27 @@ axd[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axd[1].legend()
 
 
-# plot non-rotated flux
+# plot rotated velocity
 srho = 3
 fig, (axa) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 fig.subplots_adjust(hspace=0.25)
-axa[0].plot_date(datetime_list, t1_SSC_flux_yn[:, srho, c_t1], label='yn',
+axa[0].plot_date(datetime_list, t1_vel_vy_rot[:, srho, c_t1], label='vy',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[0].plot_date(datetime_list, t1_SSC_flux_xe[:, srho, c_t1], label='xe',
+axa[0].plot_date(datetime_list, t1_vel_ux_rot[:, srho, c_t1], label='ux',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[0].set_ylabel('Total SSC flux (kg/s)')
-axa[0].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T1' % (srho, c_t1))
+axa[0].set_ylabel('Velocity (m/s)')
+axa[0].set_title('Along (ux) and Cross (vy) channel velocity at s-rho=%i, cell=%i, Transect T1' % (srho, c_t1))
 
-axa[1].plot_date(datetime_list, t2_SSC_flux_yn[:, srho, c_t2], label='yn',
+axa[1].plot_date(datetime_list, t2_vel_vy_rot[:, srho, c_t2], label='vy',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[1].plot_date(datetime_list, t2_SSC_flux_xe[:, srho, c_t2], label='xe',
+axa[1].plot_date(datetime_list, t2_vel_ux_rot[:, srho, c_t2], label='ux',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axa[1].set_ylabel('Total SSC flux (kg/s)')
-axa[1].set_title('SSC flux N-E, non-rotated at s-rho=%i, cell=%i, Transect T2' % (srho, c_t2))
+axa[1].set_ylabel('Velocity (m/s)')
+axa[1].set_title('Along (ux) and Cross (vy) channel velocity at s-rho=%i, cell=%i, Transect T2' % (srho, c_t2))
 axa[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axa[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axa[1].legend()
@@ -253,12 +257,12 @@ fig, (axb) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 axb[0].plot_date(datetime_list, t1_angle, label='T1',
                xdate=True, linestyle='', linewidth=1,
                marker='.', markersize=1)
-axb[0].set_title('Calculated angle from SSC flux N-E at Transect T1 from s-rho=%i'% srho_angle)
+axb[0].set_title('Calculated angle from velocity N-E at Transect T1 from s-rho=%i'% srho_angle)
 axb[0].set_ylabel('Angle')
 axb[1].plot_date(datetime_list, t2_angle, label='T2',
               xdate=True, linestyle='', linewidth=1,
               marker='.', markersize=1)
-axb[1].set_title('Calculated angle from SSC flux N-E at Transect T2')
+axb[1].set_title('Calculated angle from velocity N-E at Transect T2 from s-rho=%i'% srho_angle)
 axb[1].set_ylabel('Angle')
 axb[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axb[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
