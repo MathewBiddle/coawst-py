@@ -13,17 +13,17 @@ inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
 # Get the data we want
-ocean_time = f.variables['ocean_time'][:]
+ocean_time = f.variables['ocean_time'][0:131]
 lat = f.variables['lat_rho'][:]
 lon = f.variables['lon_rho'][:]
 h = f.variables['h'][:]
-zeta = f.variables['zeta'][:]
-mud_01 = f.variables['mud_01'][:]
-sand_01 = f.variables['sand_01'][:]
-ubar = f.variables['ubar_eastward'][:]
-vbar = f.variables['vbar_northward'][:]
-u = f.variables['u_eastward'][:]
-v = f.variables['v_northward'][:]
+zeta = f.variables['zeta'][0:131,:,:]
+mud_01 = f.variables['mud_01'][0:131,:,:,:]
+sand_01 = f.variables['sand_01'][0:131,:,:,:]
+ubar = f.variables['ubar_eastward'][0:131,:,:]
+vbar = f.variables['vbar_northward'][0:131,:,:]
+u = f.variables['u_eastward'][0:131,:,:,:]
+v = f.variables['v_northward'][0:131,:,:,:]
 pm = f.variables['pm'][:] #XI --> cell width in x dir.
 pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
 s_rho = f.variables['s_rho'][:] # depth levels
@@ -97,7 +97,8 @@ t1_SSC_flux_vy_rot = np.empty(t1_SSC_flux_xe.shape)
 
 # compute angle and rotate
 srho_angle = 3 # decide on s-rho coordinate for angle computation
-t1_angle = coawstpy.maj_ax(t1_SSC_flux_xe[tx1:tx2, srho_angle, :], t1_SSC_flux_yn[tx1:tx2, srho_angle, :])
+#t1_angle = coawstpy.maj_ax(t1_SSC_flux_xe[tx1:tx2, srho_angle, :], t1_SSC_flux_yn[tx1:tx2, srho_angle, :])
+t1_angle = 338
 for t in range(0,t1_SSC_flux_yn.shape[0]):  # time
     #t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, srho_angle, :], t1_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
@@ -159,7 +160,8 @@ for i in range(mud_01_trans.shape[1]):  # for each depth level
 #t2_angle = []
 t2_SSC_flux_ux_rot = np.empty(t2_SSC_flux_yn.shape)
 t2_SSC_flux_vy_rot = np.empty(t2_SSC_flux_xe.shape)
-t2_angle = coawstpy.maj_ax(t2_SSC_flux_xe[tx1:tx2, srho_angle, :], t2_SSC_flux_yn[tx1:tx2, srho_angle, :])
+#t2_angle = coawstpy.maj_ax(t2_SSC_flux_xe[tx1:tx2, srho_angle, :], t2_SSC_flux_yn[tx1:tx2, srho_angle, :])
+t2_angle = 358
 # compute angle and rotate
 for t in range(0,t2_SSC_flux_yn.shape[0]):  # time
     #t2_angle.append(coawstpy.maj_ax(t2_SSC_flux_xe[t, srho_angle, :], t2_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
@@ -188,7 +190,7 @@ t2_total_sed = t2_cumsum_ssc[-1]*3600# (datetime_list[-1]-datetime_list[1]).tota
 
 print('Total Sediment across transect over %s seconds\nT1 = %e kg = %e tons\nT2 = %e kg = %e tons' %
       ((datetime_list[-1]-datetime_list[1]).total_seconds(), t1_total_sed, t1_total_sed/1000, t2_total_sed, t2_total_sed/1000))
-#sys.exit()
+sys.exit()
 ## Create some plots
 # pick a depth and cell for investigation
 # srho = depth coordinate
