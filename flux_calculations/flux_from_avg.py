@@ -220,7 +220,6 @@ axa[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axa[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axa[1].legend()
 
-
 # plot angle calculation
 # fig, (axb) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8),sharex=True)
 # axb[0].plot_date(datetime_list, t1_angle, label='T1',
