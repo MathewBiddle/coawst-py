@@ -13,17 +13,17 @@ inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
 # Get the data we want
-ocean_time = f.variables['ocean_time'][0:131]
+ocean_time = f.variables['ocean_time'][:]
 lat = f.variables['lat_rho'][:]
 lon = f.variables['lon_rho'][:]
 h = f.variables['h'][:]
-zeta = f.variables['zeta'][0:131,:,:]
-mud_01 = f.variables['mud_01'][0:131,:,:,:]
-sand_01 = f.variables['sand_01'][0:131,:,:,:]
-ubar = f.variables['ubar_eastward'][0:131,:,:]
-vbar = f.variables['vbar_northward'][0:131,:,:]
-u = f.variables['u_eastward'][0:131,:,:,:]
-v = f.variables['v_northward'][0:131,:,:,:]
+zeta = f.variables['zeta'][:,:,:]
+mud_01 = f.variables['mud_01'][:,:,:,:]
+sand_01 = f.variables['sand_01'][:,:,:,:]
+ubar = f.variables['ubar_eastward'][:,:,:]
+vbar = f.variables['vbar_northward'][:,:,:]
+u = f.variables['u_eastward'][:,:,:,:]
+v = f.variables['v_northward'][:,:,:,:]
 pm = f.variables['pm'][:] #XI --> cell width in x dir.
 pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
 s_rho = f.variables['s_rho'][:] # depth levels

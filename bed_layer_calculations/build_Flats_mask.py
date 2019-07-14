@@ -14,7 +14,11 @@ lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
 ocean_time = f.variables['ocean_time'][:]
 bed_thick = f.variables['bed_thickness'][:]
+Srho = f.variables['Srho'][0] # kg/m3 2650 kg/m^3 sediment grain density
+pm = f.variables['pm'][:] #XI --> cell width in x dir.
+pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
 
+SA = (1/pm) * (1/pn)
 ## Do some date conversions ##
 datetime_list=[]
 for sec in ocean_time:
@@ -70,6 +74,17 @@ plant_height[32:35, 11] = 5
 # so apply a mask to everything not 5 to the bed thick matrix
 bed_thick_diff_ma = np.ma.masked_where(plant_height != 5, bed_thick_diff)
 
+bed_deposition = np.ma.masked_less(bed_thick_diff_ma, 0) # height in meters
+bed_erosion = np.ma.masked_greater(bed_thick_diff_ma, 0) # height in meters
+
+bed_dep_vol = bed_deposition * SA.mean() # vol deposited m^3
+bed_ero_vol = bed_erosion * SA.mean() # vol eroded m^3
+
+mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
+mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
+
+print('mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
+print('mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
 
 
 ## Plotting
@@ -88,8 +103,10 @@ m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax)
 #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
 
 # pcolor variable of interest
-cax = m.pcolormesh(lon, lat, bed_thick_diff_ma*100, latlon=True,
-                    vmin=-10, vmax=10, cmap='jet', ax=ax)
+cax = m.pcolormesh(lon, lat, mass_deposited, latlon=True,
+                    cmap='jet', ax=ax)
 cbar = fig.colorbar(cax)
-cbar.set_label('Bed evolution [cm]')
+cbar.set_label('Bed mass deposited [kg]')
 plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
+
+
