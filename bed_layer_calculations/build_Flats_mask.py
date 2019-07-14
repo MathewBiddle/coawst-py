@@ -33,8 +33,8 @@ t1_y = np.array([13,12,11,10])
 
 plant_height = f.variables['plant_height'][0, 0, :, :]
 plant_height = np.ma.masked_greater(plant_height, 1)
-plant_height.harden_mask()
-#mk = plant_height.mask
+plant_height.harden_mask() # makes the mask immutable
+
 for i in range(len(t1_x)):
     plant_height[t1_x[i], t1_y[i]] = 10
 
@@ -48,23 +48,31 @@ for i in range(len(t2_x)):
     #l = i/5
     plant_height[t2_x[i], t2_y[i]] = 10
 
-# build flats inner cell indexes:
+# build Flats cell locations:
+# This does not include the transect cells themselves. Just all cells between T1 and T2, excluding South River.
 ## Southern Boundary
-plant_height[:, 13:59] = 5
+plant_height[:, 14:58] = 5
 
-## Northern Boundary
-plant_height[30:37, 12] = 5
-plant_height[31:35, 11] = 5
-plant_height[32, 10] = 5
-
-# South river
+# Remove Elk River
 plant_height[78:100, 41:59] = 0
 plant_height[72:78, 55:59] = 0
 
-#sf_mask = np.ma.masked_equal(plant_height,5)
+## Northern Boundary
+plant_height[48:64,0:14] = 5 # add mill creek/Furnace Bay
+# dealing with angled transect boundary here
+plant_height[30:50, 13] = 5
+plant_height[31:37, 12] = 5
+plant_height[32:35, 11] = 5
 
+
+# apply the mask
+# plant_height = 5 is where the region of interest is.
+# so apply a mask to everything not 5 to the bed thick matrix
 bed_thick_diff_ma = np.ma.masked_where(plant_height != 5, bed_thick_diff)
 
+
+
+## Plotting
 plt.figure()
 plt.pcolor(f.variables['lon_rho'][:], f.variables['lat_rho'][:], plant_height)
 plt.title('Transects')
@@ -72,7 +80,7 @@ plt.title('Transects')
 # set up figure
 fig, ax = plt.subplots(figsize=(8, 6))
 
-#set up map
+# set up map
 m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
     resolution='i', projection='merc', ax=ax)
 m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax)
