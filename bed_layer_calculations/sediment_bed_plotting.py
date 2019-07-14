@@ -45,8 +45,8 @@ for sec in ocean_time:
 dvar = 'bed_thickness'
 data = f.variables[dvar][:, :, :, :]
 
-data_init=np.sum(data[1202,:,:,:],axis=0)
-data_final=np.sum(data[1466,:,:,:],axis=0)
+data_init=np.sum(data[1202,:,:,:],axis=0) # total from all layers
+data_final=np.sum(data[1466,:,:,:],axis=0) # total from all layers
 # set up figure
 fig, ax = plt.subplots(figsize=(8, 6))
 
