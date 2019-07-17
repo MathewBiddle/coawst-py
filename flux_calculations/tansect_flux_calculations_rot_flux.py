@@ -7,6 +7,8 @@ import numpy as np
 import netCDF4
 import coawstpy
 
+## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
+
 # bring in the data
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
 inputfile = dir+'/upper_ches_his.nc'
@@ -177,7 +179,7 @@ t1_mag_ssc = np.sqrt(t1_SSC_flux_ux_rot**2 + t1_SSC_flux_vy_rot**2)
 t2_mag_ssc = np.sqrt(t2_SSC_flux_ux_rot**2 + t2_SSC_flux_vy_rot**2)
 
 # sum of magnitude of rotated flux across transect and depth
-t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2)) ##TODO review this. use t1_mag_ssc?
+t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2))
 t2_SSC_ts_sum = np.sum(t2_mag_ssc, axis=(1,2))
 
 # cumulative sum

@@ -6,28 +6,45 @@ import pandas as pd
 import numpy as np
 import netCDF4
 
+## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
+
 ## Read COAWST data
+# from coupling.out
+# Initial domain volumes:  TotVolume =  6.1046316405E+08 m3
+#                         MinCellVol =  1.0721942507E+03 m3
+#                         MaxCellVol =  1.0719327656E+05 m3
+#                            Max/Min =  9.9975612154E+01
+
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
+h = f.variables['h'][:] # at rho points
 ocean_time = f.variables['ocean_time'][:]
 bed_thick = f.variables['bed_thickness'][:]
+mask_rho = f.variables['mask_rho'][:]
 Srho = f.variables['Srho'][0] # kg/m3 2650 kg/m^3 sediment grain density
-pm = f.variables['pm'][:] #XI --> cell width in x dir.
-pn = f.variables['pn'][:] #ETA --> cell width in y dir. Want to use this for Surface Area Calcs
+pm = f.variables['pm'][:] #XI --> cell width in x dir. east-west
+pn = f.variables['pn'][:] #ETA --> cell width in y dir. north-south Want to use this for Surface Area Calcs
+
+hm = np.ma.masked_where(mask_rho == 0, h)  # initial masked water depth at rho points
 
 SA = (1/pm) * (1/pn)
+SAm = np.ma.masked_where(mask_rho == 0, SA)
+cell_vol_init = hm * SAm # total initial volume of water in valid cells. assuming all cells are square!
+print('Initial domain volumes:  TotVolume = 6.1046316405e+08 m3\n   Calculated Initial Total Volume = %e m3' % np.sum(cell_vol_init))
+sys.exit()
 ## Do some date conversions ##
 datetime_list=[]
 for sec in ocean_time:
     datetime_list.append(
         netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
-
+# Calculate the delta bed thickness
+# time indexes: 1202 - 1466 for event
 bed_thick_init = np.sum(bed_thick[0,:,:,:],axis=0) # total from all 3 bed layers
-bed_thick_final = np.sum(bed_thick[-1,:,:,:],axis=0) # total from all 3 bed layers
+bed_thick_final = np.sum(bed_thick[10,:,:,:],axis=0) # total from all 3 bed layers
 bed_thick_diff = bed_thick_final - bed_thick_init # meters
 
 # Susquehanna River mouth
@@ -68,7 +85,9 @@ plant_height[30:50, 13] = 5
 plant_height[31:37, 12] = 5
 plant_height[32:35, 11] = 5
 
-
+plt.figure()
+plt.plot_date(datetime_list,np.sum(bed_thick[:,:,32,15],axis=1))
+## Plotting
 # apply the mask
 # plant_height = 5 is where the region of interest is.
 # so apply a mask to everything not 5 to the bed thick matrix
@@ -103,10 +122,27 @@ m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax)
 #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
 
 # pcolor variable of interest
-cax = m.pcolormesh(lon, lat, mass_deposited, latlon=True,
+cax = m.pcolormesh(lon, lat, bed_ero_vol, latlon=True,
                     cmap='jet', ax=ax)
 cbar = fig.colorbar(cax)
-cbar.set_label('Bed mass deposited [kg]')
-plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
+cbar.set_label('Bed volume eroded [m^3]')
+#plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
+
+# set up figure
+fig, ax = plt.subplots(figsize=(8, 6))
+
+# set up map
+m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
+    resolution='i', projection='merc', ax=ax)
+m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax)
+m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax)
+#m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
+
+# pcolor variable of interest
+cax = m.pcolormesh(lon, lat, bed_dep_vol, latlon=True,
+                    cmap='jet', ax=ax)
+cbar = fig.colorbar(cax)
+cbar.set_label('Bed volume deposited [m^3]')
+#plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
 
 

@@ -7,6 +7,9 @@ import numpy as np
 import netCDF4
 import coawstpy
 
+## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
+
+
 # bring in the data
 dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
 inputfile = dir+'/upper_ches_avg.nc'
