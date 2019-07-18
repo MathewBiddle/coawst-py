@@ -36,8 +36,8 @@ SAm = np.ma.masked_where(mask_rho == 0, SA)
 cell_vol_init = hm * SAm # total initial volume of water in valid cells. assuming all cells are square!
 
 # TODO calculate the integral across x and y
-total_cell_vol_x =integrate.trapz(cell_vol_init,axis=0)
-total_cell_vol_y =integrate.trapz(cell_vol_init,axis=1)
+total_cell_vol_x = integrate.trapz(cell_vol_init,axis=0)
+total_cell_vol_y = integrate.trapz(cell_vol_init,axis=1)
 print('Initial domain volumes:  TotVolume = 6.1046316405e+08 m3\n   Calculated Initial Total Volume = %e m3' % np.sum(cell_vol_init))
 #sys.exit()
 ## Do some date conversions ##
