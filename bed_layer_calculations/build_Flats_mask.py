@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import netCDF4
+import scipy.integrate as integrate
 
 ## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
 
@@ -33,8 +34,12 @@ hm = np.ma.masked_where(mask_rho == 0, h)  # initial masked water depth at rho p
 SA = (1/pm) * (1/pn)
 SAm = np.ma.masked_where(mask_rho == 0, SA)
 cell_vol_init = hm * SAm # total initial volume of water in valid cells. assuming all cells are square!
+
+# TODO calculate the integral across x and y
+total_cell_vol_x =integrate.trapz(cell_vol_init,axis=0)
+total_cell_vol_y =integrate.trapz(cell_vol_init,axis=1)
 print('Initial domain volumes:  TotVolume = 6.1046316405e+08 m3\n   Calculated Initial Total Volume = %e m3' % np.sum(cell_vol_init))
-sys.exit()
+#sys.exit()
 ## Do some date conversions ##
 datetime_list=[]
 for sec in ocean_time:
@@ -86,7 +91,12 @@ plant_height[31:37, 12] = 5
 plant_height[32:35, 11] = 5
 
 plt.figure()
-plt.plot_date(datetime_list,np.sum(bed_thick[:,:,32,15],axis=1))
+plt.plot_date(datetime_list, np.sum(bed_thick[:, :, 32, 15], axis=1), markersize=1, linewidth=1)
+plt.ylabel('total bed thickness [m]')
+plt.title('Bed thickness time series at point index (32,15)')
+#plt.plot_date(datetime_list,integrate.trapz(bed_thick[:,:,32,15],axis=1),label='trapz',markersize=1,linewidth=1)
+plt.legend()
+sys.exit()
 ## Plotting
 # apply the mask
 # plant_height = 5 is where the region of interest is.

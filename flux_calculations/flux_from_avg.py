@@ -6,12 +6,14 @@ from matplotlib.dates import DateFormatter
 import numpy as np
 import netCDF4
 import coawstpy
+import scipy.integrate as integrate
 
 ## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
 
 
 # bring in the data
-dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
+#dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 inputfile = dir+'/upper_ches_avg.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
@@ -74,10 +76,10 @@ t1_sand_01_flux_vy_rot = np.empty(t1_sand_01_flux_yn.shape)
 
 # compute angle and rotate
 srho_angle = 3 # decide on s-rho coordinate for angle computation
-#t1_angle = coawstpy.maj_ax(t1_mud_01_flux_xe[tx1:tx2, srho_angle, :], t1_mud_01_flux_yn[tx1:tx2, srho_angle, :])
+t1_angle = coawstpy.maj_ax(t1_mud_01_flux_xe[tx1:tx2, srho_angle, :], t1_mud_01_flux_yn[tx1:tx2, srho_angle, :])
 #t1_angle = coawstpy.maj_ax(t1_mud_01_flux_xe[:, srho_angle, :], t1_mud_01_flux_yn[:, srho_angle, :])
 #t1_angle = 338 # from my rot_flux calculations
-t1_angle = 39.7527
+#t1_angle = 39.7527
 for t in range(0,t1_mud_01_flux_yn.shape[0]):  # time
     #t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, srho_angle, :], t1_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
@@ -114,10 +116,10 @@ t2_sand_01_flux_ux_rot = np.empty(t2_sand_01_flux_xe.shape)
 t2_sand_01_flux_vy_rot = np.empty(t2_sand_01_flux_yn.shape)
 
 # compute angle and rotate
-#t2_angle = coawstpy.maj_ax(t2_mud_01_flux_xe[tx1:tx2, srho_angle, :], t2_mud_01_flux_yn[tx1:tx2, srho_angle, :])
+t2_angle = coawstpy.maj_ax(t2_mud_01_flux_xe[tx1:tx2, srho_angle, :], t2_mud_01_flux_yn[tx1:tx2, srho_angle, :])
 #t2_angle = coawstpy.maj_ax(t2_mud_01_flux_xe[:, srho_angle, :], t2_mud_01_flux_yn[:, srho_angle, :])
 #t2_angle = 358 # from my rot_flux calculations
-t2_angle = 0.707
+#t2_angle = 0.707
 for t in range(0,t2_mud_01_flux_yn.shape[0]):  # time
     #t1_angle.append(coawstpy.maj_ax(t1_SSC_flux_xe[t, srho_angle, :], t1_SSC_flux_yn[t, srho_angle, :])) # angle for entire cross-section, pick a depth
     #  ux, uy = coawstpy.rot2xy(ubar_trans[t, :], vbar_trans[t, :], angle)
@@ -136,22 +138,29 @@ for t in range(0,t2_mud_01_flux_yn.shape[0]):  # time
 #t1_mag_ssc = np.sqrt(t1_SSC_flux_ux_rot**2 + t1_SSC_flux_vy_rot**2)
 t1_mag_mud_01 = np.sqrt(t1_mud_01_flux_ux_rot**2 + t1_mud_01_flux_vy_rot**2)
 t1_mag_sand_01 = np.sqrt(t1_sand_01_flux_ux_rot**2 + t1_sand_01_flux_vy_rot**2)
-t1_mag_ssc = t1_mag_mud_01 + t1_mag_sand_01
+t1_mag_ssc = t1_mag_mud_01 + t1_mag_sand_01 # total sediment together
 
 t2_mag_mud_01 = np.sqrt(t2_mud_01_flux_ux_rot**2 + t2_mud_01_flux_vy_rot**2)
 t2_mag_sand_01 = np.sqrt(t2_sand_01_flux_ux_rot**2 + t2_sand_01_flux_vy_rot**2)
-t2_mag_ssc = t2_mag_mud_01 + t2_mag_sand_01
+t2_mag_ssc = t2_mag_mud_01 + t2_mag_sand_01 # total sediment together
 
 # sum of magnitude of rotated flux across transect and depth
-t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2)) ##TODO review this. use t1_mag_ssc?
+t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2))
+#t1_SSC_ts_trapz = integrate.trapz(t1_mag_ssc)
+
 t2_SSC_ts_sum = np.sum(t2_mag_ssc, axis=(1,2))
+#t2_SSC_ts_trapz = integrate.trapz(t2_mag_ssc)
 
 # cumulative sum
-t1_cumsum_ssc = np.nancumsum(t1_SSC_ts_sum, axis=0)
+t1_cumsum_ssc = np.nancumsum(t1_SSC_ts_sum, axis=0)  # cumulative sum over time
+t1_cumtrapz_ssc = integrate.cumtrapz(t1_SSC_ts_sum, axis=0)  # cumulative integral over time
+
 t1_total_sed = t1_cumsum_ssc[-1]*3600 # sum is integrated over every hour, so we multiply by 3600 seconds
 #(datetime_list[-1]-datetime_list[1]).total_seconds() #kg
 
-t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)
+t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)  # cumulative sum over time
+t2_cumtrapz_ssc = integrate.cumtrapz(t2_SSC_ts_sum, axis=0)  # cumulative integral over time
+
 t2_total_sed = t2_cumsum_ssc[-1]*3600# (datetime_list[-1]-datetime_list[1]).total_seconds()
 
 print('Total Sediment across transect over %s seconds\nT1 = %e kg = %e tons\nT2 = %e kg = %e tons' %
