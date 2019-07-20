@@ -17,11 +17,11 @@ f = netCDF4.Dataset(inputfile, 'r')
 ocean_time = f.variables['ocean_time'][:]
 lat = f.variables['lat_rho'][:]
 lon = f.variables['lon_rho'][:]
-Huon_sand_01 = f.variables['Huon_sand_01'][:] # east-west
-Hvom_sand_01 = f.variables['Hvom_sand_01'][:] # north-south
+Huon_sand_01 = f.variables['Huon_sand_01'][:] # east-west (from panoply should be S)
+Hvom_sand_01 = f.variables['Hvom_sand_01'][:] # north-south (from panoply should be E)
 Huon_mud_01 = f.variables['Huon_mud_01'][:] # east-west
 Hvom_mud_01 = f.variables['Hvom_mud_01'][:] # north-south
-plant_height = f.variables['Hvom_sand_01'][0,0,:,:]
+plant_height = f.variables['Huon_sand_01'][0,0,:,:]
 s_rho = f.variables['s_rho'][:] # depth levels
 
 tx1 = 1202
@@ -38,19 +38,20 @@ for sec in ocean_time:
 # SR entrance #
 ###############
 trans_name = 'T0'
-x = np.array(list(range(20,28)))
-y = np.array([0]*len(x))
-
+x = np.array([27,26,25,24,23])
+#x = np.array(list(range(20,28)))
+#y = np.array([0]*len(x))
+y = np.array([0,1,2,3,4])
 # Verify point location
 for i in range(len(x)):
     l = i/5
     plant_height[x[i], y[i]] = 10#l*100
 
 # Gather subset data
-t0_mud_01_flux_yn = Hvom_mud_01[:, :, x, y]
-t0_mud_01_flux_xe = Huon_mud_01[:, :, x, y]
-t0_sand_01_flux_yn = Hvom_sand_01[:, :, x, y]
-t0_sand_01_flux_xe = Huon_sand_01[:, :, x, y]
+t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
+t0_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
+t0_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
+t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 # init arrays
 t0_mud_01_flux_ux_rot = np.empty(t0_mud_01_flux_xe.shape)
@@ -98,10 +99,10 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 10
 
 # Gather subset data
-t1_mud_01_flux_yn = Hvom_mud_01[:, :, x, y]
-t1_mud_01_flux_xe = Huon_mud_01[:, :, x, y]
-t1_sand_01_flux_yn = Hvom_sand_01[:, :, x, y]
-t1_sand_01_flux_xe = Huon_sand_01[:, :, x, y]
+t1_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
+t1_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
+t1_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
+t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 t1_mud_01_flux_ux_rot = np.empty(t1_mud_01_flux_xe.shape)
 t1_mud_01_flux_vy_rot = np.empty(t1_mud_01_flux_yn.shape)
@@ -146,10 +147,10 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 10#l*100
 
 # Gather subset data
-t2_mud_01_flux_yn = Hvom_mud_01[:, :, x, y]
-t2_mud_01_flux_xe = Huon_mud_01[:, :, x, y]
-t2_sand_01_flux_yn = Hvom_sand_01[:, :, x, y]
-t2_sand_01_flux_xe = Huon_sand_01[:, :, x, y]
+t2_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
+t2_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
+t2_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
+t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 # init arrays
 t2_mud_01_flux_ux_rot = np.empty(t2_mud_01_flux_xe.shape)
