@@ -32,16 +32,63 @@ for sec in ocean_time:
     datetime_list.append(
         netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
+##############################
+# SR entrance Model boundary #
+##############################
+trans_name = 'Tb'
+x = np.array(list(range(20,28)))
+y = np.array([0]*len(x))
+# Verify point location
+for i in range(len(x)):
+    l = i/5
+    plant_height[x[i], y[i]] = 10#l*100
+
+# Gather subset data
+tb_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
+tb_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
+tb_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
+tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+
+# init arrays
+tb_mud_01_flux_ux_rot = np.empty(tb_mud_01_flux_xe.shape)
+tb_mud_01_flux_vy_rot = np.empty(tb_mud_01_flux_yn.shape)
+tb_sand_01_flux_ux_rot = np.empty(tb_sand_01_flux_xe.shape)
+tb_sand_01_flux_vy_rot = np.empty(tb_sand_01_flux_yn.shape)
+
+# compute angle and rotate
+# angle = maj_ax(ue, vn)
+tb_angle = coawstpy.maj_ax(tb_mud_01_flux_xe[tx1:tx2, srho_angle, :], tb_mud_01_flux_yn[tx1:tx2, srho_angle, :])
+tb_angle_list = []
+for t in range(0,tb_mud_01_flux_yn.shape[0]):  # time
+    tb_angle_list.append(coawstpy.maj_ax(tb_mud_01_flux_xe[t, srho_angle, :], tb_mud_01_flux_yn[t, srho_angle, :]))
+    for xy in range(0, tb_mud_01_flux_yn.shape[2]):  # cell in xy
+        for z in range(0,tb_mud_01_flux_yn.shape[1]):
+            # ux,uy = rot2xy(ue, vn, projangle)
+            # ux - along channel velocity
+            # vy - cross channel velocity (positive to the left of the along channel
+            tb_mud_01_flux_ux_rot[t, z, xy], tb_mud_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
+                tb_mud_01_flux_xe[t, z, xy], tb_mud_01_flux_yn[t, z, xy], tb_angle)
+
+            tb_sand_01_flux_ux_rot[t, z, xy], tb_sand_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
+                tb_sand_01_flux_xe[t, z, xy], tb_sand_01_flux_yn[t, z, xy], tb_angle)
+
+tb_mag_mud_01 = np.sqrt(tb_mud_01_flux_ux_rot**2 + tb_mud_01_flux_vy_rot**2)
+tb_mag_sand_01 = np.sqrt(tb_sand_01_flux_ux_rot**2 + tb_sand_01_flux_vy_rot**2)
+tb_mag_ssc = tb_mag_mud_01 + tb_mag_sand_01 # total sediment together
+tb_SSC_ts_sum = np.sum(tb_mag_ssc, axis=(1,2)) # sum over depth and transect
+tb_cumsum_ssc = np.nancumsum(tb_SSC_ts_sum, axis=0)  # cumulative sum over time
+tb_cumtrapz_ssc = integrate.cumtrapz(tb_SSC_ts_sum, axis=0)  # cumulative integral over time
+tb_total_sed = tb_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we multiply by 3600 seconds = total weight
 
 
 ###############
 # SR entrance #
 ###############
 trans_name = 'T0'
-x = np.array([27,26,25,24,23])
+x = np.array([27,26,25,24])
 #x = np.array(list(range(20,28)))
 #y = np.array([0]*len(x))
-y = np.array([0,1,2,3,4])
+y = np.array([0,1,2,3])
 # Verify point location
 for i in range(len(x)):
     l = i/5
@@ -186,6 +233,7 @@ t2_total_sed = t2_cumtrapz_ssc[-1]*3600
 
 ## print out some information
 print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
+print('Tb = %e kg = %e tons' % (tb_total_sed, tb_total_sed/1000))
 print('T0 = %e kg = %e tons' % (t0_total_sed, t0_total_sed/1000))
 print('T1 = %e kg = %e tons' % (t1_total_sed, t1_total_sed/1000))
 print('T2 = %e kg = %e tons' % (t2_total_sed, t2_total_sed/1000))
@@ -359,6 +407,11 @@ axf.set_ylabel('SSC flux (kg/s)')
 fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
 
 # since integrating need to start at second timestep for time.
+axg.plot_date(datetime_list[1:], tb_cumtrapz_ssc, label='Tb',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axg.text(datetime_list[-1],tb_cumtrapz_ssc[-1],'%.2e tons' % (tb_total_sed/1000))
+
 axg.plot_date(datetime_list[1:], t0_cumtrapz_ssc, label='T0',
               xdate=True, linestyle='-', linewidth=0.5,
               marker='', markersize=1)

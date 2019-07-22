@@ -7,7 +7,7 @@ from matplotlib.dates import DateFormatter
 import numpy as np
 
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 
 
 ## river data
@@ -38,11 +38,11 @@ x = np.arange(20,30)
 y = np.array([1]*len(x))
 #x = 26
 #y = 1
-plant_height = f.variables['plant_height'][0, 0, :, :]
-plant_height = np.ma.masked_greater(plant_height, 1)
-plant_height[x, y] = 1
-plt.figure(1)
-plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
+#plant_height = f.variables['plant_height'][0, 0, :, :]
+#plant_height = np.ma.masked_greater(plant_height, 1)
+#plant_height[x, y] = 1
+#plt.figure(1)
+#plt.pcolor(f.variables['lon_rho'][:][:], f.variables['lat_rho'][:][:], plant_height)
 
 
 # calculate water column volume for points x and y
