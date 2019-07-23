@@ -36,7 +36,7 @@ Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # north-south (from panoply shoul
 Huon_mud_01 = f.variables['Huon_mud_01'][:]  # east-west
 Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # north-south
 plant_height = f.variables['Huon_sand_01'][0, 0, :, :]
-plant_height = plant_height[:, 1:]
+#plant_height = plant_height[:, 1:]
 
 s_rho = f.variables['s_rho'][:]  # depth levels
 

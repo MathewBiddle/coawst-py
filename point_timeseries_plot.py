@@ -1,26 +1,13 @@
-#%tb
 import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
-from mpl_toolkits.basemap import Basemap
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
-#from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-#from matplotlib.ticker import LinearLocator, FormatStrFormatter
-#import warnings
 import numpy as np
-import datetime
-import time
 import netCDF4
 import pandas as pd
 import coawstpy
-#import sys
-#import os
 
-## point location geo
-#lat_pt = 39.516345
-#lon_pt = -76.034109
 
 # Cindy's locations
 locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
@@ -37,7 +24,7 @@ locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
                    '','','','','','','',
                    'CBIBS Susquehanna Flats','Larry tripod site']
 
-z_pt = 4 # 0=bottom 4=surface
+z_pt = -1 # 0=bottom 4=surface (-1)
 
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 inputfile = dir+'/upper_ches_his.nc'
@@ -238,7 +225,7 @@ for site in sites:
     fig.suptitle('Site %s @ %fN %fE' % (site, f.variables['lat_rho'][x, y], f.variables['lon_rho'][x, y]))
     #fig.axes[0].title('test')
 
-    outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/veg/site_%s_timeseries_lowres.png' % site
-    print("Saving to %s" % outfile)
-    plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
+    #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/veg/site_%s_timeseries_lowres.png' % site
+    #print("Saving to %s" % outfile)
+    #plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
 
