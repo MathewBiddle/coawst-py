@@ -9,20 +9,36 @@ import coawstpy
 import scipy.integrate as integrate
 
 # bring in the data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 inputfile = dir+'/upper_ches_avg.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
 # Get the data we want
 ocean_time = f.variables['ocean_time'][:]
-lat = f.variables['lat_rho'][:]
-lon = f.variables['lon_rho'][:]
-Huon_sand_01 = f.variables['Huon_sand_01'][:] # east-west (from panoply should be S)
-Hvom_sand_01 = f.variables['Hvom_sand_01'][:] # north-south (from panoply should be E)
-Huon_mud_01 = f.variables['Huon_mud_01'][:] # east-west
-Hvom_mud_01 = f.variables['Hvom_mud_01'][:] # north-south
-plant_height = f.variables['Huon_sand_01'][0,0,:,:]
-s_rho = f.variables['s_rho'][:] # depth levels
+#lat = f.variables['lat_v'][:]
+#lon = f.variables['lon_v'][:]
+
+# from https://github.com/trondkr/romstools/blob/master/VolumeFlux/tools.py
+## TODO look at some of the scripts at https://github.com/ESMG/pyroms for using lat_v coordinates
+## also some scripts at https://github.com/bjornaa/roppy/tree/master/roppy
+lat_v = f.variables['lat_v'][:]
+lat_u = f.variables['lat_u'][:]
+lon_v = f.variables['lon_v'][:]
+lon_u = f.variables['lon_u'][:]
+mask_v = f.variables['mask_v'][:]
+lat = lat_u
+lon = lon_u
+#lat = 0.5 * (lat_v[:-1,:] + lat_v[1:,:])
+#lon = 0.5 * (lon_v[:-1,:] + lon_v[1:,:])
+
+Huon_sand_01 = f.variables['Huon_sand_01'][:]  # east-west (from panoply should be S)
+Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # north-south (from panoply should be E)
+Huon_mud_01 = f.variables['Huon_mud_01'][:]  # east-west
+Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # north-south
+plant_height = f.variables['Huon_sand_01'][0, 0, :, :]
+plant_height = plant_height[:, 1:]
+
+s_rho = f.variables['s_rho'][:]  # depth levels
 
 tx1 = 1202
 tx2 = 1466
