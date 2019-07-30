@@ -39,8 +39,8 @@ mask_v = f.variables['mask_v'][:]
 lat = 0.5 * (lat_v[:,1:] + lat_v[:,:-1]) # v ==> psi
 lon = 0.5 * (lon_v[:,1:] + lon_v[:,:-1]) # v ==> psi
 
-#lat = 0.5 * (lat_v[:-1,:] + lat_v[1:,:])
-#lon = 0.5 * (lon_v[:-1,:] + lon_v[1:,:])
+#lat = 0.5 * (lat_u[1:,:] + lat_u[:-1,:])
+#lon = 0.5 * (lon_u[1:,:] + lon_u[:-1,:])
 
 
 Huon_sand_01 = f.variables['Huon_sand_01'][:]  # lon_u east-west (from panoply should be S)
@@ -123,18 +123,14 @@ tb_total_sed = tb_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we m
 ###############
 trans_name = 'T0'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array([26,25,24])
+x = np.array([26,25,24,23])
 #x = np.array(list(range(20,28)))
 #y = np.array([0]*len(x))
-y = np.array([1,2,3])
+y = np.array([0,1,2,3])
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 100#l*100
-plt.figure()
-plt.pcolor(lon, lat, plant_height)
-plt.title('Transects')
-sys.exit()
+    plant_height[x[i], y[i]] = 10#l*100
 
 # Gather subset data
 t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -294,7 +290,7 @@ c_t2 = 12
 print("Making plots...")
 # map of transect
 plt.figure()
-plt.pcolor(lon, lat, plant_height)
+plt.pcolor(lon, lat, plant_height, edgecolors='k', cmap='PuBu')
 plt.title('Transects')
 
 #  plot raw velocity
