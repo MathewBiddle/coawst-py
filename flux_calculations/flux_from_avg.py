@@ -11,6 +11,7 @@ import scipy.integrate as integrate
 # bring in the data
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 inputfile = dir+'/upper_ches_avg.nc'
+print('Reading %s...' % inputfile.split("/")[-1])
 f = netCDF4.Dataset(inputfile, 'r')
 
 # Get the data we want
@@ -22,20 +23,39 @@ ocean_time = f.variables['ocean_time'][:]
 ## TODO look at some of the scripts at https://github.com/ESMG/pyroms for using lat_v coordinates
 ## also some scripts at https://github.com/bjornaa/roppy/tree/master/roppy
 lat_v = f.variables['lat_v'][:]
-lat_u = f.variables['lat_u'][:]
 lon_v = f.variables['lon_v'][:]
+lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
 mask_v = f.variables['mask_v'][:]
-lat = lat_u
-lon = lon_u
+
+# adjust to uniform grid
+# https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
+# u ==> psi
+# 0.5 * (varin[:,1:,:] + varin[:,:-1,:])
+# v ==> psi
+# 0.5 * (varin[:,:,1:] + varin[:,:,:-1])
+# TODO figure out if that transformation is correct. nervous about non-contiguous grids at SR mouth
+
+lat = 0.5 * (lat_v[:,1:] + lat_v[:,:-1]) # v ==> psi
+lon = 0.5 * (lon_v[:,1:] + lon_v[:,:-1]) # v ==> psi
+
 #lat = 0.5 * (lat_v[:-1,:] + lat_v[1:,:])
 #lon = 0.5 * (lon_v[:-1,:] + lon_v[1:,:])
 
-Huon_sand_01 = f.variables['Huon_sand_01'][:]  # east-west (from panoply should be S)
-Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # north-south (from panoply should be E)
-Huon_mud_01 = f.variables['Huon_mud_01'][:]  # east-west
-Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # north-south
-plant_height = f.variables['Huon_sand_01'][0, 0, :, :]
+
+Huon_sand_01 = f.variables['Huon_sand_01'][:]  # lon_u east-west (from panoply should be S)
+Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # lon_v north-south (from panoply should be E)
+Huon_mud_01 = f.variables['Huon_mud_01'][:]  # lon_u east-west
+Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # lon_v north-south
+
+Huon_sand_01 = 0.5 * (Huon_sand_01[:,:,1:,:] + Huon_sand_01[:,:,:-1,:]) # u ==> psi
+Hvom_sand_01 = 0.5 * (Hvom_sand_01[:,:,:,1:] + Hvom_sand_01[:,:,:,:-1]) # v ==> psi
+
+Huon_mud_01 = 0.5 * (Huon_mud_01[:,:,1:,:] + Huon_mud_01[:,:,:-1,:]) # u ==> psi
+Hvom_mud_01 = 0.5 * (Hvom_mud_01[:,:,:,1:] + Hvom_mud_01[:,:,:,:-1]) # v ==> psi
+
+plant_height = Hvom_sand_01[0,0,:,:]
+#plant_height = f.variables['Hvom_sand_01'][0, 0, :, :]
 #plant_height = plant_height[:, 1:]
 
 s_rho = f.variables['s_rho'][:]  # depth levels
@@ -52,6 +72,7 @@ for sec in ocean_time:
 # SR entrance Model boundary #
 ##############################
 trans_name = 'Tb'
+print('Extracting data for transect %s...' % trans_name)
 x = np.array(list(range(20,28)))
 y = np.array([0]*len(x))
 # Verify point location
@@ -101,14 +122,19 @@ tb_total_sed = tb_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we m
 # SR entrance #
 ###############
 trans_name = 'T0'
-x = np.array([27,26,25,24])
+print('Extracting data for transect %s...' % trans_name)
+x = np.array([26,25,24])
 #x = np.array(list(range(20,28)))
 #y = np.array([0]*len(x))
-y = np.array([0,1,2,3])
+y = np.array([1,2,3])
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 10#l*100
+    plant_height[x[i], y[i]] = 100#l*100
+plt.figure()
+plt.pcolor(lon, lat, plant_height)
+plt.title('Transects')
+sys.exit()
 
 # Gather subset data
 t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -152,6 +178,7 @@ t0_total_sed = t0_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we m
 # Susquehanna River mouth #
 ###########################
 trans_name = 'T1'
+print('Extracting data for transect %s...' % trans_name)
 #x = np.array([29,30,31,32])
 #y = np.array([13,12,11,10])
 x = np.array([29,30,31])
@@ -201,6 +228,7 @@ t1_total_sed = t1_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we m
 # Turkey Point to Sandy Point #
 ###############################
 trans_name = 'T2'
+print('Extracting data for transect %s...' % trans_name)
 x = np.array(list(range(42,66)))  #
 y = np.array([58]*len(x))
 
@@ -263,6 +291,7 @@ c_t0 = 3
 c_t1 = 1
 c_t2 = 12
 
+print("Making plots...")
 # map of transect
 plt.figure()
 plt.pcolor(lon, lat, plant_height)
