@@ -77,20 +77,3 @@ def rot2xy(ue, vn, projangle):
     vy = -ue*np.sin(theta*np.pi/180)+vn*np.cos(theta*np.pi/180)
     return ux, vy
 
-
-def get_transect(f, transect, var, latst, lonst, latend, lonend):
-
-    out = dict({transect: {'variable': var,
-                           'data': [],
-                           'latitude': [],
-                           'longitude': [],
-                           'idx': [],
-                           'idy': []
-                           }})
-    # TODO work up finding index from lat/lon values
-    x = 1
-    y = 1
-
-    out[transect]['data'] = f.variable[var][:, :, x, y]
-
-    return out
