@@ -35,11 +35,8 @@ SA = (1/pm) * (1/pn)
 SAm = np.ma.masked_where(mask_rho == 0, SA)
 cell_vol_init = hm * SAm # total initial volume of water in valid cells. assuming all cells are square!
 
-# TODO calculate the integral across x and y
-total_cell_vol_x = integrate.trapz(cell_vol_init,axis=0)
-total_cell_vol_y = integrate.trapz(cell_vol_init,axis=1)
 print('Initial domain volumes:  TotVolume = 6.1046316405e+08 m3\n   Calculated Initial Total Volume = %e m3' % np.sum(cell_vol_init))
-#sys.exit()
+
 ## Do some date conversions ##
 datetime_list=[]
 for sec in ocean_time:
@@ -49,7 +46,7 @@ for sec in ocean_time:
 # Calculate the delta bed thickness
 # time indexes: 1202 - 1466 for event
 bed_thick_init = np.sum(bed_thick[0,:,:,:],axis=0) # total from all 3 bed layers
-bed_thick_final = np.sum(bed_thick[10,:,:,:],axis=0) # total from all 3 bed layers
+bed_thick_final = np.sum(bed_thick[-1,:,:,:],axis=0) # total from all 3 bed layers
 bed_thick_diff = bed_thick_final - bed_thick_init # meters
 
 # Susquehanna River mouth
@@ -96,7 +93,7 @@ plt.ylabel('total bed thickness [m]')
 plt.title('Bed thickness time series at point index (32,15)')
 #plt.plot_date(datetime_list,integrate.trapz(bed_thick[:,:,32,15],axis=1),label='trapz',markersize=1,linewidth=1)
 plt.legend()
-sys.exit()
+#sys.exit()
 ## Plotting
 # apply the mask
 # plant_height = 5 is where the region of interest is.
@@ -136,6 +133,7 @@ cax = m.pcolormesh(lon, lat, bed_ero_vol, latlon=True,
                     cmap='jet', ax=ax)
 cbar = fig.colorbar(cax)
 cbar.set_label('Bed volume eroded [m^3]')
+plt.title('mass eroded = %e tons' % (np.sum(mass_eroded) / 1000))
 #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
 
 # set up figure
@@ -153,6 +151,7 @@ cax = m.pcolormesh(lon, lat, bed_dep_vol, latlon=True,
                     cmap='jet', ax=ax)
 cbar = fig.colorbar(cax)
 cbar.set_label('Bed volume deposited [m^3]')
+plt.title('mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
 #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import scipy.integrate as integrate
 
 
 def stick_plot(time, u, v, **kw):
@@ -77,3 +78,48 @@ def rot2xy(ue, vn, projangle):
     vy = -ue*np.sin(theta*np.pi/180)+vn*np.cos(theta*np.pi/180)
     return ux, vy
 
+
+def sediment_flux(mud_flux_xe,mud_flux_yn,sand_flux_xe,sand_flux_yn,srho_angle,tx1,tx2):
+    mud_flux_ux_rot = np.empty(mud_flux_xe.shape)
+    mud_flux_vy_rot = np.empty(mud_flux_yn.shape)
+    sand_flux_ux_rot = np.empty(sand_flux_xe.shape)
+    sand_flux_vy_rot = np.empty(sand_flux_yn.shape)
+
+    # compute angle and rotate
+    angle = maj_ax(mud_flux_xe[tx1:tx2, srho_angle, :], mud_flux_yn[tx1:tx2, srho_angle, :])
+    angle_list = []
+    for t in range(0, mud_flux_yn.shape[0]):  # time
+        angle_list.append(maj_ax(mud_flux_xe[t, srho_angle, :], mud_flux_yn[t, srho_angle, :]))
+        for xy in range(0, mud_flux_yn.shape[2]):  # cell in xy
+            for z in range(0, mud_flux_yn.shape[1]):
+                # ux - along channel velocity
+                # vy - cross channel velocity (positive to the left of the along channel
+                mud_flux_ux_rot[t, z, xy], mud_flux_vy_rot[t, z, xy] = rot2xy(
+                    mud_flux_xe[t, z, xy], mud_flux_yn[t, z, xy], angle)
+
+                sand_flux_ux_rot[t, z, xy], sand_flux_vy_rot[t, z, xy] = rot2xy(
+                    sand_flux_xe[t, z, xy], sand_flux_yn[t, z, xy], angle)
+
+    # magnitude of the rotated flux
+    mag_mud = np.sqrt(mud_flux_ux_rot ** 2 + mud_flux_vy_rot ** 2)
+    mag_sand = np.sqrt(sand_flux_ux_rot ** 2 + sand_flux_vy_rot ** 2)
+    mag_ssc = mag_mud + mag_sand  # total sediment together
+    SSC_ts_sum = np.sum(mag_ssc, axis=(1, 2))  # sum over depth and transect
+    #cumsum_ssc = np.nancumsum(SSC_ts_sum, axis=0)  # cumulative sum over time
+    cumtrapz_ssc = integrate.cumtrapz(SSC_ts_sum, axis=0)  # cumulative integral over time
+    total_sed = cumtrapz_ssc[-1] * 3600  # sum is integrated for every hour, multiply by 3600 seconds = total weight
+
+    outdict = dict()
+    outdict['angle_list'] = angle_list
+    outdict['angle'] = angle
+    outdict['mud_flux_ux_rot'] = mud_flux_ux_rot
+    outdict['mud_flux_vy_rot'] = mud_flux_vy_rot
+    outdict['sand_flux_ux_rot'] = sand_flux_ux_rot
+    outdict['sand_flux_vy_rot'] = sand_flux_vy_rot
+    outdict['mag_mud'] = mag_mud
+    outdict['mag_sand'] = mag_sand
+    outdict['mag_ssc'] = mag_ssc
+    outdict['SSC_ts_sum'] = SSC_ts_sum
+    outdict['cumtrapz_ssc'] = cumtrapz_ssc
+    outdict['total_sed'] = total_sed
+    return outdict
