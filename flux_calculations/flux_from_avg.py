@@ -78,7 +78,7 @@ y = np.array([0]*len(x))
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 10#l*100
+    plant_height[x[i], y[i]] = 5#l*100
 
 # Gather subset data
 tb_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -86,51 +86,22 @@ tb_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 tb_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-# init arrays
-tb_mud_01_flux_ux_rot = np.empty(tb_mud_01_flux_xe.shape)
-tb_mud_01_flux_vy_rot = np.empty(tb_mud_01_flux_yn.shape)
-tb_sand_01_flux_ux_rot = np.empty(tb_sand_01_flux_xe.shape)
-tb_sand_01_flux_vy_rot = np.empty(tb_sand_01_flux_yn.shape)
-
-# compute angle and rotate
-# angle = maj_ax(ue, vn)
-tb_angle = coawstpy.maj_ax(tb_mud_01_flux_xe[tx1:tx2, srho_angle, :], tb_mud_01_flux_yn[tx1:tx2, srho_angle, :])
-tb_angle_list = []
-for t in range(0,tb_mud_01_flux_yn.shape[0]):  # time
-    tb_angle_list.append(coawstpy.maj_ax(tb_mud_01_flux_xe[t, srho_angle, :], tb_mud_01_flux_yn[t, srho_angle, :]))
-    for xy in range(0, tb_mud_01_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,tb_mud_01_flux_yn.shape[1]):
-            # ux,uy = rot2xy(ue, vn, projangle)
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            tb_mud_01_flux_ux_rot[t, z, xy], tb_mud_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                tb_mud_01_flux_xe[t, z, xy], tb_mud_01_flux_yn[t, z, xy], tb_angle)
-
-            tb_sand_01_flux_ux_rot[t, z, xy], tb_sand_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                tb_sand_01_flux_xe[t, z, xy], tb_sand_01_flux_yn[t, z, xy], tb_angle)
-
-tb_mag_mud_01 = np.sqrt(tb_mud_01_flux_ux_rot**2 + tb_mud_01_flux_vy_rot**2)
-tb_mag_sand_01 = np.sqrt(tb_sand_01_flux_ux_rot**2 + tb_sand_01_flux_vy_rot**2)
-tb_mag_ssc = tb_mag_mud_01 + tb_mag_sand_01 # total sediment together
-tb_SSC_ts_sum = np.sum(tb_mag_ssc, axis=(1,2)) # sum over depth and transect
-tb_cumsum_ssc = np.nancumsum(tb_SSC_ts_sum, axis=0)  # cumulative sum over time
-tb_cumtrapz_ssc = integrate.cumtrapz(tb_SSC_ts_sum, axis=0)  # cumulative integral over time
-tb_total_sed = tb_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we multiply by 3600 seconds = total weight
-
+Tb = coawstpy.sediment_flux(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
+Tb['name'] = trans_name
 
 ###############
 # SR entrance #
 ###############
 trans_name = 'T0'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array([26,25,24,23])
+x = np.array([27,26,25,24,23])
 #x = np.array(list(range(20,28)))
 #y = np.array([0]*len(x))
-y = np.array([0,1,2,3])
+y = np.array([0,0,1,2,3])
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 10#l*100
+    plant_height[x[i], y[i]] = 10
 
 # Gather subset data
 t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -138,37 +109,8 @@ t0_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t0_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-# init arrays
-t0_mud_01_flux_ux_rot = np.empty(t0_mud_01_flux_xe.shape)
-t0_mud_01_flux_vy_rot = np.empty(t0_mud_01_flux_yn.shape)
-t0_sand_01_flux_ux_rot = np.empty(t0_sand_01_flux_xe.shape)
-t0_sand_01_flux_vy_rot = np.empty(t0_sand_01_flux_yn.shape)
-
-# compute angle and rotate
-# angle = maj_ax(ue, vn)
-t0_angle = coawstpy.maj_ax(t0_mud_01_flux_xe[tx1:tx2, srho_angle, :], t0_mud_01_flux_yn[tx1:tx2, srho_angle, :])
-t0_angle_list = []
-for t in range(0,t0_mud_01_flux_yn.shape[0]):  # time
-    t0_angle_list.append(coawstpy.maj_ax(t0_mud_01_flux_xe[t, srho_angle, :], t0_mud_01_flux_yn[t, srho_angle, :]))
-    for xy in range(0, t0_mud_01_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,t0_mud_01_flux_yn.shape[1]):
-            # ux,uy = rot2xy(ue, vn, projangle)
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            t0_mud_01_flux_ux_rot[t, z, xy], t0_mud_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t0_mud_01_flux_xe[t, z, xy], t0_mud_01_flux_yn[t, z, xy], t0_angle)
-
-            t0_sand_01_flux_ux_rot[t, z, xy], t0_sand_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t0_sand_01_flux_xe[t, z, xy], t0_sand_01_flux_yn[t, z, xy], t0_angle)
-
-t0_mag_mud_01 = np.sqrt(t0_mud_01_flux_ux_rot**2 + t0_mud_01_flux_vy_rot**2)
-t0_mag_sand_01 = np.sqrt(t0_sand_01_flux_ux_rot**2 + t0_sand_01_flux_vy_rot**2)
-t0_mag_ssc = t0_mag_mud_01 + t0_mag_sand_01 # total sediment together
-t0_SSC_ts_sum = np.sum(t0_mag_ssc, axis=(1,2)) # sum over depth and transect
-t0_cumsum_ssc = np.nancumsum(t0_SSC_ts_sum, axis=0)  # cumulative sum over time
-t0_cumtrapz_ssc = integrate.cumtrapz(t0_SSC_ts_sum, axis=0)  # cumulative integral over time
-t0_total_sed = t0_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we multiply by 3600 seconds = total weight
-
+T0 = coawstpy.sediment_flux(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
+T0['name'] = trans_name
 
 ###########################
 # Susquehanna River mouth #
@@ -190,35 +132,8 @@ t1_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t1_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-t1_mud_01_flux_ux_rot = np.empty(t1_mud_01_flux_xe.shape)
-t1_mud_01_flux_vy_rot = np.empty(t1_mud_01_flux_yn.shape)
-t1_sand_01_flux_ux_rot = np.empty(t1_sand_01_flux_xe.shape)
-t1_sand_01_flux_vy_rot = np.empty(t1_sand_01_flux_yn.shape)
-
-# compute angle and rotate
-t1_angle = coawstpy.maj_ax(t1_mud_01_flux_xe[tx1:tx2, srho_angle, :], t1_mud_01_flux_yn[tx1:tx2, srho_angle, :])
-t1_angle_list = []
-for t in range(0,t1_mud_01_flux_yn.shape[0]):  # time
-    t1_angle_list.append(coawstpy.maj_ax(t1_mud_01_flux_xe[t, srho_angle, :], t1_mud_01_flux_yn[t, srho_angle, :]))
-    for xy in range(0, t1_mud_01_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,t1_mud_01_flux_yn.shape[1]):
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            t1_mud_01_flux_ux_rot[t, z, xy], t1_mud_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t1_mud_01_flux_xe[t, z, xy], t1_mud_01_flux_yn[t, z, xy], t1_angle)
-
-            t1_sand_01_flux_ux_rot[t, z, xy], t1_sand_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t1_sand_01_flux_xe[t, z, xy], t1_sand_01_flux_yn[t, z, xy], t1_angle)
-
-# magnitude of the rotated flux
-t1_mag_mud_01 = np.sqrt(t1_mud_01_flux_ux_rot**2 + t1_mud_01_flux_vy_rot**2)
-t1_mag_sand_01 = np.sqrt(t1_sand_01_flux_ux_rot**2 + t1_sand_01_flux_vy_rot**2)
-t1_mag_ssc = t1_mag_mud_01 + t1_mag_sand_01 # total sediment together
-t1_SSC_ts_sum = np.sum(t1_mag_ssc, axis=(1,2)) # sum over depth and transect
-t1_cumsum_ssc = np.nancumsum(t1_SSC_ts_sum, axis=0)  # cumulative sum over time
-t1_cumtrapz_ssc = integrate.cumtrapz(t1_SSC_ts_sum, axis=0)  # cumulative integral over time
-t1_total_sed = t1_cumtrapz_ssc[-1]*3600 # sum is integrated for every hour, we multiply by 3600 seconds = total weight
-
+T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
+T1['name'] = trans_name
 
 ###############################
 # Turkey Point to Sandy Point #
@@ -239,45 +154,17 @@ t2_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t2_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-# init arrays
-t2_mud_01_flux_ux_rot = np.empty(t2_mud_01_flux_xe.shape)
-t2_mud_01_flux_vy_rot = np.empty(t2_mud_01_flux_yn.shape)
-t2_sand_01_flux_ux_rot = np.empty(t2_sand_01_flux_xe.shape)
-t2_sand_01_flux_vy_rot = np.empty(t2_sand_01_flux_yn.shape)
-
-# compute angle and rotate
-t2_angle = coawstpy.maj_ax(t2_mud_01_flux_xe[tx1:tx2, srho_angle, :], t2_mud_01_flux_yn[tx1:tx2, srho_angle, :])
-t2_angle_list = []
-for t in range(0,t2_mud_01_flux_yn.shape[0]):  # time
-    t2_angle_list.append(coawstpy.maj_ax(t2_mud_01_flux_xe[t, srho_angle, :], t2_mud_01_flux_yn[t, srho_angle, :]))
-    for xy in range(0, t2_mud_01_flux_yn.shape[2]):  # cell in xy
-        for z in range(0,t2_mud_01_flux_yn.shape[1]):
-            # ux - along channel velocity
-            # vy - cross channel velocity (positive to the left of the along channel
-            t2_mud_01_flux_ux_rot[t, z, xy], t2_mud_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t2_mud_01_flux_xe[t, z, xy], t2_mud_01_flux_yn[t, z, xy], t2_angle)
-
-            t2_sand_01_flux_ux_rot[t, z, xy], t2_sand_01_flux_vy_rot[t, z, xy] = coawstpy.rot2xy(
-                t2_sand_01_flux_xe[t, z, xy], t2_sand_01_flux_yn[t, z, xy], t2_angle)
-
-# magnitude of rotated flux
-t2_mag_mud_01 = np.sqrt(t2_mud_01_flux_ux_rot**2 + t2_mud_01_flux_vy_rot**2)
-t2_mag_sand_01 = np.sqrt(t2_sand_01_flux_ux_rot**2 + t2_sand_01_flux_vy_rot**2)
-t2_mag_ssc = t2_mag_mud_01 + t2_mag_sand_01 # total sediment together
-t2_SSC_ts_sum = np.sum(t2_mag_ssc, axis=(1,2)) # sum across transect and depth
-t2_cumsum_ssc = np.nancumsum(t2_SSC_ts_sum, axis=0)  # cumulative sum over time
-t2_cumtrapz_ssc = integrate.cumtrapz(t2_SSC_ts_sum, axis=0)  # cumulative integral over time
-t2_total_sed = t2_cumtrapz_ssc[-1]*3600
+T2 = coawstpy.sediment_flux(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
+T2['name'] = trans_name
 
 
 
 ## print out some information
 print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
-print('Tb = %e kg = %e tons' % (tb_total_sed, tb_total_sed/1000))
-print('T0 = %e kg = %e tons' % (t0_total_sed, t0_total_sed/1000))
-print('T1 = %e kg = %e tons' % (t1_total_sed, t1_total_sed/1000))
-print('T2 = %e kg = %e tons' % (t2_total_sed, t2_total_sed/1000))
-sys.exit()
+trans = [Tb,T0,T1,T2] # group all transects together to loop over
+for t in trans:
+    print('%s = %e kg = %e tons' % (t['name'],t['total_sed'], t['total_sed']/1000))
+
 ## Create some plots
 # pick a depth and cell for investigation
 # srho = depth coordinate
@@ -318,7 +205,21 @@ plt.title('Transects')
 # axd[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 # axd[1].legend()
 
+# plot cumulative sum of SSC for transect
+fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+for t in trans:
+    axg.plot_date(datetime_list[1:],t['cumtrapz_sand'],label=t['name'],
+                  xdate=True, linestyle='-', linewidth=0.5,
+                  marker='', markersize=1)
+    axg.text(datetime_list[-1],t['cumtrapz_sand'][-1],'%.2e tons' %(t['total_sand']/1000))
 
+axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axg.legend()
+axg.set_title('Cumulative integral of the rotated flux for transects')
+axg.set_ylabel('Cumulative integral of mud flux (kg/s)')
+
+sys.exit()
 # plot non-rotated flux
 srho = 3
 fig, (axa) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8),sharex=True)

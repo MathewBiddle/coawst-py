@@ -164,9 +164,6 @@ for t in trans:
     print('%s = %e kg = %e tons' % (t['name'],t['total_sed'], t['total_sed']/1000))
 #sys.exit()
 
-
-
-
 ## Create some plots
 # pick a depth and cell for investigation
 # srho = depth coordinate

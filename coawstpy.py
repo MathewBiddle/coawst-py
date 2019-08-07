@@ -107,6 +107,10 @@ def sediment_flux(mud_flux_xe,mud_flux_yn,sand_flux_xe,sand_flux_yn,srho_angle,t
     SSC_ts_sum = np.sum(mag_ssc, axis=(1, 2))  # sum over depth and transect
     #cumsum_ssc = np.nancumsum(SSC_ts_sum, axis=0)  # cumulative sum over time
     cumtrapz_ssc = integrate.cumtrapz(SSC_ts_sum, axis=0)  # cumulative integral over time
+    cumtrapz_mud = integrate.cumtrapz(np.sum(mag_mud,axis=(1,2)), axis=0)
+    cumtrapz_sand = integrate.cumtrapz(np.sum(mag_sand,axis=(1,2)), axis=0)
+    total_mud = cumtrapz_mud[-1] * 3600
+    total_sand = cumtrapz_sand[-1] * 3600
     total_sed = cumtrapz_ssc[-1] * 3600  # sum is integrated for every hour, multiply by 3600 seconds = total weight
 
     outdict = dict()
@@ -120,6 +124,10 @@ def sediment_flux(mud_flux_xe,mud_flux_yn,sand_flux_xe,sand_flux_yn,srho_angle,t
     outdict['mag_sand'] = mag_sand
     outdict['mag_ssc'] = mag_ssc
     outdict['SSC_ts_sum'] = SSC_ts_sum
+    outdict['cumtrapz_mud'] = cumtrapz_mud
+    outdict['cumtrapz_sand'] = cumtrapz_sand
     outdict['cumtrapz_ssc'] = cumtrapz_ssc
+    outdict['total_mud'] = total_mud
+    outdict['total_sand'] = total_sand
     outdict['total_sed'] = total_sed
     return outdict

@@ -11,6 +11,7 @@ dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST
 
 
 ## river data
+print("Reading river data...")
 river_frc = dir+'/river_frc.nc'
 f_river = netCDF4.Dataset(river_frc, 'r')
 river_time = f_river.variables['river_time'][:]
@@ -22,6 +23,7 @@ for sec in river_time:
 
 
 ## wind data
+print("Reading wind data...")
 ptsfile = dir+"/tripod_wave.pts"
 ptsdf = pd.read_fwf(ptsfile, header=4)
 ptsdf.drop([0,1],axis=0,inplace=True)
@@ -35,6 +37,7 @@ ptsdf['X-Windv']=ptsdf['X-Windv'].astype(float)
 ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
 
 ## tide data
+print("Reading tide data...")
 bry_file = dir + '/upper_ches_bry.nc'
 f_bry = netCDF4.Dataset(bry_file, 'r')
 bry_time = f_bry.variables['zeta_time'][:]
@@ -44,41 +47,56 @@ for sec in bry_time:
     bry_datetime_list.append(netCDF4.num2date(sec, units=f_bry.variables['zeta_time'].units, calendar='standard'))
 
 ## plotting
-fig, (ax) = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(12, 8))
+print("Creating plots...")
+fig, (ax) = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.1)
 myFmt = DateFormatter("%m/%d")
 dayint=10
 xlim= (ptsdf['Time'].min(), ptsdf['Time'].max())
 
 ax[0].plot_date(river_datetime_list,
-                (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
+                np.sum(f_river.variables['river_sand_01'],axis=(1,2)), label='sand',
+                xdate=True, linestyle='-', linewidth=0.5,
+                marker='', markersize=1)
+ax[0].plot_date(river_datetime_list,
+                np.sum(f_river.variables['river_mud_01'],axis=(1,2)), label='mud',
                 xdate=True, linestyle='-', linewidth=0.5,
                 marker='', markersize=1)
 ax[0].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].set_xlim(xlim)
-ax[0].set_ylabel('Discharge (m3/s)')
+ax[0].legend()
+ax[0].set_ylabel('River SSC (m3/s)')
 
-coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[1])
+ax[1].plot_date(river_datetime_list,
+                (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
+                xdate=True, linestyle='-', linewidth=0.5,
+                marker='', markersize=1)
 ax[1].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel('Wind')
+ax[1].set_ylabel('Discharge (m3/s)')
 
-ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
-                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
+coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2])
 ax[2].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[2].xaxis.set_major_formatter(myFmt)
 ax[2].set_xlim(xlim)
-ax[2].set_ylabel('Wind Speed [m/s]')
+ax[2].set_ylabel('Wind')
 
-
-ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
+ax[3].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
+                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
 ax[3].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[3].xaxis.set_major_formatter(myFmt)
 ax[3].set_xlim(xlim)
-ax[3].set_ylabel('Water surface [m]')
+ax[3].set_ylabel('Wind Speed [m/s]')
+
+
+ax[4].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
+                     marker='', markersize=1)
+ax[4].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+ax[4].xaxis.set_major_formatter(myFmt)
+ax[4].set_xlim(xlim)
+ax[4].set_ylabel('Water surface [m]')
 
 
 
