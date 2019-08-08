@@ -9,8 +9,12 @@ import coawstpy
 import scipy.integrate as integrate
 
 # bring in the data
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+if dir.split("_")[-1] == 'noveg':
+    run = "noveg"
+else:
+    run = "veg"
 inputfile = dir+'/upper_ches_avg.nc'
 print('Reading %s...' % inputfile.split("/")[-1])
 f = netCDF4.Dataset(inputfile, 'r')
@@ -206,19 +210,32 @@ plt.title('Transects')
 # axd[1].legend()
 
 # plot cumulative sum of SSC for transect
-fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+varlist = ['cumtrapz_ssc','cumtrapz_mud','cumtrapz_sand','mag_mud', 'mag_sand', 'mag_ssc']
+trans = [Tb,T1,T2]
+for var in varlist:
+    fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+    for t in trans:
+        if var.split("_")[0] == 'mag':
+            axg.plot_date(datetime_list, np.sum(t[var],axis=(1,2)), label=t['name'],
+                          xdate=True, linestyle='-', linewidth=0.5,
+                          marker='', markersize=1)
+            #axg.text(datetime_list[-1], np.sum(t[var],axis=(1,2))[-1], '%.2e tons' % ((np.sum(t[var],axis=(1,2))[-1] * 3600) / 1000))
+        else:
+            axg.plot_date(datetime_list[1:],t[var],label=t['name'],
+                      xdate=True, linestyle='-', linewidth=0.5,
+                      marker='', markersize=1)
+            axg.text(datetime_list[-1],t[var][-1],'%.2e tons' %((t[var][-1] * 3600)/1000))
 
-for t in trans:
-    axg.plot_date(datetime_list[1:],t['cumtrapz_ssc'],label=t['name'],
-                  xdate=True, linestyle='-', linewidth=0.5,
-                  marker='', markersize=1)
-    axg.text(datetime_list[-1],t['cumtrapz_ssc'][-1],'%.2e tons' %(t['total_sed']/1000))
-
-axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
-axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
-axg.legend()
-axg.set_title('Cumulative integral of the rotated flux for transects veg')
-axg.set_ylabel('Cumulative integral of ssc flux (kg/s)')
+    axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+    axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+    axg.set_yscale('log')
+    axg.legend()
+    if var.split("_")[0] == 'cumtrapz':
+        axg.set_title('Cumulative integral of the rotated flux for transects %s' % run)
+        axg.set_ylabel('Cumulative integral of %s flux (kg/s)' % var.split("_")[-1])
+    else:
+        axg.set_title('Magnitude of the rotated flux for transects %s' % run)
+        axg.set_ylabel('Magnitude of %s flux (kg/s)' % var.split("_")[-1])
 
 sys.exit()
 

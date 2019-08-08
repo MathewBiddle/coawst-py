@@ -34,7 +34,12 @@ for location in locations:
 z_pt = 4 # 0=bottom 4=surface
 
 ## Vegetation File Load ##
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+if dir.split("_")[-1] == 'noveg':
+    run = "noveg"
+else:
+    run = "veg"
 inputfile = dir+'/upper_ches_his.nc'
 f_veg = netCDF4.Dataset(inputfile, 'r')
 ocean_time = f_veg.variables['ocean_time'][:]

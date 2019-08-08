@@ -26,7 +26,12 @@ locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
 
 z_pt = -1 # 0=bottom 4=surface (-1)
 
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+if dir.split("_")[-1] == 'noveg':
+    run = "noveg"
+else:
+    run = "veg"
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 ocean_time = f.variables['ocean_time'][:]

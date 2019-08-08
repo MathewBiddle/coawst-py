@@ -26,7 +26,12 @@ site = 'Lee6'
 lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
 
 ## Read COAWST data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+if dir.split("_")[-1] == 'noveg':
+    run = "noveg"
+else:
+    run = "veg"
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
@@ -45,8 +50,8 @@ for sec in ocean_time:
 dvar = 'bed_thickness'
 data = f.variables[dvar][:, :, :, :]
 
-data_init=np.sum(data[1202,:,:,:],axis=0) # total from all layers
-data_final=np.sum(data[1466,:,:,:],axis=0) # total from all layers
+data_init=np.sum(data[0,:,:,:],axis=0) # total from all layers
+data_final=np.sum(data[-1,:,:,:],axis=0) # total from all layers
 # set up figure
 fig, ax = plt.subplots(figsize=(8, 6))
 
@@ -62,7 +67,7 @@ cax = m.pcolormesh(lon, lat, (data_final-data_init)*100, latlon=True,
                     vmin=-10, vmax=10, cmap='jet', ax=ax)
 cbar = fig.colorbar(cax)
 cbar.set_label('Bed evolution [cm]')
-m.scatter(-76.079,39.414,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
-m.scatter(-76.088,39.380,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
-plt.title("%s through %s"%(datetime_list[1202],datetime_list[1466]))
+#m.scatter(-76.079,39.414,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
+#m.scatter(-76.088,39.380,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
+plt.title("No Veg %s through %s"%(datetime_list[0],datetime_list[-1]))
 print('Sediment Deposition @ %s = %f cm' % (site, (data_final[x, y]-data_init[x,y])*100))
