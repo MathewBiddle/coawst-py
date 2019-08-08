@@ -9,7 +9,8 @@ import coawstpy
 import scipy.integrate as integrate
 
 # bring in the data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 inputfile = dir+'/upper_ches_avg.nc'
 print('Reading %s...' % inputfile.split("/")[-1])
 f = netCDF4.Dataset(inputfile, 'r')
@@ -216,8 +217,8 @@ for t in trans:
 axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axg.legend()
-axg.set_title('Cumulative integral of the rotated flux for transects')
-axg.set_ylabel('Cumulative integral of SSC flux (kg/s)')
+axg.set_title('Cumulative integral of the rotated flux for transects veg')
+axg.set_ylabel('Cumulative integral of ssc flux (kg/s)')
 
 sys.exit()
 

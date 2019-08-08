@@ -21,7 +21,6 @@ for sec in river_time:
     river_datetime_list.append(
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 
-
 ## wind data
 print("Reading wind data...")
 ptsfile = dir+"/tripod_wave.pts"
@@ -66,7 +65,7 @@ ax[0].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].set_xlim(xlim)
 ax[0].legend()
-ax[0].set_ylabel('River SSC (m3/s)')
+ax[0].set_ylabel('River SSC (kg/m3)')
 
 ax[1].plot_date(river_datetime_list,
                 (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
