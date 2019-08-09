@@ -28,12 +28,12 @@ h = f.variables['h'][:] # at rho points
 ocean_time = f.variables['ocean_time'][:]
 bed_thick = f.variables['bed_thickness'][:] # m
 sand_mass = f.variables['sandmass_01'][:] # kg/m2
-mud_mass = f.variables['mudmass_01'][:] # kg/m2
+mud_mass = f.variables['mudmass_01'][:] # kg/m2 already accounts for cell height.
 mask_rho = f.variables['mask_rho'][:]
 Srho = f.variables['Srho'][0] # kg/m3 2650 kg/m^3 sediment grain density, same for both
 pm = f.variables['pm'][:] #XI --> cell width in x dir. east-west 1/m
 pn = f.variables['pn'][:] #ETA --> cell width in y dir. north-south Want to use this for Surface Area Calcs 1/m
-
+#sys.exit()
 hm = np.ma.masked_where(mask_rho == 0, h)  # initial masked water depth at rho points
 
 SA = (1/pm) * (1/pn) # m2
@@ -123,20 +123,20 @@ bed_erosion = np.ma.masked_greater(bed_thick_diff_ma, 0) # height in meters
 sand_mass_diff_ma = np.ma.masked_where(plant_height != 5, sand_mass_diff)
 sand_mass_deposition = np.ma.masked_less(sand_mass_diff_ma, 0) # deposited sand kg/m2
 sand_mass_erosion = np.ma.masked_greater(sand_mass_diff_ma, 0) # eroded sand kg/m2
-sand_mass_deposited = sand_mass_deposition# * SAm # kg/m^2 * m^2 = kg
-sand_mass_eroded = sand_mass_erosion# * SAm # kg/m^2 * m^2 = kg
+sand_mass_deposited = sand_mass_deposition * SAm # kg/m^2 * m^2 = kg
+sand_mass_eroded = sand_mass_erosion * SAm # kg/m^2 * m^2 = kg
 
 mud_mass_diff_ma = np.ma.masked_where(plant_height != 5, mud_mass_diff)
 mud_mass_deposition = np.ma.masked_less(mud_mass_diff_ma, 0) # deposited sand kg/m2
 mud_mass_erosion = np.ma.masked_greater(mud_mass_diff_ma, 0) # eroded sand kg/m2
-mud_mass_deposited = mud_mass_deposition# * SAm # kg/m^2 * m^2 = kg
-mud_mass_eroded = mud_mass_erosion# * SAm # kg/m^3 * m^2 = kg
+mud_mass_deposited = mud_mass_deposition * SAm # kg/m^2 * m^2 = kg
+mud_mass_eroded = mud_mass_erosion * SAm # kg/m^3 * m^2 = kg
 
 ## using volume
-bed_dep_vol = bed_deposition * SAm#.mean() # vol deposited m^3
-bed_ero_vol = bed_erosion * SAm#.mean() # vol eroded m^3
-mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
-mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
+#bed_dep_vol = bed_deposition * SAm#.mean() # vol deposited m^3
+#bed_ero_vol = bed_erosion * SAm#.mean() # vol eroded m^3
+#mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg # TODO multiply by dry bulk density using Srho and porosity
+#mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg # TODO multiply by dry bulk density using Srho and porosity
 
 ## using sed mass
 mass_eroded = sand_mass_eroded + mud_mass_eroded

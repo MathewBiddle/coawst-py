@@ -32,7 +32,7 @@ lon_v = f.variables['lon_v'][:]
 lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
 mask_v = f.variables['mask_v'][:]
-
+sys.exit()
 # adjust to uniform grid
 # https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
 # u ==> psi
@@ -65,8 +65,8 @@ plant_height = Hvom_sand_01[0,0,:,:]
 
 s_rho = f.variables['s_rho'][:]  # depth levels
 
-tx1 = 1202
-tx2 = 1466
+tx1 = 0#1202
+tx2 = -1#1466
 srho_angle = 3
 datetime_list=[]
 for sec in ocean_time:
@@ -93,6 +93,7 @@ tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 Tb = coawstpy.sediment_flux(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
 Tb['name'] = trans_name
+Tb['c_t'] = 5
 
 ###############
 # SR entrance #
@@ -116,6 +117,7 @@ t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 T0 = coawstpy.sediment_flux(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
 T0['name'] = trans_name
+T0['c_t'] = 3
 
 ###########################
 # Susquehanna River mouth #
@@ -139,6 +141,7 @@ t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
 T1['name'] = trans_name
+T1['c_t'] = 1
 
 ###############################
 # Turkey Point to Sandy Point #
@@ -161,6 +164,7 @@ t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 T2 = coawstpy.sediment_flux(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
 T2['name'] = trans_name
+T2['c_t'] = 12
 ## print out some information
 
 print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
@@ -237,8 +241,6 @@ for var in varlist:
         axg.set_title('Magnitude of the rotated flux for transects %s' % run)
         axg.set_ylabel('Magnitude of %s flux (kg/s)' % var.split("_")[-1])
 
-sys.exit()
-
 # plot non-rotated flux
 srho = 3
 fig, (axa) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8),sharex=True)
@@ -273,46 +275,26 @@ axa[2].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axa[2].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axa[0].legend()
 
-
-
 # plot rotated flux values at a specific depth and cell
+i=0
 fig, (axc) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8),sharex=True)
 fig.subplots_adjust(hspace=0.25)
-
-axc[0].plot_date(datetime_list, t0_mud_01_flux_ux_rot[:, srho, c_t0], label='ux',
+for t in trans:
+    axc[i].plot_date(datetime_list, t['mud_flux_ux_rot'][:, srho, t['c_t']], label='ux',
               xdate=True, linestyle='-', linewidth=0.5,
               marker='', markersize=1)
-axc[0].plot_date(datetime_list,t0_mud_01_flux_vy_rot[:, srho, c_t0],label='vy',
+    axc[i].plot_date(datetime_list,t['mud_flux_vy_rot'][:, srho, t['c_t']],label='vy',
               xdate=True, linestyle='-', linewidth=0.5,
               marker='', markersize=1)
-axc[0].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T0, angle = %i' %
-                 (srho,c_t0,t0_angle))
-axc[0].set_ylabel('mud_01 flux (kg/s)')
-
-axc[1].plot_date(datetime_list, t1_mud_01_flux_ux_rot[:, srho, c_t1], label='ux',
-              xdate=True, linestyle='-', linewidth=0.5,
-              marker='', markersize=1)
-axc[1].plot_date(datetime_list,t1_mud_01_flux_vy_rot[:, srho, c_t1],label='vy',
-              xdate=True, linestyle='-', linewidth=0.5,
-              marker='', markersize=1)
-axc[1].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T1, angle = %i' %
-                 (srho,c_t1,t1_angle))
-axc[1].set_ylabel('mud_01 flux (kg/s)')
-
-axc[2].plot_date(datetime_list, t2_mud_01_flux_ux_rot[:, srho, c_t2], label='ux',
-              xdate=True, linestyle='-', linewidth=0.5,
-              marker='', markersize=1)
-axc[2].plot_date(datetime_list,t2_mud_01_flux_vy_rot[:, srho, c_t2],label='vy',
-              xdate=True, linestyle='-', linewidth=0.5,
-              marker='', markersize=1)
-axc[2].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T2, angle = %i' %
-                 (srho,c_t2, t2_angle))
-axc[2].set_ylabel('mud_01 flux (kg/s)')
+    axc[i].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect %s, angle = %i' %
+                 (srho, c_t0, t['name'], t['angle']))
+    axc[i].set_ylabel('mud_01 flux (kg/s)')
+    i+=1
 axc[2].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axc[2].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axc[0].legend()
 
-
+sys.exit()
 ## Plot magnitude of rotated flux
 fig, (axe) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
 axe.plot_date(datetime_list, t0_mag_ssc[:, srho, c_t0], label='T0 cell %i' % c_t0,

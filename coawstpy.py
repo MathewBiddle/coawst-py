@@ -34,13 +34,14 @@ def stick_plot(time, u, v, **kw):
 
 
 def maj_ax(ue, vn):
+    '''
     # script to calculate major axis direction in compass direction from
     # east and north components. By LP Sanford, Nov 27, 2006.
     #  translated to python by Mathew Biddle June 26, 2019
     # ue = east velocity
     # vn = north velocity
     # angle = compass direction of major axis of demeaned current vectors
-
+    '''
     uem = np.mean(ue)
     vnm = np.mean(vn)
     uep = ue-uem
@@ -60,6 +61,7 @@ def maj_ax(ue, vn):
 
 
 def rot2xy(ue, vn, projangle):
+    '''
     # function [ux,vy]=rot2xy(ue,vn,projangle)
     # script to rotate east and north components into along and cross channel
     # components. By SE Suttles, Nov 26, 2006.
@@ -72,7 +74,7 @@ def rot2xy(ue, vn, projangle):
     # ux - along channel velocity
     # vy - cross channel velocity (positive to the left of the along channel
         # velocity (right-hand convention with vertical + up)
-
+    '''
     theta = 450-projangle  # convert compass direction to geometric direction
     ux = +ue*np.cos(theta*np.pi/180)+vn*np.sin(theta*np.pi/180)
     vy = -ue*np.sin(theta*np.pi/180)+vn*np.cos(theta*np.pi/180)
@@ -80,6 +82,34 @@ def rot2xy(ue, vn, projangle):
 
 
 def sediment_flux(mud_flux_xe,mud_flux_yn,sand_flux_xe,sand_flux_yn,srho_angle,tx1,tx2):
+    '''
+    Calculates the sediment flux through already subsetted data.
+    :param mud_flux_xe: mud flux in the east direction
+    :param mud_flux_yn: mud flux in the west direction
+    :param sand_flux_xe: sand flux in the east direction
+    :param sand_flux_yn: sand flux in the north direction
+    :param srho_angle: depth coordinate for angle computation
+    :param tx1: start time index for angle computation
+    :param tx2: end time index for angle computation
+    :return: dictionary of all flux values
+
+    outdict['angle_list']
+    outdict['angle']
+    outdict['mud_flux_ux_rot']
+    outdict['mud_flux_vy_rot']
+    outdict['sand_flux_ux_rot']
+    outdict['sand_flux_vy_rot']
+    outdict['mag_mud']
+    outdict['mag_sand']
+    outdict['mag_ssc']
+    outdict['SSC_ts_sum']
+    outdict['cumtrapz_mud']
+    outdict['cumtrapz_sand']
+    outdict['cumtrapz_ssc']
+    outdict['total_mud']
+    outdict['total_sand']
+    outdict['total_sed']
+    '''
     mud_flux_ux_rot = np.empty(mud_flux_xe.shape)
     mud_flux_vy_rot = np.empty(mud_flux_yn.shape)
     sand_flux_ux_rot = np.empty(sand_flux_xe.shape)
