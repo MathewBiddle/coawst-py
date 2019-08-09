@@ -7,8 +7,6 @@ import numpy as np
 import netCDF4
 import scipy.integrate as integrate
 
-## TODO use import scipy.integrate.trapz and import scipy.integrate.cumtrapz instead of np.sum and np.cumsum
-
 ## Read COAWST data
 # from coupling.out
 # Initial domain volumes:  TotVolume =  6.1046316405E+08 m3
@@ -53,6 +51,12 @@ for sec in ocean_time:
 
 # Calculate the delta bed thickness
 # time indexes: 1202 - 1466 for event
+bed_thick_init = np.sum(bed_thick[0,:,:,:],axis=0) # total from all 3 bed layers
+bed_thick_final = np.sum(bed_thick[-1,:,:,:],axis=0) # total from all 3 bed layers
+bed_thick_diff = bed_thick_final - bed_thick_init # meters
+
+# TODO Ask Cindy/Larry if sum converts from kg/m2 -> kg??
+# see https://www.myroms.org/forum/viewtopic.php?f=20&t=4447
 mud_mass_init = np.sum(mud_mass[0,:,:,:],axis=0) # total from all 3 bed layers
 mud_mass_final = np.sum(mud_mass[-1,:,:,:],axis=0) # total from all 3 bed layers
 mud_mass_diff = mud_mass_final - mud_mass_init # kg/m2
@@ -111,24 +115,30 @@ plant_height[32:35, 11] = 5
 # apply the mask
 # plant_height = 5 is where the region of interest is.
 # so apply a mask to everything not 5 to the bed thick matrix
-sand_mass_diff_ma = np.ma.masked_where(plant_height != 5, sand_mass_diff)
-mud_mass_diff_ma = np.ma.masked_where(plant_height != 5, mud_mass_diff)
 
+bed_thick_diff_ma = np.ma.masked_where(plant_height != 5, bed_thick_diff)
+bed_deposition = np.ma.masked_less(bed_thick_diff_ma, 0) # height in meters
+bed_erosion = np.ma.masked_greater(bed_thick_diff_ma, 0) # height in meters
+
+sand_mass_diff_ma = np.ma.masked_where(plant_height != 5, sand_mass_diff)
 sand_mass_deposition = np.ma.masked_less(sand_mass_diff_ma, 0) # deposited sand kg/m2
 sand_mass_erosion = np.ma.masked_greater(sand_mass_diff_ma, 0) # eroded sand kg/m2
+sand_mass_deposited = sand_mass_deposition# * SAm # kg/m^2 * m^2 = kg
+sand_mass_eroded = sand_mass_erosion# * SAm # kg/m^2 * m^2 = kg
 
+mud_mass_diff_ma = np.ma.masked_where(plant_height != 5, mud_mass_diff)
 mud_mass_deposition = np.ma.masked_less(mud_mass_diff_ma, 0) # deposited sand kg/m2
 mud_mass_erosion = np.ma.masked_greater(mud_mass_diff_ma, 0) # eroded sand kg/m2
+mud_mass_deposited = mud_mass_deposition# * SAm # kg/m^2 * m^2 = kg
+mud_mass_eroded = mud_mass_erosion# * SAm # kg/m^3 * m^2 = kg
 
-#bed_dep_vol = bed_deposition * SA.mean() # vol deposited m^3
-#bed_ero_vol = bed_erosion * SA.mean() # vol eroded m^3
+## using volume
+bed_dep_vol = bed_deposition * SAm#.mean() # vol deposited m^3
+bed_ero_vol = bed_erosion * SAm#.mean() # vol eroded m^3
+mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
+mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
 
-sand_mass_deposited = sand_mass_deposition * SAm # kg/m^2 * m^2 = kg
-sand_mass_eroded = sand_mass_erosion * SAm # kg/m^2 * m^2 = kg
-
-mud_mass_deposited = mud_mass_deposition * SAm # kg/m^2 * m^2 = kg
-mud_mass_eroded = mud_mass_erosion * SAm # kg/m^3 * m^2 = kg
-
+## using sed mass
 mass_eroded = sand_mass_eroded + mud_mass_eroded
 mass_deposited = sand_mass_deposited + mud_mass_deposited
 

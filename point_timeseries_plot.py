@@ -8,21 +8,30 @@ import netCDF4
 import pandas as pd
 import coawstpy
 
-
 # Cindy's locations
-locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
-locs['Site'] = ['1','2','3','4','5',
-                'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
-                'CBIBS','Tripod']
-locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
-               39.414,39.380,39.346,39.197,39.135,39.061,38.757,
-               39.5396,39.4931]
-locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
-               -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
-               -76.0741,-76.0341]
-locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
-                   '','','','','','','',
-                   'CBIBS Susquehanna Flats','Larry tripod site']
+locs = pd.DataFrame(columns=['Site', 'lat', 'lon','comment'])
+
+locations = [
+    ['1', 39.527, -76.061, 'Russ and Palinkas 2018'],
+    ['2', 39.533, -76.061, ''],
+    ['3', 39.515, -76.051, 'Middle of bed'],
+    ['4', 39.505, -76.039, ''],
+    ['5', 39.497, -76.036, ''],
+    ['Lee7', 39.414, -76.079, ''],
+    ['Lee6', 39.38, -76.088, ''],
+    ['Lee5', 39.346, -76.197, ''],
+    ['Lee2.5', 39.197, -76.311, ''],
+    ['Lee2', 39.135, -76.328, ''],
+    ['Lee0', 39.061, -76.328, ''],
+    ['LeeS2', 38.757, -76.473, ''],
+    ['CBIBS', 39.5396, -76.0741, 'CBIBS Susquehanna Flats'],
+    ['Tripod', 39.4931, -76.0341, 'Larry tripod site']
+    ]
+
+i = 0
+for location in locations:
+    locs.loc[i] = location
+    i += 1
 
 z_pt = -1 # 0=bottom 4=surface (-1)
 
