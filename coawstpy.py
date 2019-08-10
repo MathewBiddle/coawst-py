@@ -48,9 +48,9 @@ def maj_ax(ue, vn):
     vnp = vn-vnm
     n = len(uep)
 
-    cross = np.sum(np.multiply(ue, vn))
-    uesq = np.sum(np.square(ue))
-    vnsq = np.sum(np.square(vn))
+    cross = np.nansum(np.multiply(ue, vn))
+    uesq = np.nansum(np.square(ue))
+    vnsq = np.nansum(np.square(vn))
 
     angle = 0.5*np.arctan(2*cross/(uesq-vnsq))*180/np.pi  # minor axis geometric coords
     angle = 360-angle  # major axis compass direction
@@ -121,7 +121,7 @@ def sediment_flux(mud_flux_xe,mud_flux_yn,sand_flux_xe,sand_flux_yn,srho_angle,t
     for t in range(0, mud_flux_yn.shape[0]):  # time
         angle_list.append(maj_ax(mud_flux_xe[t, srho_angle, :], mud_flux_yn[t, srho_angle, :]))
         for xy in range(0, mud_flux_yn.shape[2]):  # cell in xy
-            for z in range(0, mud_flux_yn.shape[1]):
+            for z in range(0, mud_flux_yn.shape[1]): # depth
                 # ux - along channel velocity
                 # vy - cross channel velocity (positive to the left of the along channel
                 mud_flux_ux_rot[t, z, xy], mud_flux_vy_rot[t, z, xy] = rot2xy(

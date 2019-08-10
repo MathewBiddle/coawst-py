@@ -29,14 +29,18 @@ ocean_time = f.variables['ocean_time'][:]
 ## also some scripts at https://github.com/bjornaa/roppy/tree/master/roppy
 lat_v = f.variables['lat_v'][:]
 lon_v = f.variables['lon_v'][:]
+mask_v = f.variables['mask_v'][:]
+
 lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
-mask_v = f.variables['mask_v'][:]
+mask_u = f.variables['mask_u'][:]
+
 lat_rho = f.variables['lat_rho'][:]
 lon_rho = f.variables['lon_rho'][:]
 
 lat = lat_rho
 lon = lon_rho
+#sys.exit()
 # adjust to uniform grid
 # https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
 # u ==> psi
@@ -57,13 +61,13 @@ Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # lon_v north-south (from panoply
 Huon_mud_01 = f.variables['Huon_mud_01'][:]  # lon_u east-west
 Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # lon_v north-south
 
-upad = ((0, 0), (0, 0), (0, 0), (1, 0)) # (1, 0) puts it at the left (0,1) puts it at the right
-vpad = ((0, 0), (0, 0), (0, 1), (0, 0)) # (1,0) puts it at the top (0,1) puts it at the bottom
-
-Huon_sand_01 = np.pad(Huon_sand_01, pad_width=upad, mode='constant', constant_values=0)
-Hvom_sand_01 = np.pad(Hvom_sand_01, pad_width=vpad, mode='constant', constant_values=0)
-Huon_mud_01 = np.pad(Huon_mud_01, pad_width=upad, mode='constant', constant_values=0)
-Hvom_mud_01 = np.pad(Hvom_mud_01, pad_width=vpad, mode='constant', constant_values=0)
+## pad the arrays to make 100 x 100
+#upad = ((0, 0), (0, 0), (0, 0), (1, 0)) # (1, 0) puts it at the left (0,1) puts it at the right
+#vpad = ((0, 0), (0, 0), (0, 1), (0, 0)) # (1,0) puts it at the top (0,1) puts it at the bottom
+#Huon_sand_01 = np.pad(Huon_sand_01, pad_width=upad, mode='constant', constant_values=0)
+#Hvom_sand_01 = np.pad(Hvom_sand_01, pad_width=vpad, mode='constant', constant_values=0)
+#Huon_mud_01 = np.pad(Huon_mud_01, pad_width=upad, mode='constant', constant_values=0)
+#Hvom_mud_01 = np.pad(Hvom_mud_01, pad_width=vpad, mode='constant', constant_values=0)
 
 #sand = np.full((2497, 5, 100, 100), 0)
 #sand1 = np.insert(sand,[:,:,:,0:99],Huon_sand_01)
@@ -156,7 +160,7 @@ t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
 T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
 T1['name'] = trans_name
-
+#sys.exit()
 ###############################
 # Turkey Point to Sandy Point #
 ###############################

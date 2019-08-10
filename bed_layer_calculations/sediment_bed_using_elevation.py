@@ -1,3 +1,7 @@
+'''
+Calculate the change in bed using the elevation change
+'''
+
 import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
