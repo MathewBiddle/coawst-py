@@ -32,7 +32,11 @@ lon_v = f.variables['lon_v'][:]
 lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
 mask_v = f.variables['mask_v'][:]
+lat_rho = f.variables['lat_rho'][:]
+lon_rho = f.variables['lon_rho'][:]
 
+lat = lat_rho
+lon = lon_rho
 # adjust to uniform grid
 # https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
 # u ==> psi
@@ -40,9 +44,9 @@ mask_v = f.variables['mask_v'][:]
 # v ==> psi
 # 0.5 * (varin[:,:,1:] + varin[:,:,:-1])
 # TODO figure out if that transformation is correct. nervous about non-contiguous grids at SR mouth
-
-lat = 0.5 * (lat_v[:,1:] + lat_v[:,:-1]) # v ==> psi
-lon = 0.5 * (lon_v[:,1:] + lon_v[:,:-1]) # v ==> psi
+#sys.exit()
+#lat = 0.5 * (lat_v[:,1:] + lat_v[:,:-1]) # v ==> psi
+#lon = 0.5 * (lon_v[:,1:] + lon_v[:,:-1]) # v ==> psi
 
 #lat = 0.5 * (lat_u[1:,:] + lat_u[:-1,:])
 #lon = 0.5 * (lon_u[1:,:] + lon_u[:-1,:])
@@ -53,13 +57,26 @@ Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # lon_v north-south (from panoply
 Huon_mud_01 = f.variables['Huon_mud_01'][:]  # lon_u east-west
 Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # lon_v north-south
 
-Huon_sand_01 = 0.5 * (Huon_sand_01[:,:,1:,:] + Huon_sand_01[:,:,:-1,:]) # u ==> psi
-Hvom_sand_01 = 0.5 * (Hvom_sand_01[:,:,:,1:] + Hvom_sand_01[:,:,:,:-1]) # v ==> psi
+upad = ((0, 0), (0, 0), (0, 0), (1, 0)) # (1, 0) puts it at the left (0,1) puts it at the right
+vpad = ((0, 0), (0, 0), (0, 1), (0, 0)) # (1,0) puts it at the top (0,1) puts it at the bottom
 
-Huon_mud_01 = 0.5 * (Huon_mud_01[:,:,1:,:] + Huon_mud_01[:,:,:-1,:]) # u ==> psi
-Hvom_mud_01 = 0.5 * (Hvom_mud_01[:,:,:,1:] + Hvom_mud_01[:,:,:,:-1]) # v ==> psi
+Huon_sand_01 = np.pad(Huon_sand_01, pad_width=upad, mode='constant', constant_values=0)
+Hvom_sand_01 = np.pad(Hvom_sand_01, pad_width=vpad, mode='constant', constant_values=0)
+Huon_mud_01 = np.pad(Huon_mud_01, pad_width=upad, mode='constant', constant_values=0)
+Hvom_mud_01 = np.pad(Hvom_mud_01, pad_width=vpad, mode='constant', constant_values=0)
 
-plant_height = Hvom_sand_01[0,0,:,:]
+#sand = np.full((2497, 5, 100, 100), 0)
+#sand1 = np.insert(sand,[:,:,:,0:99],Huon_sand_01)
+#plt.pcolor(lon_rho,lat_rho,sand[1000,0,:,:])
+#plt.colorbar()
+#sys.exit()
+#Huon_sand_01 = 0.5 * (Huon_sand_01[:,:,1:,:] + Huon_sand_01[:,:,:-1,:]) # u ==> psi
+#Hvom_sand_01 = 0.5 * (Hvom_sand_01[:,:,:,1:] + Hvom_sand_01[:,:,:,:-1]) # v ==> psi
+
+#Huon_mud_01 = 0.5 * (Huon_mud_01[:,:,1:,:] + Huon_mud_01[:,:,:-1,:]) # u ==> psi
+#Hvom_mud_01 = 0.5 * (Hvom_mud_01[:,:,:,1:] + Hvom_mud_01[:,:,:,:-1]) # v ==> psi
+
+plant_height = f.variables['mask_rho'][:]
 #plant_height = f.variables['Hvom_sand_01'][0, 0, :, :]
 #plant_height = plant_height[:, 1:]
 
@@ -106,7 +123,7 @@ y = np.array([0,0,1,2,3])
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 10
+    plant_height[x[i], y[i]] = 5
 
 # Gather subset data
 t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -124,12 +141,12 @@ trans_name = 'T1'
 print('Extracting data for transect %s...' % trans_name)
 #x = np.array([29,30,31,32])
 #y = np.array([13,12,11,10])
-x = np.array([29,30,31])
-y = np.array([13,12,11])
+x = np.array([29,30,31,32])
+y = np.array([13,12,11,10])
 
 # Verify point location
 for i in range(len(x)):
-    plant_height[x[i], y[i]] = 10
+    plant_height[x[i], y[i]] = 5
 
 # Gather subset data
 t1_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
@@ -151,7 +168,7 @@ y = np.array([58]*len(x))
 # Verify point location
 for i in range(len(x)):
     l = i/5
-    plant_height[x[i], y[i]] = 10#l*100
+    plant_height[x[i], y[i]] = 5#l*100
 
 # Gather subset data
 t2_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
