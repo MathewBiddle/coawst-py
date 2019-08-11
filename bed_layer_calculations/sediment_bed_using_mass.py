@@ -18,8 +18,8 @@ import scipy.integrate as integrate
 #                         MaxCellVol =  1.0719327656E+05 m3
 #                            Max/Min =  9.9975612154E+01
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
 else:
@@ -148,7 +148,7 @@ mass_deposited = sand_mass_deposited + mud_mass_deposited
 
 print('mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
 print('mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
-
+sys.exit()
 
 ## Plotting
 plt.figure()

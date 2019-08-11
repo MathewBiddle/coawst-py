@@ -20,8 +20,8 @@ import scipy.integrate as integrate
 #                         MaxCellVol =  1.0719327656E+05 m3
 #                            Max/Min =  9.9975612154E+01
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
 else:
@@ -96,12 +96,12 @@ plant_height[30:50, 13] = 5
 plant_height[31:37, 12] = 5
 plant_height[32:35, 11] = 5
 
-plt.figure()
-plt.plot_date(datetime_list, np.sum(bed_thick[:, :, 32, 15], axis=1), markersize=1, linewidth=1)
-plt.ylabel('total bed thickness [m]')
-plt.title('Bed thickness time series at point index (32,15)')
+#plt.figure()
+#plt.plot_date(datetime_list, np.sum(bed_thick[:, :, 32, 15], axis=1), markersize=1, linewidth=1)
+#plt.ylabel('total bed thickness [m]')
+#plt.title('Bed thickness time series at point index (32,15)')
 #plt.plot_date(datetime_list,integrate.trapz(bed_thick[:,:,32,15],axis=1),label='trapz',markersize=1,linewidth=1)
-plt.legend()
+#plt.legend()
 #sys.exit()
 ## Plotting
 # apply the mask
@@ -116,16 +116,20 @@ bed_dep_vol = bed_deposition * SAm#.mean() # vol deposited m^3
 bed_ero_vol = bed_erosion * SAm#.mean() # vol eroded m^3
 
 # MUD_POROS == 0.9d0
-# mud = Srho * 0.1 = 265 kg/m3
+mud_mass_deposited = (f.variables['Srho'][0] * (1-f.variables['poros'][0])) * bed_dep_vol#= 265 kg/m3
+mud_mass_eroded = (f.variables['Srho'][0] * (1-f.variables['poros'][0])) * bed_ero_vol#= 265 kg/m3
 # SAND_POROS == 0.5d0
-# sand = Srho * 0.5 = 1325 kg/m3
-mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
-mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
+sand_mass_deposited = (f.variables['Srho'][1] * (1-f.variables['poros'][1])) * bed_dep_vol
+sand_mass_eroded = (f.variables['Srho'][1] * (1-f.variables['poros'][1])) * bed_ero_vol
 
-print('mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
-print('mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
+mass_deposited = mud_mass_deposited + sand_mass_deposited
+mass_eroded = mud_mass_eroded + sand_mass_eroded
+#mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
+#mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
+print('Total mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
+print('Total mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
 
-
+sys.exit()
 ## Plotting
 plt.figure()
 plt.pcolor(f.variables['lon_rho'][:], f.variables['lat_rho'][:], plant_height)
