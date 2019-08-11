@@ -115,6 +115,10 @@ bed_erosion = np.ma.masked_greater(bed_thick_diff_ma, 0) # height in meters
 bed_dep_vol = bed_deposition * SAm#.mean() # vol deposited m^3
 bed_ero_vol = bed_erosion * SAm#.mean() # vol eroded m^3
 
+# MUD_POROS == 0.9d0
+# mud = Srho * 0.1 = 265 kg/m3
+# SAND_POROS == 0.5d0
+# sand = Srho * 0.5 = 1325 kg/m3
 mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
 mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
 

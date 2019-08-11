@@ -1,3 +1,8 @@
+'''
+Computes the flux across transects by computing the along and across channel flux sum, then computing the
+net flux over the transect.
+'''
+
 import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 import matplotlib.dates as mdates
@@ -32,7 +37,6 @@ lon_v = f.variables['lon_v'][:]
 lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
 mask_v = f.variables['mask_v'][:]
-sys.exit()
 # adjust to uniform grid
 # https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
 # u ==> psi
@@ -91,7 +95,7 @@ tb_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 tb_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-Tb = coawstpy.sediment_flux(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
+Tb = coawstpy.sediment_flux1(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
 Tb['name'] = trans_name
 Tb['c_t'] = 5
 
@@ -115,7 +119,7 @@ t0_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t0_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-T0 = coawstpy.sediment_flux(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
+T0 = coawstpy.sediment_flux1(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
 T0['name'] = trans_name
 T0['c_t'] = 3
 
@@ -126,8 +130,8 @@ trans_name = 'T1'
 print('Extracting data for transect %s...' % trans_name)
 #x = np.array([29,30,31,32])
 #y = np.array([13,12,11,10])
-x = np.array([29,30,31])
-y = np.array([13,12,11])
+x = np.array([29,30,31,32])
+y = np.array([13,12,11,10])
 
 # Verify point location
 for i in range(len(x)):
@@ -139,7 +143,7 @@ t1_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t1_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
+T1 = coawstpy.sediment_flux1(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
 T1['name'] = trans_name
 T1['c_t'] = 1
 
@@ -162,16 +166,16 @@ t2_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
 t2_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
 t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
 
-T2 = coawstpy.sediment_flux(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
+T2 = coawstpy.sediment_flux1(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
 T2['name'] = trans_name
 T2['c_t'] = 12
 ## print out some information
 
 print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
-trans = [Tb,T0,T1,T2] # group all transects together to loop over
+trans = [Tb,T1,T2] # group all transects together to loop over
 for t in trans:
     print('%s = %e kg = %e tons' % (t['name'],t['total_sed'], t['total_sed']/1000))
-#sys.exit()
+sys.exit()
 
 ## Create some plots
 # pick a depth and cell for investigation
@@ -187,7 +191,6 @@ print("Making plots...")
 plt.figure()
 plt.pcolor(lon, lat, plant_height, edgecolors='k', cmap='PuBu')
 plt.title('Transects')
-
 #  plot raw velocity
 # fig, (axd) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), sharex=True)
 # fig.subplots_adjust(hspace=0.25)
@@ -277,7 +280,7 @@ axa[0].legend()
 
 # plot rotated flux values at a specific depth and cell
 i=0
-fig, (axc) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8),sharex=True)
+fig, (axc) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8), sharex=True)
 fig.subplots_adjust(hspace=0.25)
 for t in trans:
     axc[i].plot_date(datetime_list, t['mud_flux_ux_rot'][:, srho, t['c_t']], label='ux',

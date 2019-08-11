@@ -1,3 +1,7 @@
+'''
+Computes the flux across transects by computing the flux sum in North and East direction, then translating to
+along and across channel fluxes.
+'''
 import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 import matplotlib.dates as mdates
@@ -9,8 +13,8 @@ import coawstpy
 import scipy.integrate as integrate
 
 # bring in the data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
 else:
@@ -99,7 +103,7 @@ for sec in ocean_time:
 ##############################
 trans_name = 'Tb'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array(list(range(20,28)))
+x = np.array(list(range(20,29)))
 y = np.array([0]*len(x))
 # Verify point location
 for i in range(len(x)):
@@ -107,12 +111,13 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 5#l*100
 
 # Gather subset data
-tb_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-tb_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-tb_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+tb_mud_01_flux_xe = np.sum(Hvom_mud_01[:, :, x, y],axis=(1,2))
+tb_mud_01_flux_yn = np.sum(Huon_mud_01[:, :, x, y],axis=(1,2))
+tb_sand_01_flux_xe = np.sum(Hvom_sand_01[:, :, x, y],axis=(1,2))
+tb_sand_01_flux_yn = np.sum(Huon_sand_01[:, :, x, y],axis=(1,2))
 
-Tb = coawstpy.sediment_flux(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
+#Tb = coawstpy.sediment_flux(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
+Tb = coawstpy.sediment_flux2(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,tx1,tx2)
 Tb['name'] = trans_name
 
 ###############
@@ -130,12 +135,13 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 5
 
 # Gather subset data
-t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t0_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t0_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+t0_mud_01_flux_xe = np.sum(Hvom_mud_01[:, :, x, y], axis=(1,2))
+t0_mud_01_flux_yn = np.sum(Huon_mud_01[:, :, x, y], axis=(1,2))
+t0_sand_01_flux_xe = np.sum(Hvom_sand_01[:, :, x, y], axis=(1,2))
+t0_sand_01_flux_yn = np.sum(Huon_sand_01[:, :, x, y], axis=(1,2))
 
-T0 = coawstpy.sediment_flux(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
+#T0 = coawstpy.sediment_flux(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
+T0 = coawstpy.sediment_flux2(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,tx1,tx2)
 T0['name'] = trans_name
 
 ###########################
@@ -153,12 +159,13 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 5
 
 # Gather subset data
-t1_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t1_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t1_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+t1_mud_01_flux_xe = np.sum(Hvom_mud_01[:, :, x, y], axis=(1,2))
+t1_mud_01_flux_yn = np.sum(Huon_mud_01[:, :, x, y], axis=(1,2))
+t1_sand_01_flux_xe = np.sum(Hvom_sand_01[:, :, x, y], axis=(1,2))
+t1_sand_01_flux_yn = np.sum(Huon_sand_01[:, :, x, y], axis=(1,2))
 
-T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
+#T1 = coawstpy.sediment_flux(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
+T1 = coawstpy.sediment_flux2(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,tx1,tx2)
 T1['name'] = trans_name
 #sys.exit()
 ###############################
@@ -166,7 +173,7 @@ T1['name'] = trans_name
 ###############################
 trans_name = 'T2'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array(list(range(42,66)))  #
+x = np.array(list(range(42,67)))  #
 y = np.array([58]*len(x))
 
 # Verify point location
@@ -175,22 +182,22 @@ for i in range(len(x)):
     plant_height[x[i], y[i]] = 5#l*100
 
 # Gather subset data
-t2_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t2_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t2_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+t2_mud_01_flux_xe = np.sum(Hvom_mud_01[:, :, x, y], axis=(1,2))
+t2_mud_01_flux_yn = np.sum(Huon_mud_01[:, :, x, y], axis=(1,2))
+t2_sand_01_flux_xe = np.sum(Hvom_sand_01[:, :, x, y], axis=(1,2))
+t2_sand_01_flux_yn = np.sum(Huon_sand_01[:, :, x, y], axis=(1,2))
 
-T2 = coawstpy.sediment_flux(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
+#T2 = coawstpy.sediment_flux(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
+T2 = coawstpy.sediment_flux2(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,tx1,tx2)
 T2['name'] = trans_name
 
 
 
 ## print out some information
 print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
-trans = [Tb,T0,T1,T2] # group all transects together to loop over
+trans = [Tb,T1,T2] # group all transects together to loop over
 for t in trans:
     print('%s = %e kg = %e tons' % (t['name'],t['total_sed'], t['total_sed']/1000))
-
 ## Create some plots
 # pick a depth and cell for investigation
 # srho = depth coordinate
@@ -205,7 +212,7 @@ print("Making plots...")
 plt.figure()
 plt.pcolor(lon, lat, plant_height, edgecolors='k', cmap='PuBu')
 plt.title('Transects')
-
+sys.exit()
 #  plot raw velocity
 # fig, (axd) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), sharex=True)
 # fig.subplots_adjust(hspace=0.25)
@@ -232,18 +239,32 @@ plt.title('Transects')
 # axd[1].legend()
 
 # plot cumulative sum of SSC for transect
-fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
-for t in trans:
-    axg.plot_date(datetime_list[1:],t['cumtrapz_sand'],label=t['name'],
-                  xdate=True, linestyle='-', linewidth=0.5,
-                  marker='', markersize=1)
-    axg.text(datetime_list[-1],t['cumtrapz_sand'][-1],'%.2e tons' %(t['total_sand']/1000))
+varlist = ['cumtrapz_ssc','cumtrapz_mud','cumtrapz_sand','mag_mud', 'mag_sand', 'mag_ssc']
+trans = [Tb,T1,T2]
+for var in varlist:
+    fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+    for t in trans:
+        if var.split("_")[0] == 'mag':
+            axg.plot_date(datetime_list, t[var], label=t['name'],
+                          xdate=True, linestyle='-', linewidth=0.5,
+                          marker='', markersize=1)
+            #axg.text(datetime_list[-1], np.sum(t[var],axis=(1,2))[-1], '%.2e tons' % ((np.sum(t[var],axis=(1,2))[-1] * 3600) / 1000))
+        else:
+            axg.plot_date(datetime_list[1:],t[var],label=t['name'],
+                      xdate=True, linestyle='-', linewidth=0.5,
+                      marker='', markersize=1)
+            axg.text(datetime_list[-1],t[var][-1],'%.2e tons' %((t[var][-1] * 3600)/1000))
 
-axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
-axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
-axg.legend()
-axg.set_title('Cumulative integral of the rotated flux for transects')
-axg.set_ylabel('Cumulative integral of mud flux (kg/s)')
+    axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+    axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+    axg.set_yscale('log')
+    axg.legend()
+    if var.split("_")[0] == 'cumtrapz':
+        axg.set_title('Cumulative integral of the rotated flux for transects %s' % run)
+        axg.set_ylabel('Cumulative integral of %s flux (kg/s)' % var.split("_")[-1])
+    else:
+        axg.set_title('Magnitude of the rotated flux for transects %s' % run)
+        axg.set_ylabel('Magnitude of %s flux (kg/s)' % var.split("_")[-1])
 
 sys.exit()
 # plot non-rotated flux
