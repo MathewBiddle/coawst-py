@@ -1,8 +1,3 @@
-'''
-Computes the sediment flux across transects by computing the along and across channel flux sum, then computing the
-net flux over the transect.
-'''
-
 import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 import matplotlib.dates as mdates
@@ -13,9 +8,14 @@ import netCDF4
 import coawstpy
 import scipy.integrate as integrate
 
+'''
+Computes the water flux across transects by computing the flux sum in North and East direction, then translating to
+along and cross channel fluxes.
+'''
+
 # bring in the data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
 else:
@@ -26,51 +26,32 @@ f = netCDF4.Dataset(inputfile, 'r')
 
 # Get the data we want
 ocean_time = f.variables['ocean_time'][:]
-#lat = f.variables['lat_v'][:]
-#lon = f.variables['lon_v'][:]
 
-# from https://github.com/trondkr/romstools/blob/master/VolumeFlux/tools.py
-## TODO look at some of the scripts at https://github.com/ESMG/pyroms for using lat_v coordinates
-## also some scripts at https://github.com/bjornaa/roppy/tree/master/roppy
 lat_v = f.variables['lat_v'][:]
 lon_v = f.variables['lon_v'][:]
+mask_v = f.variables['mask_v'][:]
+
 lat_u = f.variables['lat_u'][:]
 lon_u = f.variables['lon_u'][:]
-mask_v = f.variables['mask_v'][:]
-# adjust to uniform grid
-# https://github.com/ESMG/pyroms/blob/df6f90698e6b5903a1d484a738d693595f5cf213/pyroms/pyroms/utility.py#L400
-# u ==> psi
-# 0.5 * (varin[:,1:,:] + varin[:,:-1,:])
-# v ==> psi
-# 0.5 * (varin[:,:,1:] + varin[:,:,:-1])
-# TODO figure out if that transformation is correct. nervous about non-contiguous grids at SR mouth
+mask_u = f.variables['mask_u'][:]
 
-lat = 0.5 * (lat_v[:,1:] + lat_v[:,:-1]) # v ==> psi
-lon = 0.5 * (lon_v[:,1:] + lon_v[:,:-1]) # v ==> psi
+lat_rho = f.variables['lat_rho'][:]
+lon_rho = f.variables['lon_rho'][:]
 
-#lat = 0.5 * (lat_u[1:,:] + lat_u[:-1,:])
-#lon = 0.5 * (lon_u[1:,:] + lon_u[:-1,:])
+lat = lat_rho
+lon = lon_rho
 
+Huon = f.variables['Huon'][0:100,:,:,:]  # lon_u east-west (from panoply should be S)
+Hvom = f.variables['Hvom'][0:100,:,:,:]  # lon_v north-south (from panoply should be E)
 
-Huon_sand_01 = f.variables['Huon_sand_01'][:]  # lon_u east-west (from panoply should be S)
-Hvom_sand_01 = f.variables['Hvom_sand_01'][:]  # lon_v north-south (from panoply should be E)
-Huon_mud_01 = f.variables['Huon_mud_01'][:]  # lon_u east-west
-Hvom_mud_01 = f.variables['Hvom_mud_01'][:]  # lon_v north-south
-
-Huon_sand_01 = 0.5 * (Huon_sand_01[:,:,1:,:] + Huon_sand_01[:,:,:-1,:]) # u ==> psi
-Hvom_sand_01 = 0.5 * (Hvom_sand_01[:,:,:,1:] + Hvom_sand_01[:,:,:,:-1]) # v ==> psi
-
-Huon_mud_01 = 0.5 * (Huon_mud_01[:,:,1:,:] + Huon_mud_01[:,:,:-1,:]) # u ==> psi
-Hvom_mud_01 = 0.5 * (Hvom_mud_01[:,:,:,1:] + Hvom_mud_01[:,:,:,:-1]) # v ==> psi
-
-plant_height = Hvom_sand_01[0,0,:,:]
-#plant_height = f.variables['Hvom_sand_01'][0, 0, :, :]
-#plant_height = plant_height[:, 1:]
+plant_height = f.variables['mask_rho'][:]
 
 s_rho = f.variables['s_rho'][:]  # depth levels
 
-tx1 = 0#1202
-tx2 = -1#1466
+tx1 =0
+tx2 = -1
+#tx1 = 1202
+#tx2 = 1466
 srho_angle = 3
 datetime_list=[]
 for sec in ocean_time:
@@ -82,100 +63,101 @@ for sec in ocean_time:
 ##############################
 trans_name = 'Tb'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array(list(range(20,28)))
-y = np.array([0]*len(x))
+xb = np.array(list(range(20,29)))
+yb = np.array([0]*len(xb))
 # Verify point location
-for i in range(len(x)):
+for i in range(len(xb)):
     l = i/5
-    plant_height[x[i], y[i]] = 5#l*100
+    plant_height[xb[i], yb[i]] = 5#l*100
+
+## TODO
+#  plt.figure(); plt.plot(tb_flux_xe,tb_flux_yn,marker='.')
+# plt.figure(); plt.plot(t1_flux_xe,t1_flux_yn,marker='.')
 
 # Gather subset data
-tb_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-tb_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-tb_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-tb_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+#tb_flux_xe = np.sum(Hvom[:, :, xb, yb], axis=(1,2))
+#tb_flux_yn = np.sum(Huon[:, :, xb, yb], axis=(1,2))
 
-Tb = coawstpy.sediment_flux1(tb_mud_01_flux_xe,tb_mud_01_flux_yn,tb_sand_01_flux_xe,tb_sand_01_flux_yn,srho_angle,tx1,tx2)
+tb_flux_xe = np.sum(Hvom[:, :, xb, yb], axis=(1,2))
+tb_flux_yn = np.sum(Huon[:, :, xb, yb], axis=(1,2))
+
+Tb = coawstpy.sediment_flux3(tb_flux_xe, tb_flux_yn, tx1, tx2)
 Tb['name'] = trans_name
-Tb['c_t'] = 5
 
 ###############
 # SR entrance #
 ###############
-trans_name = 'T0'
-print('Extracting data for transect %s...' % trans_name)
-x = np.array([27,26,25,24,23])
-#x = np.array(list(range(20,28)))
-#y = np.array([0]*len(x))
-y = np.array([0,0,1,2,3])
-# Verify point location
-for i in range(len(x)):
-    l = i/5
-    plant_height[x[i], y[i]] = 10
-
-# Gather subset data
-t0_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t0_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t0_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t0_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
-
-T0 = coawstpy.sediment_flux1(t0_mud_01_flux_xe,t0_mud_01_flux_yn,t0_sand_01_flux_xe,t0_sand_01_flux_yn,srho_angle,tx1,tx2)
-T0['name'] = trans_name
-T0['c_t'] = 3
+# trans_name = 'T0'
+# print('Extracting data for transect %s...' % trans_name)
+# x0 = np.array([27,26,25,24,23])
+# y0 = np.array([0,0,1,2,3])
+# # Verify point location
+# for i in range(len(x0)):
+#     l = i/5
+#     plant_height[x0[i], y0[i]] = 5
+#
+# # Gather subset data
+# t0_flux_xe = np.sum(Hvom[:, :, x0, y0], axis=(1,2))
+# t0_flux_yn = np.sum(Huon[:, :, x0, y0], axis=(1,2))
+#
+# T0 = coawstpy.sediment_flux3(t0_flux_xe, t0_flux_yn, tx1, tx2)
+# T0['name'] = trans_name
 
 ###########################
 # Susquehanna River mouth #
 ###########################
 trans_name = 'T1'
 print('Extracting data for transect %s...' % trans_name)
-#x = np.array([29,30,31,32])
-#y = np.array([13,12,11,10])
-x = np.array([29,30,31,32])
-y = np.array([13,12,11,10])
+x1 = np.array(list(range(27,33)))
+y1 = np.array([10]*len(x1))
+#x1 = np.array([28,29,30,31,32,33])
+#y1 = np.array([14,13,12,11,10,9])
 
 # Verify point location
-for i in range(len(x)):
-    plant_height[x[i], y[i]] = 10
+for i in range(len(x1)):
+    plant_height[x1[i], y1[i]] = 5
 
 # Gather subset data
-t1_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t1_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t1_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t1_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+print('hvom:', Hvom[0, 0, x1, y1])
+print('huon:', Huon[0, 0, x1, y1])
+#sys.exit()
+t1_flux_xe = np.sum(Hvom[:, :, x1, y1], axis=(1,2))
+t1_flux_yn = np.sum(Huon[:, :, x1, y1], axis=(1,2))
 
-T1 = coawstpy.sediment_flux1(t1_mud_01_flux_xe,t1_mud_01_flux_yn,t1_sand_01_flux_xe,t1_sand_01_flux_yn,srho_angle,tx1,tx2)
+T1 = coawstpy.sediment_flux3(t1_flux_xe, t1_flux_yn, tx1, tx2)
 T1['name'] = trans_name
-T1['c_t'] = 1
 
 ###############################
 # Turkey Point to Sandy Point #
 ###############################
 trans_name = 'T2'
 print('Extracting data for transect %s...' % trans_name)
-x = np.array(list(range(42,66)))  #
-y = np.array([58]*len(x))
+x2 = np.array(list(range(42,67)))  #
+y2 = np.array([58]*len(x2))
 
 # Verify point location
-for i in range(len(x)):
+for i in range(len(x2)):
     l = i/5
-    plant_height[x[i], y[i]] = 10#l*100
+    plant_height[x2[i], y2[i]] = 5#l*100
 
 # Gather subset data
-t2_mud_01_flux_xe = Hvom_mud_01[:, :, x, y]
-t2_mud_01_flux_yn = Huon_mud_01[:, :, x, y]
-t2_sand_01_flux_xe = Hvom_sand_01[:, :, x, y]
-t2_sand_01_flux_yn = Huon_sand_01[:, :, x, y]
+t2_flux_xe = np.sum(Hvom[:, :, x2, y2], axis=(1,2))
+t2_flux_yn = np.sum(Huon[:, :, x2, y2], axis=(1,2))
 
-T2 = coawstpy.sediment_flux1(t2_mud_01_flux_xe,t2_mud_01_flux_yn,t2_sand_01_flux_xe,t2_sand_01_flux_yn,srho_angle,tx1,tx2)
+T2 = coawstpy.sediment_flux3(t2_flux_xe, t2_flux_yn, tx1, tx2)
 T2['name'] = trans_name
-T2['c_t'] = 12
-## print out some information
 
-print('Total Sediment across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
+
+## print out some information
+print('Total Water Flux across transect over %s seconds' % (datetime_list[-1]-datetime_list[1]).total_seconds())
 trans = [Tb,T1,T2] # group all transects together to loop over
 for t in trans:
-    print('%s = %e kg = %e tons' % (t['name'],t['total_sed'], t['total_sed']/1000))
-sys.exit()
+    mag = np.sqrt(t['xe'] ** 2 + t['yn'] ** 2)
+    raw_flux = integrate.cumtrapz(mag, axis=0)
+    print('Raw Flux: %s = %e m3/s' % (t['name'], raw_flux[-1]))
+    print('Rotated Flux: %s = %e m3/s' % (t['name'], t['cumtrapz'][-1]))
+    print('Along channel flux = %e m3/s' % integrate.cumtrapz(t['ux_rot'], axis=0)[-1])
+    print('Cross channel flux = %e m3/s\n' % integrate.cumtrapz(t['vy_rot'], axis=0)[-1])
 
 ## Create some plots
 # pick a depth and cell for investigation
@@ -216,33 +198,35 @@ plt.title('Transects')
 # axd[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 # axd[1].legend()
 
-# plot cumulative sum of SSC for transect
-varlist = ['cumtrapz_ssc','cumtrapz_mud','cumtrapz_sand','mag_mud', 'mag_sand', 'mag_ssc']
+# plot fluxes for transects
+varlist = ['cumtrapz','mag']
 trans = [Tb,T1,T2]
 for var in varlist:
     fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
     for t in trans:
-        if var.split("_")[0] == 'mag':
-            axg.plot_date(datetime_list, np.sum(t[var],axis=(1,2)), label=t['name'],
+        if var == 'mag':
+            axg.plot_date(datetime_list, t[var], label=t['name'],
                           xdate=True, linestyle='-', linewidth=0.5,
                           marker='', markersize=1)
-            #axg.text(datetime_list[-1], np.sum(t[var],axis=(1,2))[-1], '%.2e tons' % ((np.sum(t[var],axis=(1,2))[-1] * 3600) / 1000))
         else:
             axg.plot_date(datetime_list[1:],t[var],label=t['name'],
                       xdate=True, linestyle='-', linewidth=0.5,
                       marker='', markersize=1)
-            axg.text(datetime_list[-1],t[var][-1],'%.2e tons' %((t[var][-1] * 3600)/1000))
+            axg.text(datetime_list[-1],t[var][-1],'%.2e m3/s' %(t[var][-1]))
 
     axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
     axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
     axg.set_yscale('log')
     axg.legend()
-    if var.split("_")[0] == 'cumtrapz':
+    if var == 'cumtrapz':
         axg.set_title('Cumulative integral of the rotated flux for transects %s' % run)
-        axg.set_ylabel('Cumulative integral of %s flux (kg/s)' % var.split("_")[-1])
+        axg.set_ylabel('Cumulative integral of %s flux (m3/s)' % var.split("_")[-1])
     else:
         axg.set_title('Magnitude of the rotated flux for transects %s' % run)
-        axg.set_ylabel('Magnitude of %s flux (kg/s)' % var.split("_")[-1])
+        axg.set_ylabel('Magnitude of %s flux (m3/s)' % var.split("_")[-1])
+
+sys.exit()
+
 
 # plot non-rotated flux
 srho = 3
@@ -278,26 +262,61 @@ axa[2].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axa[2].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axa[0].legend()
 
+# plot angle calculation
+fig, (axb) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8),sharex=True)
+axb.plot_date(datetime_list, t0_angle_list, label='T0',
+               xdate=True, linestyle='', linewidth=1,
+               marker='.', markersize=1)
+axb.plot_date(datetime_list, t1_angle_list, label='T1',
+               xdate=True, linestyle='', linewidth=1,
+               marker='.', markersize=1)
+axb.plot_date(datetime_list, t2_angle_list, label='T2',
+              xdate=True, linestyle='', linewidth=1,
+              marker='.', markersize=1)
+axb.set_title('Calculated angle from SSC flux N-E at each transect')
+axb.set_ylabel('Angle')
+axb.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axb.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axb.legend()
+
 # plot rotated flux values at a specific depth and cell
-i=0
-fig, (axc) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8), sharex=True)
+fig, (axc) = plt.subplots(nrows=3, ncols=1, figsize=(12, 8),sharex=True)
 fig.subplots_adjust(hspace=0.25)
-for t in trans:
-    axc[i].plot_date(datetime_list, t['mud_flux_ux_rot'][:, srho, t['c_t']], label='ux',
+
+axc[0].plot_date(datetime_list, t0_mud_01_flux_ux_rot[:, srho, c_t0], label='ux',
               xdate=True, linestyle='-', linewidth=0.5,
               marker='', markersize=1)
-    axc[i].plot_date(datetime_list,t['mud_flux_vy_rot'][:, srho, t['c_t']],label='vy',
+axc[0].plot_date(datetime_list,t0_mud_01_flux_vy_rot[:, srho, c_t0],label='vy',
               xdate=True, linestyle='-', linewidth=0.5,
               marker='', markersize=1)
-    axc[i].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect %s, angle = %i' %
-                 (srho, c_t0, t['name'], t['angle']))
-    axc[i].set_ylabel('mud_01 flux (kg/s)')
-    i+=1
+axc[0].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T0, angle = %i' %
+                 (srho,c_t0,t0_angle))
+axc[0].set_ylabel('mud_01 flux (kg/s)')
+
+axc[1].plot_date(datetime_list, t1_mud_01_flux_ux_rot[:, srho, c_t1], label='ux',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axc[1].plot_date(datetime_list,t1_mud_01_flux_vy_rot[:, srho, c_t1],label='vy',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axc[1].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T1, angle = %i' %
+                 (srho,c_t1,t1_angle))
+axc[1].set_ylabel('mud_01 flux (kg/s)')
+
+axc[2].plot_date(datetime_list, t2_mud_01_flux_ux_rot[:, srho, c_t2], label='ux',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axc[2].plot_date(datetime_list,t2_mud_01_flux_vy_rot[:, srho, c_t2],label='vy',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axc[2].set_title('Along (ux) and Cross (vy) channel mud_01 flux at s-rho=%i, cell=%i, Transect T2, angle = %i' %
+                 (srho,c_t2, t2_angle))
+axc[2].set_ylabel('mud_01 flux (kg/s)')
 axc[2].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 axc[2].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 axc[0].legend()
 
-sys.exit()
+
 ## Plot magnitude of rotated flux
 fig, (axe) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
 axe.plot_date(datetime_list, t0_mag_ssc[:, srho, c_t0], label='T0 cell %i' % c_t0,
@@ -334,19 +353,31 @@ axf.set_title('Sum (depth and transect) of the magnitude of the rotated flux for
 axf.set_ylabel('SSC flux (kg/s)')
 
 
-# plot angle calculation
-fig, (axb) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8),sharex=True)
-axb.plot_date(datetime_list, t0_angle_list, label='T0',
-               xdate=True, linestyle='', linewidth=1,
-               marker='.', markersize=1)
-axb.plot_date(datetime_list, t1_angle_list, label='T1',
-               xdate=True, linestyle='', linewidth=1,
-               marker='.', markersize=1)
-axb.plot_date(datetime_list, t2_angle_list, label='T2',
-              xdate=True, linestyle='', linewidth=1,
-              marker='.', markersize=1)
-axb.set_title('Calculated angle from SSC flux N-E at each transect')
-axb.set_ylabel('Angle')
-axb.xaxis.set_major_locator(mdates.DayLocator(interval=30))
-axb.xaxis.set_major_formatter(DateFormatter("%m/%d"))
-axb.legend()
+# plot cumulative sum of SSC for transect
+fig, (axg) = plt.subplots(nrows=1, ncols=1, figsize=(12, 8))
+
+# since integrating need to start at second timestep for time.
+axg.plot_date(datetime_list[1:], tb_cumtrapz_ssc, label='Tb',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axg.text(datetime_list[-1],tb_cumtrapz_ssc[-1],'%.2e tons' % (tb_total_sed/1000))
+
+axg.plot_date(datetime_list[1:], t0_cumtrapz_ssc, label='T0',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axg.text(datetime_list[-1],t0_cumtrapz_ssc[-1],'%.2e tons' % (t0_total_sed/1000))
+
+axg.plot_date(datetime_list[1:], t1_cumtrapz_ssc, label='T1',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axg.text(datetime_list[-1],t1_cumtrapz_ssc[-1],'%.2e tons' % (t1_total_sed/1000))
+
+axg.plot_date(datetime_list[1:], t2_cumtrapz_ssc, label='T2',
+              xdate=True, linestyle='-', linewidth=0.5,
+              marker='', markersize=1)
+axg.text(datetime_list[-1],t2_cumsum_ssc[-1],'%.2e tons' % (t2_total_sed/1000))
+axg.xaxis.set_major_locator(mdates.DayLocator(interval=30))
+axg.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+axg.legend()
+axg.set_title('Cumulative integral of the rotated flux for transects')
+axg.set_ylabel('Cumulative integral of SSC flux (kg/s)')

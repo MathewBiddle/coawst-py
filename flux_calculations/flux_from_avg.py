@@ -1,5 +1,5 @@
 '''
-Computes the flux across transects by computing the flux sum in North and East direction, then translating to
+Computes the sediment flux across transects by computing the flux sum in North and East direction, then translating to
 along and across channel fluxes.
 '''
 import os
