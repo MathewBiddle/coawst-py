@@ -73,9 +73,9 @@ transect['T1']['y'] = np.array([13,12,11,10])
 transect['T2'] = dict()
 transect['T2']['x'] = np.array(list(range(42,67)))
 transect['T2']['y'] = np.array([58]*len(transect['T2']['x']))
-i=0
-fig, (ax) = plt.subplots(nrows=3, ncols=1, figsize=(12, 12))
+#fig, (ax) = plt.subplots(nrows=3, ncols=1, figsize=(12, 12))
 for t in transect: # each transect
+    fig, (ax) = plt.subplots(nrows=3, ncols=1, figsize=(12, 12))
     x = transect[t]['x']
     y = transect[t]['y']
     for j in range(len(x)):
@@ -84,35 +84,39 @@ for t in transect: # each transect
     transect[t]['Huon'] = Huon[:, :, x, y]
     transect[t]['fs'] = np.sum(Huon[:, :, x, y], axis=(1,2))
     transect[t]['fe'] = np.sum(Hvom[:, :, x, y], axis=(1,2))
-
+    ax[0].plot(transect[t]['fs'],label='fs')
+    ax[0].plot(transect[t]['fe'],label='fe')
+    ax[0].set_ylabel('Raw Flux [m3/s]')
+    ax[0].legend()
     # TODO plotting
-    ax[i].plot(transect[t]['fs'], transect[t]['fe'], marker='.', linestyle='')
-    ax[i].set_title(t,fontsize=10)
-    ax[i].set_xlabel('South Flux (fs) [m3/s]', fontsize=8)
-    ax[i].set_ylabel('East Flux (fe) [m3/s]', fontsize=8)
+    ax[1].plot(transect[t]['fs'], transect[t]['fe'], marker='.', linestyle='')
+
+    ax[1].set_xlabel('South Flux (fs) [m3/s]', fontsize=8)
+    ax[1].set_ylabel('East Flux (fe) [m3/s]', fontsize=8)
     xmin = np.min([transect[t]['fs'].min(), transect[t]['fe'].min()])
     xmax = np.max([transect[t]['fs'].max(), transect[t]['fe'].max()])
-    ax[i].set_xlim(xmin, xmax)
-    ax[i].set_ylim(xmin, xmax)
-    ax[i].grid(axis='both')
-    ax[i].set_aspect('equal', 'box')
+    ax[1].set_xlim(xmin, xmax)
+    ax[1].set_ylim(xmin, xmax)
+    ax[1].grid(axis='both')
+    ax[1].set_aspect('equal', 'box')
     if t is 'Tb':
-        ax[i].set_yticks([5000, 10000, 15000])
-
+        ax[1].set_yticks([5000, 10000, 15000])
     slope, intercept, r_value, p_value, std_err = stats.linregress(transect[t]['fs'], transect[t]['fe'])
     xs = np.array([xmin, xmax])
-    ax[i].plot(xs, slope*xs+intercept, linestyle='-', color='k')
+    ax[1].plot(xs, slope*xs+intercept, linestyle='-', color='k')
     theta = math.degrees(math.atan(slope))
-    ax[i].text(500, 8000, '%i' % theta)
+    ax[1].text(8000, 8000, 'theta = %.1f' % theta)
     # TODO work through trigonometry here:
     transect[t]['fd'] = transect[t]['fs']*np.cos(theta) + transect[t]['fe']*np.sin(theta)
     transect[t]['fa'] = -1*transect[t]['fs']*np.sin(theta) + transect[t]['fe']*np.cos(theta)
-    plt.figure()
-    plt.plot(transect[t]['fa'])
-    plt.title(t)
-    i += 1
+    ax[2].plot(transect[t]['fa'],label='fa = -fs*sin(theta) + fe*cos(theta)')
+    ax[2].plot(transect[t]['fd'], label='fd = fs*cos(theta) + fe*sin(theta)')
+    ax[2].set_ylabel('Rotated Flux [m/s]')
+    ax[2].legend()
+    fig.suptitle(t)
 
-fig.tight_layout()
+#fig.tight_layout()
+
 
 plt.figure()
 plt.pcolor(lon, lat, mask_rho, edgecolors='k', cmap='PuBu')
