@@ -104,7 +104,8 @@ for t in transect: # each transect
     slope, intercept, r_value, p_value, std_err = stats.linregress(transect[t]['fs'], transect[t]['fe'])
     xs = np.array([xmin, xmax])
     ax[1].plot(xs, slope*xs+intercept, linestyle='-', color='k')
-    theta = math.degrees(math.atan(slope))
+#    theta = math.degrees(math.atan(slope))
+    theta = math.atan(slope)
     ax[1].text(8000, 8000, 'theta = %.1f' % theta)
     # TODO work through trigonometry here:
     transect[t]['fd'] = transect[t]['fs']*np.cos(theta) + transect[t]['fe']*np.sin(theta)
