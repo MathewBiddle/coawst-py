@@ -41,8 +41,8 @@ lon_rho = f.variables['lon_rho'][:]
 lat = lat_rho
 lon = lon_rho
 
-Huon = f.variables['Huon'][0:100,:,:,:]  # lon_u east-west (from panoply should be S)
-Hvom = f.variables['Hvom'][0:100,:,:,:]  # lon_v north-south (from panoply should be E)
+Huon = f.variables['Huon'][0:-1,:,:,:]  # lon_u east-west (from panoply should be S)
+Hvom = f.variables['Hvom'][0:-1,:,:,:]  # lon_v north-south (from panoply should be E)
 
 plant_height = f.variables['mask_rho'][:]
 
@@ -70,16 +70,14 @@ for i in range(len(xb)):
     l = i/5
     plant_height[xb[i], yb[i]] = 5#l*100
 
-## TODO
-#  plt.figure(); plt.plot(tb_flux_xe,tb_flux_yn,marker='.')
-# plt.figure(); plt.plot(t1_flux_xe,t1_flux_yn,marker='.')
-
 # Gather subset data
 #tb_flux_xe = np.sum(Hvom[:, :, xb, yb], axis=(1,2))
 #tb_flux_yn = np.sum(Huon[:, :, xb, yb], axis=(1,2))
 
 tb_flux_xe = np.sum(Hvom[:, :, xb, yb], axis=(1,2))
 tb_flux_yn = np.sum(Huon[:, :, xb, yb], axis=(1,2))
+
+
 
 Tb = coawstpy.sediment_flux3(tb_flux_xe, tb_flux_yn, tx1, tx2)
 Tb['name'] = trans_name
@@ -108,10 +106,10 @@ Tb['name'] = trans_name
 ###########################
 trans_name = 'T1'
 print('Extracting data for transect %s...' % trans_name)
-x1 = np.array(list(range(27,33)))
-y1 = np.array([10]*len(x1))
-#x1 = np.array([28,29,30,31,32,33])
-#y1 = np.array([14,13,12,11,10,9])
+#x1 = np.array(list(range(27,33)))
+#y1 = np.array([10]*len(x1))
+x1 = np.array([28,29,30,31,32,33])
+y1 = np.array([14,13,12,11,10,9])
 
 # Verify point location
 for i in range(len(x1)):
@@ -169,6 +167,21 @@ c_t1 = 1
 c_t2 = 12
 
 print("Making plots...")
+# angle determination
+## TODO
+plt.figure(); plt.plot(tb_flux_xe,tb_flux_yn,marker='.',linestyle='');plt.title('T0')
+xmin = np.min([tb_flux_xe.min(),tb_flux_yn.min()])
+xmax = np.min([tb_flux_xe.max(),tb_flux_yn.max()])
+plt.xlim(xmin, xmax)
+plt.ylim(xmin,xmax)
+plt.axis('square')
+plt.figure(); plt.plot(t1_flux_xe,t1_flux_yn,marker='.',linestyle='');plt.title('T1')
+xmin = np.min([t1_flux_xe.min(),t1_flux_yn.min()])
+xmax = np.min([t1_flux_xe.max(),t1_flux_yn.max()])
+plt.xlim(xmin, xmax)
+plt.ylim(xmin,xmax)
+plt.axis('square')
+sys.exit()
 # map of transect
 plt.figure()
 plt.pcolor(lon, lat, plant_height, edgecolors='k', cmap='PuBu')
@@ -197,6 +210,7 @@ plt.title('Transects')
 # axd[1].xaxis.set_major_locator(mdates.DayLocator(interval=30))
 # axd[1].xaxis.set_major_formatter(DateFormatter("%m/%d"))
 # axd[1].legend()
+
 
 # plot fluxes for transects
 varlist = ['cumtrapz','mag']
