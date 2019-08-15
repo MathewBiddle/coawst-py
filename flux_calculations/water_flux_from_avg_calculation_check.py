@@ -28,7 +28,7 @@ print('Reading %s...' % inputfile.split("/")[-1])
 f = netCDF4.Dataset(inputfile, 'r')
 
 ## TODO check the mask
-f.set_auto_maskandscale(False)
+#f.set_auto_maskandscale(False)
 
 # Get the data we want
 ocean_time = f.variables['ocean_time'][:]
@@ -37,10 +37,10 @@ lon = f.variables['lon_rho'][:]
 mask_u = f.variables['mask_u'][:]
 mask_v = f.variables['mask_v'][:]
 Huon = f.variables['Huon'][:]  # lon_u east-west (from panoply should be S)
-ma.masked_greater(Huon,100000000000)
+#ma.masked_greater(Huon,100000000000)
 #ma.set_fill_value(Huon, 0)
 Hvom = f.variables['Hvom'][:]  # lon_v north-south (from panoply should be E)
-ma.masked_greater(Hvom,10000000000)
+#ma.masked_greater(Hvom,10000000000)
 #ma.masked_where(mask_v == 0, Hvom)
 #ma.set_fill_value(Hvom, 0)
 
@@ -69,10 +69,10 @@ transect['Tb']['y'] = np.array([0]*len(transect['Tb']['x']))
 # Susquehanna River mouth #
 ###########################
 transect['T1'] = dict()
-transect['T1']['x'] = np.array([27,28,29,30,31,32,33,34])
-transect['T1']['y'] = np.array([15,14,13,12,11,10,9,8])
-#transect['T1']['x'] = np.array([28,29,30,31,32,33])
-#transect['T1']['y'] = np.array([14,13,12,11,10,9])
+#transect['T1']['x'] = np.array([27,28,29,30,31,32,33,34])
+#transect['T1']['y'] = np.array([15,14,13,12,11,10,9,8])
+transect['T1']['x'] = np.array(list(range(27,33)))
+transect['T1']['y'] = np.array([10]*len(transect['T1']['x']))
 
 ###############################
 # Turkey Point to Sandy Point #
@@ -138,6 +138,7 @@ for t in transect: # each transect
     fig.suptitle(t)
 
     print('%s max flux = %g m3/s' % (t, transect[t]['fd'].max()))
+    print('%s integrated flux = %g m3/s' % (t, integrate.trapz(transect[t]['fd'])))
 #fig.tight_layout()
 
 
