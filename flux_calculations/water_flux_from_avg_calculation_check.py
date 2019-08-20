@@ -80,7 +80,7 @@ transect['T1']['y'] = np.array([10]*len(transect['T1']['x']))
 # Turkey Point to Sandy Point #
 ###############################
 transect['T2'] = dict()
-transect['T2']['x'] = np.array(list(range(42,67)))
+transect['T2']['x'] = np.array(list(range(40,69)))
 transect['T2']['y'] = np.array([58]*len(transect['T2']['x']))
 
 
@@ -91,16 +91,16 @@ for t in transect: # each transect
     # get index of interest
     x = transect[t]['x']
     y = transect[t]['y']
-    transect[t]['Hvom'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
-    transect[t]['Huon'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
+    #transect[t]['Hvom'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
+    #transect[t]['Huon'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
     for j in range(len(x)):
         mask_rho[x[j], y[j]] = 5
-        transect[t]['Hvom'][:,:,j] = Hvom[:,:,x[j],y[j]]
-        transect[t]['Huon'][:,:,j] = Huon[:,:,x[j],y[j]]
+        #transect[t]['Hvom'][:,:,j] = Hvom[:,:,x[j],y[j]]
+        #transect[t]['Huon'][:,:,j] = Huon[:,:,x[j],y[j]]
 
     # collect data at index of interest
-    #transect[t]['Hvom'] = Hvom[:, :, x, y]
-    #transect[t]['Huon'] = Huon[:, :, x, y]
+    transect[t]['Hvom'] = Hvom[:, :, x, y]
+    transect[t]['Huon'] = Huon[:, :, x, y]
 
     # sum across transect and depth
     transect[t]['fs'] = np.sum(transect[t]['Huon'], axis=(1, 2))
@@ -136,7 +136,7 @@ for t in transect: # each transect
 
     # compute angle linear regression is ccw from x axis
     theta = math.atan(slope)
-    #ax[1].text(8000, 8000, 'theta = %.2f' % theta)
+    ax[1].set_title('theta = %.2f' % theta)
 
     # rotate to theta in radians
     transect[t]['fd'] = transect[t]['fs']*np.cos(theta) + transect[t]['fe']*np.sin(theta)
