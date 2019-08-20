@@ -83,7 +83,7 @@ transect['T2'] = dict()
 transect['T2']['x'] = np.array(list(range(40,69)))
 transect['T2']['y'] = np.array([58]*len(transect['T2']['x']))
 
-
+fig1, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
 ## Iterate through each transect
 for t in transect: # each transect
     fig, (ax) = plt.subplots(nrows=3, ncols=1, figsize=(12, 12))
@@ -91,16 +91,16 @@ for t in transect: # each transect
     # get index of interest
     x = transect[t]['x']
     y = transect[t]['y']
-    #transect[t]['Hvom'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
-    #transect[t]['Huon'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
+    transect[t]['Hvom'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
+    transect[t]['Huon'] = np.ma.empty((Hvom.shape[0],Hvom.shape[1],len(x)))
     for j in range(len(x)):
         mask_rho[x[j], y[j]] = 5
-        #transect[t]['Hvom'][:,:,j] = Hvom[:,:,x[j],y[j]]
-        #transect[t]['Huon'][:,:,j] = Huon[:,:,x[j],y[j]]
+        transect[t]['Hvom'][:,:,j] = Hvom[:,:,x[j],y[j]]
+        transect[t]['Huon'][:,:,j] = Huon[:,:,x[j],y[j]]
 
     # collect data at index of interest
-    transect[t]['Hvom'] = Hvom[:, :, x, y]
-    transect[t]['Huon'] = Huon[:, :, x, y]
+    #transect[t]['Hvom'] = Hvom[:, :, x, y]
+    #transect[t]['Huon'] = Huon[:, :, x, y]
 
     # sum across transect and depth
     transect[t]['fs'] = np.sum(transect[t]['Huon'], axis=(1, 2))
@@ -153,6 +153,12 @@ for t in transect: # each transect
 
     print('%s max flux = %g m3/s' % (t, transect[t]['fd'].max()))
     print('%s integrated flux = %g m3/s' % (t, integrate.trapz(transect[t]['fd'])))
+
+    ax1.plot_date(datetime_list, transect[t]['fd'], label=t, linestyle='-', linewidth=1, marker='')
+    ax1.legend()
+    ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+    ax1.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+    #ax1.set_yscale('log')
 #fig.tight_layout()
 
 
