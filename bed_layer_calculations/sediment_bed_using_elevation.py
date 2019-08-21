@@ -124,8 +124,7 @@ sand_mass_eroded = (f.variables['Srho'][1] * (1-f.variables['poros'][1])) * bed_
 
 mass_deposited = mud_mass_deposited + sand_mass_deposited
 mass_eroded = mud_mass_eroded + sand_mass_eroded
-#mass_deposited = Srho * bed_dep_vol  # kg/m^3 * m^3 = kg
-#mass_eroded = Srho * bed_ero_vol  # kg/m^3 * m^3 = kg
+
 print('Total mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
 print('Total mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
 
