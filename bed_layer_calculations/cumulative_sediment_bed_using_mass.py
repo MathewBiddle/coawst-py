@@ -79,7 +79,20 @@ for sec in ocean_time:
 # Calculate the delta bed mass
 # time indexes: 1202 - 1466 for event
 # see https://www.myroms.org/forum/viewtopic.php?f=20&t=4447
+tot_mud_mass = np.sum(mud_mass,axis=1) # compute sum over bed layers
+tot_sand_mass = np.sum(sand_mass,axis=1)
 
+diff_mud_mass = np.diff(tot_mud_mass,axis=0) # calculate difference along time axis
+diff_sand_mass = np.diff(tot_sand_mass,axis=0)
+
+sys.exit()
+cum_diff_mud = np.ma.empty(tot_mud_mass.shape)
+for i in range(tot_sand_mass.shape[0]):
+    if i == 0:
+        cum_diff_mud[i] = cum_diff_mud[i]
+    else:
+        cum_diff_mud[i] = tot_mud_mass[i] - tot_mud_mass[0]
+sys.exit()
 mud_mass_init = np.sum(mud_mass[0,:,:,:],axis=0) # total from all 3 bed layers
 mud_mass_final = np.sum(mud_mass[-1,:,:,:],axis=0) # total from all 3 bed layers
 mud_mass_diff = mud_mass_final - mud_mass_init # kg/m2
