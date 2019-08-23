@@ -7,8 +7,16 @@ from matplotlib.dates import DateFormatter
 import numpy as np
 
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-
+# bring in the data
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_post_lee'
+if dir.split("_")[-1] == 'noveg':
+    run = "noveg"
+elif dir.split("_")[-1] == 'lee':
+    run = 'post-lee'
+else:
+    run = "veg"
 
 ## river data
 river_frc = dir+'/river_frc.nc'
@@ -75,6 +83,7 @@ ax.plot_date(datetime_list, sim_q_mean, label='COAWST', xdate=True, linestyle='-
 ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax.xaxis.set_major_formatter(myFmt)
 ax.set_ylabel('Discharge (m3/s)')
+ax.set_xlim([min(datetime_list),max(datetime_list)])
 ax.legend()
 
 #plt.xlim(xlim)
