@@ -18,10 +18,14 @@ import scipy.integrate as integrate
 #                         MaxCellVol =  1.0719327656E+05 m3
 #                            Max/Min =  9.9975612154E+01
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+# bring in the data
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_post_lee'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
+elif dir.split("_")[-1] == 'lee':
+    run = 'post-lee'
 else:
     run = "veg"
 inputfile = dir+'/upper_ches_his.nc'
