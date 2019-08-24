@@ -86,6 +86,7 @@ tot_sand_mass = np.sum(sand_mass,axis=1)
 #diff_sand_mass = np.diff(tot_sand_mass,axis=0)
 
 #sys.exit()
+# initialize arrays
 cum_diff_mud = np.ma.empty(tot_mud_mass.shape)
 cum_diff_sand = np.ma.empty(tot_sand_mass.shape)
 sand_mass_deposited = np.ma.empty(tot_sand_mass.shape[0])
