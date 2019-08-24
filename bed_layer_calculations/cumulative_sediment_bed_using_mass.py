@@ -82,24 +82,44 @@ for sec in ocean_time:
 tot_mud_mass = np.sum(mud_mass,axis=1) # compute sum over bed layers
 tot_sand_mass = np.sum(sand_mass,axis=1)
 
-diff_mud_mass = np.diff(tot_mud_mass,axis=0) # calculate difference along time axis
-diff_sand_mass = np.diff(tot_sand_mass,axis=0)
+#diff_mud_mass = np.diff(tot_mud_mass,axis=0) # calculate difference between i+1 and i time instances along time axis
+#diff_sand_mass = np.diff(tot_sand_mass,axis=0)
 
-sys.exit()
+#sys.exit()
 cum_diff_mud = np.ma.empty(tot_mud_mass.shape)
-for i in range(tot_sand_mass.shape[0]):
-    if i == 0:
-        cum_diff_mud[i] = cum_diff_mud[i]
-    else:
-        cum_diff_mud[i] = tot_mud_mass[i] - tot_mud_mass[0]
-sys.exit()
-mud_mass_init = np.sum(mud_mass[0,:,:,:],axis=0) # total from all 3 bed layers
-mud_mass_final = np.sum(mud_mass[-1,:,:,:],axis=0) # total from all 3 bed layers
-mud_mass_diff = mud_mass_final - mud_mass_init # kg/m2
+cum_diff_sand = np.ma.empty(tot_sand_mass.shape)
+sand_mass_deposited = np.ma.empty(tot_sand_mass.shape[0])
+sand_mass_eroded = np.ma.empty(tot_sand_mass.shape[0])
+mud_mass_deposited = np.ma.empty(tot_sand_mass.shape[0])
+mud_mass_eroded = np.ma.empty(tot_sand_mass.shape[0])
 
-sand_mass_init = np.sum(sand_mass[0,:,:,:],axis=0) # total from all 3 bed layers
-sand_mass_final = np.sum(sand_mass[-1,:,:,:],axis=0) # total from all 3 bed layers
-sand_mass_diff = sand_mass_final - sand_mass_init # kg/m2
+init_mud = np.ma.masked_where(plant_height != 5, tot_mud_mass[0])
+init_sand = np.ma.masked_where(plant_height != 5, tot_sand_mass[0])
+# iterate through each time instance
+for i in range(tot_sand_mass.shape[0]):
+    #if i == 0:
+    #    cum_diff_mud[i] = np.ma.masked_where(plant_height != 5, tot_mud_mass[i])
+    #    cum_diff_sand[i] = np.ma.masked_where(plant_height != 5, tot_sand_mass[i])
+    #else:
+    # final - inital cumulative difference
+    mud_obs = np.ma.masked_where(plant_height != 5, tot_mud_mass[i])
+    sand_obs = np.ma.masked_where(plant_height != 5, tot_sand_mass[i])
+    cum_diff_mud[i] = mud_obs - init_mud
+    cum_diff_sand[i] = sand_obs - init_sand
+
+    sand_mass_deposition = np.ma.masked_less(cum_diff_sand[i], 0)  # deposited sand kg/m2
+    sand_mass_erosion = np.ma.masked_greater(cum_diff_sand[i], 0)  # eroded sand kg/m2
+    sand_mass_deposited[i] = np.sum(sand_mass_deposition * SAm)  # kg/m^2 * m^2 = kg
+    sand_mass_eroded[i] = np.sum(sand_mass_erosion * SAm)  # kg/m^2 * m^2 = kg
+
+    mud_mass_deposition = np.ma.masked_less(cum_diff_mud[i], 0)  # deposited sand kg/m2
+    mud_mass_erosion = np.ma.masked_greater(cum_diff_mud[i], 0)  # eroded sand kg/m2
+    mud_mass_deposited[i] = np.sum(mud_mass_deposition * SAm)  # kg/m^2 * m^2 = kg
+    mud_mass_eroded[i] = np.sum(mud_mass_erosion * SAm)  # kg/m^3 * m^2 = kg
+
+print('mass eroded    = %e tons' % ((sand_mass_eroded[-1] + mud_mass_eroded[-1]) / 1000))
+print('mass deposited = %e tons' % ((sand_mass_deposited[-1] + mud_mass_deposited[-1]) / 1000))
+sys.exit()
 
 # Susquehanna River mouth
 trans_name = 'T1'
