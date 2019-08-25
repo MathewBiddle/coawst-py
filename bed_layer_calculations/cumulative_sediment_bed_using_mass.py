@@ -94,6 +94,24 @@ sand_mass_eroded = np.ma.empty(tot_sand_mass.shape[0])
 mud_mass_deposited = np.ma.empty(tot_sand_mass.shape[0])
 mud_mass_eroded = np.ma.empty(tot_sand_mass.shape[0])
 
+# Susquehanna River mouth
+trans_name = 'T1'
+t1_x = np.array([29,30,31,32])
+t1_y = np.array([13,12,11,10])
+
+for i in range(len(t1_x)):
+    plant_height[t1_x[i], t1_y[i]] = 10
+
+# Turkey Point to Sandy Point
+trans_name = 'T2'
+t2_x = np.array(list(range(42,67)))  #
+t2_y = np.array([58]*len(t2_x))
+
+# Verify point location
+for i in range(len(t2_x)):
+    #l = i/5
+    plant_height[t2_x[i], t2_y[i]] = 10
+
 init_mud = np.ma.masked_where(plant_height != 5, tot_mud_mass[0])
 init_sand = np.ma.masked_where(plant_height != 5, tot_sand_mass[0])
 # iterate through each time instance
@@ -120,25 +138,9 @@ for i in range(tot_sand_mass.shape[0]):
 
 print('mass eroded    = %e tons' % ((sand_mass_eroded[-1] + mud_mass_eroded[-1]) / 1000))
 print('mass deposited = %e tons' % ((sand_mass_deposited[-1] + mud_mass_deposited[-1]) / 1000))
+
+
 sys.exit()
-
-# Susquehanna River mouth
-trans_name = 'T1'
-t1_x = np.array([29,30,31,32])
-t1_y = np.array([13,12,11,10])
-
-for i in range(len(t1_x)):
-    plant_height[t1_x[i], t1_y[i]] = 10
-
-# Turkey Point to Sandy Point
-trans_name = 'T2'
-t2_x = np.array(list(range(42,67)))  #
-t2_y = np.array([58]*len(t2_x))
-
-# Verify point location
-for i in range(len(t2_x)):
-    #l = i/5
-    plant_height[t2_x[i], t2_y[i]] = 10
 
 
 
