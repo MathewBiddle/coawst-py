@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 import netCDF4
 import scipy.integrate as integrate
+import matplotlib.dates as mdates
+from matplotlib.dates import DateFormatter
 
 ## Read COAWST data
 # from coupling.out
@@ -33,10 +35,10 @@ f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
 h = f.variables['h'][:] # at rho points
-ocean_time = f.variables['ocean_time'][:]
-bed_thick = f.variables['bed_thickness'][:] # m
-sand_mass = f.variables['sandmass_01'][:] # kg/m2
-mud_mass = f.variables['mudmass_01'][:] # kg/m2 already accounts for cell height.
+ocean_time = f.variables['ocean_time'][0:-1]
+bed_thick = f.variables['bed_thickness'][0:-1,:,:] # m
+sand_mass = f.variables['sandmass_01'][0:-1,:,:] # kg/m2
+mud_mass = f.variables['mudmass_01'][0:-1,:,:] # kg/m2 already accounts for cell height.
 mask_rho = f.variables['mask_rho'][:]
 Srho = f.variables['Srho'][0] # kg/m3 2650 kg/m^3 sediment grain density, same for both
 pm = f.variables['pm'][:] #XI --> cell width in x dir. east-west 1/m
@@ -126,20 +128,46 @@ for i in range(tot_sand_mass.shape[0]):
     cum_diff_mud[i] = mud_obs - init_mud
     cum_diff_sand[i] = sand_obs - init_sand
 
-    sand_mass_deposition = np.ma.masked_less(cum_diff_sand[i], 0)  # deposited sand kg/m2
-    sand_mass_erosion = np.ma.masked_greater(cum_diff_sand[i], 0)  # eroded sand kg/m2
+    cum_diff_mud_ma = np.ma.masked_where(plant_height != 5, cum_diff_mud[i])
+    cum_diff_sand_ma = np.ma.masked_where(plant_height != 5, cum_diff_sand[i])
+
+    sand_mass_deposition = np.ma.masked_less(cum_diff_sand_ma, 0)  # deposited sand kg/m2
+    sand_mass_erosion = np.ma.masked_greater(cum_diff_sand_ma, 0)  # eroded sand kg/m2
     sand_mass_deposited[i] = np.sum(sand_mass_deposition * SAm)  # kg/m^2 * m^2 = kg
     sand_mass_eroded[i] = np.sum(sand_mass_erosion * SAm)  # kg/m^2 * m^2 = kg
 
-    mud_mass_deposition = np.ma.masked_less(cum_diff_mud[i], 0)  # deposited sand kg/m2
-    mud_mass_erosion = np.ma.masked_greater(cum_diff_mud[i], 0)  # eroded sand kg/m2
+    mud_mass_deposition = np.ma.masked_less(cum_diff_mud_ma, 0)  # deposited sand kg/m2
+    mud_mass_erosion = np.ma.masked_greater(cum_diff_mud_ma, 0)  # eroded sand kg/m2
     mud_mass_deposited[i] = np.sum(mud_mass_deposition * SAm)  # kg/m^2 * m^2 = kg
     mud_mass_eroded[i] = np.sum(mud_mass_erosion * SAm)  # kg/m^3 * m^2 = kg
 
 print('mass eroded    = %e tons' % ((sand_mass_eroded[-1] + mud_mass_eroded[-1]) / 1000))
 print('mass deposited = %e tons' % ((sand_mass_deposited[-1] + mud_mass_deposited[-1]) / 1000))
 
+fig1, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(12, 12))
+ax1.plot_date(datetime_list,mud_mass_deposited/1000,label='mud deposition',color='g',linestyle='-',marker='')
+ax1.plot_date(datetime_list,mud_mass_eroded/1000,label='mud erosion',color='g',linestyle='--',marker='')
+ax1.plot_date(datetime_list,sand_mass_deposited/1000,label='sand deposition',color='r',linestyle='-',marker='')
+ax1.plot_date(datetime_list,sand_mass_eroded/1000,label='sand erosion',color='r',linestyle='--',marker='')
+ax1.hlines(xmin=datetime_list[0],xmax=datetime_list[-1],y=0,color='k',linestyle=':')
+ax1.plot_date(datetime_list,(mud_mass_deposited+mud_mass_eroded+sand_mass_eroded+sand_mass_deposited)/1000,label='sum of all terms',
+              linestyle='-',marker='')
+ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+ax1.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+ax1.legend()
+ax1.set_ylabel('Total Mass (tons)')
 
+
+ax1.text(datetime_list[10],1.5e06,'Deposition rate mud: %e tons'%integrate.trapz(mud_mass_deposited/1000))
+ax1.text(datetime_list[10],1e06,'Deposition rate sand: %e tons'%integrate.trapz(sand_mass_deposited/1000))
+
+ax1.text(datetime_list[10],0.5e06,'deposition/erosion rate sum: %e tons'%integrate.trapz((mud_mass_deposited+
+                                                        mud_mass_eroded+sand_mass_eroded+sand_mass_deposited)/1000))
+
+ax1.text(datetime_list[10],-0.3e06,'Erosion rate mud: %e tons'%integrate.trapz(mud_mass_eroded/1000))
+ax1.text(datetime_list[10],-0.5e06,'Erosion rate sand: %e tons'%integrate.trapz(sand_mass_eroded/1000))
+#ax1.set_yscale('log')
+plt.suptitle('%s'%run)
 sys.exit()
 
 
@@ -148,6 +176,7 @@ sys.exit()
 # apply the mask
 # plant_height = 5 is where the region of interest is.
 # so apply a mask to everything not 5 to the bed thick matrix
+sand_mass_diff = sand_obs - init_sand
 
 sand_mass_diff_ma = np.ma.masked_where(plant_height != 5, sand_mass_diff)
 sand_mass_deposition = np.ma.masked_less(sand_mass_diff_ma, 0) # deposited sand kg/m2
@@ -155,6 +184,7 @@ sand_mass_erosion = np.ma.masked_greater(sand_mass_diff_ma, 0) # eroded sand kg/
 sand_mass_deposited = sand_mass_deposition * SAm # kg/m^2 * m^2 = kg
 sand_mass_eroded = sand_mass_erosion * SAm # kg/m^2 * m^2 = kg
 
+mud_mass_diff = mud_obs - init_mud
 mud_mass_diff_ma = np.ma.masked_where(plant_height != 5, mud_mass_diff)
 mud_mass_deposition = np.ma.masked_less(mud_mass_diff_ma, 0) # deposited sand kg/m2
 mud_mass_erosion = np.ma.masked_greater(mud_mass_diff_ma, 0) # eroded sand kg/m2

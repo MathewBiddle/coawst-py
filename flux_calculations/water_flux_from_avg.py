@@ -18,8 +18,8 @@ along and cross channel fluxes.
 
 # bring in the data
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_post_lee'
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_post_lee'
 if dir.split("_")[-1] == 'noveg':
     run = "noveg"
 elif dir.split("_")[-1] == 'lee':
@@ -79,9 +79,9 @@ transect['T2']['y'] = np.array([58]*len(transect['T2']['x']))
 ###############################
 #  North-East Boundary Check  #
 ###############################
-transect['T3'] = dict()
-transect['T3']['x'] = np.array(list(range(87,97)))
-transect['T3']['y'] = np.array([1]*len(transect['T3']['x']))
+#transect['T3'] = dict()
+#transect['T3']['x'] = np.array(list(range(87,97)))
+#transect['T3']['y'] = np.array([1]*len(transect['T3']['x']))
 
 fig1, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
 ## Iterate through each transect
@@ -158,6 +158,7 @@ for t in transect: # each transect
     ax1.legend()
     ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
     ax1.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+    ax1.set_ylabel('Total downstream flux m3/s')
     #ax1.set_yscale('log')
 #fig.tight_layout()
 

@@ -47,7 +47,7 @@ for sec in bry_time:
 
 ## plotting
 print("Creating plots...")
-fig, (ax) = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=(12, 8))
+fig, (ax) = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.1)
 myFmt = DateFormatter("%m/%d")
 dayint=10
@@ -76,26 +76,26 @@ ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
 ax[1].set_ylabel('Discharge (m3/s)')
 
-coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2])
+#coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2])
+#ax[2].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
+#ax[2].xaxis.set_major_formatter(myFmt)
+#ax[2].set_xlim(xlim)
+#ax[2].set_ylabel('Wind')
+
+ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
+                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
 ax[2].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[2].xaxis.set_major_formatter(myFmt)
 ax[2].set_xlim(xlim)
-ax[2].set_ylabel('Wind')
+ax[2].set_ylabel('Wind Speed [m/s]')
 
-ax[3].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
-                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
+
+ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
+                     marker='', markersize=1)
 ax[3].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 ax[3].xaxis.set_major_formatter(myFmt)
 ax[3].set_xlim(xlim)
-ax[3].set_ylabel('Wind Speed [m/s]')
-
-
-ax[4].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
-ax[4].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
-ax[4].xaxis.set_major_formatter(myFmt)
-ax[4].set_xlim(xlim)
-ax[4].set_ylabel('Water surface [m]')
+ax[3].set_ylabel('Water surface [m]')
 
 
 
