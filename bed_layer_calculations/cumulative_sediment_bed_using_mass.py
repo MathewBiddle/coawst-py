@@ -158,14 +158,14 @@ ax1.legend()
 ax1.set_ylabel('Total Mass (tons)')
 
 
-ax1.text(datetime_list[10],1.5e06,'Deposition rate mud: %e tons'%integrate.trapz(mud_mass_deposited/1000))
-ax1.text(datetime_list[10],1e06,'Deposition rate sand: %e tons'%integrate.trapz(sand_mass_deposited/1000))
+ax1.text(datetime_list[10],1.5e06,'Total deposition mud: %e tons'%integrate.trapz(mud_mass_deposited/1000))
+ax1.text(datetime_list[10],1e06,'Total deposition sand: %e tons'%integrate.trapz(sand_mass_deposited/1000))
 
-ax1.text(datetime_list[10],0.5e06,'deposition/erosion rate sum: %e tons'%integrate.trapz((mud_mass_deposited+
+ax1.text(datetime_list[10],0.5e06,'Total deposition/erosion sum: %e tons'%integrate.trapz((mud_mass_deposited+
                                                         mud_mass_eroded+sand_mass_eroded+sand_mass_deposited)/1000))
 
-ax1.text(datetime_list[10],-0.3e06,'Erosion rate mud: %e tons'%integrate.trapz(mud_mass_eroded/1000))
-ax1.text(datetime_list[10],-0.5e06,'Erosion rate sand: %e tons'%integrate.trapz(sand_mass_eroded/1000))
+ax1.text(datetime_list[10],-0.3e06,'Total erosion mud: %e tons'%integrate.trapz(mud_mass_eroded/1000))
+ax1.text(datetime_list[10],-0.5e06,'Total erosion sand: %e tons'%integrate.trapz(sand_mass_eroded/1000))
 #ax1.set_yscale('log')
 plt.suptitle('%s'%run)
 sys.exit()

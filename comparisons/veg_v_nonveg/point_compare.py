@@ -36,10 +36,6 @@ z_pt = 4 # 0=bottom 4=surface
 ## Vegetation File Load ##
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
-if dir.split("_")[-1] == 'noveg':
-    run = "noveg"
-else:
-    run = "veg"
 inputfile = dir+'/upper_ches_his.nc'
 f_veg = netCDF4.Dataset(inputfile, 'r')
 ocean_time = f_veg.variables['ocean_time'][:]
@@ -70,7 +66,7 @@ for sec in river_time:
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 
 ## Load in SWAN points file
-ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 ptsfile = ptsdir+"/tripod_wave.pts"
 ptsdf = pd.read_fwf(ptsfile, header=4)
 ptsdf.drop([0,1],axis=0,inplace=True)
@@ -128,7 +124,7 @@ for site in sites:
             ax.set_ylabel('%s_%s' % (f_veg.variables[var2plot[i]].name,(z_pt+1)))  # , f_veg.variables[var2plot[i]].units))
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
             xlim = ax.get_xlim()
             #ax.legend(loc="lower left")
 
@@ -147,7 +143,7 @@ for site in sites:
     #        ax.yaxis.tick_right()
     #        ax.yaxis.set_label_position("right")
             ax.set_ylabel('Total SSC [kg/m3]')
-            ax.grid(True)
+            #ax.grid(True)
             #ax.legend(loc="upper left")
             xlim = ax.get_xlim()
 
@@ -166,7 +162,7 @@ for site in sites:
             ax.set_ylabel('|v| [m/s]')
             #ax.set_ylim(0, 2.5)
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
             #ax.legend(loc="upper left")
             xlim = ax.get_xlim()
 
@@ -183,7 +179,7 @@ for site in sites:
          #ax.set_ylim(0.8, 1.1)
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
             #ax.legend(loc="lower left")
             xlim = ax.get_xlim()
 
@@ -194,7 +190,7 @@ for site in sites:
                          marker='', markersize=1, color='k')
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
             ax.set_xlim(xlim)
             #ax.yaxis.tick_right()
             #ax.yaxis.set_label_position("right")
@@ -211,7 +207,7 @@ for site in sites:
             #ax.set_ylim(0,6)
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
             xlim = ax.get_xlim()
             ax.legend(bbox_to_anchor=(0.4, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, ncol=2)
 
@@ -219,7 +215,7 @@ for site in sites:
             coawstpy.stick_plot(ptsdf['Time'], ptsdf['X-Windv'], ptsdf['Y-Windv'], ax=ax)
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.xaxis.grid(True)
+            #ax.xaxis.grid(True)
             #ax.get_yaxis().set_ticks([])
             ax.yaxis.tick_right()
             ax.yaxis.set_label_position("right")
@@ -249,6 +245,6 @@ for site in sites:
             ax.grid(True)
             xlim = ax.get_xlim()
     fig.suptitle('Site %s @ %fN %fE' % (site, f_veg.variables['lat_rho'][x, y], f_veg.variables['lon_rho'][x, y]))
-    outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/comparison/site_%s_timeseries_lowres.png' % site
-    print("Saving to %s" % outfile)
-    plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
+    #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/comparison/site_%s_timeseries_lowres.png' % site
+    #print("Saving to %s" % outfile)
+    #plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
