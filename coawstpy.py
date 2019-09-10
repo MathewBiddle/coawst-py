@@ -5,6 +5,13 @@ import scipy.integrate as integrate
 
 
 def stick_plot(time, u, v, **kw):
+    '''
+    :param time:
+    :param u:
+    :param v:
+    :param kw:
+    :return:
+    '''
 
     width = kw.pop('width', 0.001)
     headwidth = kw.pop('headwidth', 0)
@@ -79,3 +86,13 @@ def rot2xy(ue, vn, projangle):
     ux = +ue*np.cos(theta*np.pi/180) + vn*np.sin(theta*np.pi/180)
     vy = -ue*np.sin(theta*np.pi/180) + vn*np.cos(theta*np.pi/180)
     return ux, vy
+
+
+def nearest_ind(items, value):
+    '''
+    :param items: list of values
+    :param value: value to find closest
+    :return: index of closest value in list
+    '''
+    diff = np.abs([item - value for item in items])
+    return diff.argmin(0)

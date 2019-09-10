@@ -125,6 +125,7 @@ for site in sites:
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
             #ax.grid(True)
+            ax.xaxis.grid(True)
             xlim = ax.get_xlim()
             #ax.legend(loc="lower left")
 
@@ -144,6 +145,7 @@ for site in sites:
     #        ax.yaxis.set_label_position("right")
             ax.set_ylabel('Total SSC [kg/m3]')
             #ax.grid(True)
+            ax.xaxis.grid(True)
             #ax.legend(loc="upper left")
             xlim = ax.get_xlim()
 
@@ -163,6 +165,7 @@ for site in sites:
             #ax.set_ylim(0, 2.5)
             ax.xaxis.set_major_formatter(myFmt)
             #ax.grid(True)
+            ax.xaxis.grid(True)
             #ax.legend(loc="upper left")
             xlim = ax.get_xlim()
 
@@ -180,6 +183,7 @@ for site in sites:
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
             #ax.grid(True)
+            ax.xaxis.grid(True)
             #ax.legend(loc="lower left")
             xlim = ax.get_xlim()
 
@@ -191,6 +195,7 @@ for site in sites:
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
             #ax.grid(True)
+            ax.xaxis.grid(True)
             ax.set_xlim(xlim)
             #ax.yaxis.tick_right()
             #ax.yaxis.set_label_position("right")
@@ -208,6 +213,7 @@ for site in sites:
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
             #ax.grid(True)
+            ax.xaxis.grid(True)
             xlim = ax.get_xlim()
             ax.legend(bbox_to_anchor=(0.4, 1.02, 1, 0.2), loc="lower left", borderaxespad=0, ncol=2)
 
@@ -215,7 +221,7 @@ for site in sites:
             coawstpy.stick_plot(ptsdf['Time'], ptsdf['X-Windv'], ptsdf['Y-Windv'], ax=ax)
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            #ax.xaxis.grid(True)
+            ax.xaxis.grid(True)
             #ax.get_yaxis().set_ticks([])
             ax.yaxis.tick_right()
             ax.yaxis.set_label_position("right")
@@ -233,7 +239,8 @@ for site in sites:
             #ax.set_ylim(0,0.4)
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
+            ax.xaxis.grid(True)
             #ax.legend(loc="upper left")
             xlim = ax.get_xlim()
         else:
@@ -242,7 +249,8 @@ for site in sites:
             ax.set_ylabel('%s' % (f_veg.variables[var2plot[i]].name))#, f_veg.variables[var2plot[i]].units))
             ax.xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
             ax.xaxis.set_major_formatter(myFmt)
-            ax.grid(True)
+            #ax.grid(True)
+            ax.xaxis.grid(True)
             xlim = ax.get_xlim()
     fig.suptitle('Site %s @ %fN %fE' % (site, f_veg.variables['lat_rho'][x, y], f_veg.variables['lon_rho'][x, y]))
     #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/comparison/site_%s_timeseries_lowres.png' % site
