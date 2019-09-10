@@ -1,19 +1,10 @@
-#import os
-#os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
-#from mpl_toolkits.basemap import Basemap
-import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from matplotlib.dates import DateFormatter
-#from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-#from matplotlib.ticker import LinearLocator, FormatStrFormatter
-#import warnings
 import numpy as np
 import datetime
-import time
 import netCDF4
 import coawstpy
 import pandas as pd
+from scipy import stats
 
 # bring in the data
 #dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
@@ -27,16 +18,17 @@ else:
     run = "veg"
 
 # read CBIBS data
+print('Reading CBIBS data...')
 CBIBS_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc'
 fcbibs = netCDF4.Dataset(CBIBS_file, 'r')
 # subset indexes for time. Probably don't need this after we do the searching for matching data.
-itime_start = 1059
-itime_end = 3618
+#itime_start = 1059
+#itime_end = 3618
 
-cbibs_u = fcbibs.variables['eastward_water_velocity'][itime_start:itime_end, 2] # time,depth
-cbibs_v = fcbibs.variables['northward_water_velocity'][itime_start:itime_end, 2] # time,depth
+cbibs_u = fcbibs.variables['eastward_water_velocity'][:, 2] # time,depth
+cbibs_v = fcbibs.variables['northward_water_velocity'][:, 2] # time,depth
 cbibs_mag = np.sqrt(cbibs_u**2 + cbibs_v**2)
-cbibs_time = fcbibs.variables['time3'][itime_start:itime_end]
+cbibs_time = fcbibs.variables['time3'][:]
 
 #Geolocation is 39.5404, -76.0736
 cbibs_lon = -76.0736 # using coords from website
@@ -56,6 +48,7 @@ lat_pt = cbibs_lat
 lon_pt = cbibs_lon
 
 # read ROMS history file
+print('Reading ROMS data...')
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 
@@ -83,11 +76,82 @@ vbar = f.variables['vbar_northward'][:, x, y]
 mag_vel = np.sqrt(ubar**2 + vbar**2)
 
 
+print('Matching nearest data...')
 # TODO index = coawstpy.nearest_ind(datelist,value)
 df = pd.DataFrame(columns=['CBIBS_time','CBIBS_U','CBIBS_V','COAWST_time','COAWST_Ubar','COAWST_Vbar'],
-                  index=pd.date_range(start=datetime_list[0], end=datetime_list[-1],freq='1H'))
+                  index=pd.date_range(start='2011-07-19T23:00:00', end='2011-11-01T00:00:00',freq='1H'))
+## TODO build out data frame here!
+i=0
+idx=[]
+for time in df.index:
+    print("searching for time: %s" % time)
+    cbibs_idx = coawstpy.nearest_ind(cbibs_date,time)
+    print("Found cbibs time: %s" % cbibs_date[cbibs_idx])
+    coawst_idx = coawstpy.nearest_ind(datetime_list,time)
+    if cbibs_idx in idx:
+        continue
+    idx.append(cbibs_idx)
+    print("Found ROMS time: %s\n" % datetime_list[coawst_idx])
+    df.loc[time] = [cbibs_date[cbibs_idx],cbibs_u[cbibs_idx],cbibs_v[cbibs_idx],
+                  datetime_list[coawst_idx],ubar[coawst_idx],vbar[coawst_idx]]
+    i+=1
+df.dropna(how='any', inplace=True)
+df['CBIBS_U'] = pd.to_numeric(df['CBIBS_U'])
+df['CBIBS_V'] = pd.to_numeric(df['CBIBS_V'])
+df['COAWST_Vbar'] = pd.to_numeric(df['COAWST_Vbar'])
+df['COAWST_Ubar'] = pd.to_numeric(df['COAWST_Ubar'])
 
+start_date = '2011-08-01'
+end_date = '2011-09-01'
 
+fig, (ax) = plt.subplots(nrows=2, ncols=1, sharex=False, figsize=(6, 12))
+
+a = ax[0].scatter(x=df.loc[start_date:end_date, 'COAWST_Vbar'],y=df.loc[start_date:end_date,'CBIBS_V'],
+                c=df.loc[start_date:end_date].index)#, colormap='viridis')
+#cm = df.loc['2011-08-01':'2011-09-09', ['COAWST_Ubar','CBIBS_U']].plot.scatter(
+#    x='COAWST_Ubar', y='CBIBS_U', c=df.loc['2011-08-01':'2011-09-09'].index, colormap='viridis', ax=ax)
+cbar = fig.colorbar(a, ax=ax[0])
+cbar.ax.set_yticklabels(pd.to_datetime(cbar.get_ticks()).strftime(date_format='%b %d'))
+xmin = np.min([df.loc[start_date:end_date, 'COAWST_Vbar'].min(), df.loc[start_date:end_date,'CBIBS_V'].min()])
+xmax = np.max([df.loc[start_date:end_date, 'COAWST_Vbar'].max(), df.loc[start_date:end_date,'CBIBS_V'].max()])
+ax[0].set_xlim(xmin, xmax)
+ax[0].set_ylim(xmin, xmax)
+ax[0].grid(axis='both')
+ax[0].set_aspect('equal', 'box')
+ax[0].set_ylabel('CBIBS')
+ax[0].set_xlabel('COAWST')
+ax[0].set_title('V - North')
+slope, intercept, r_value, p_value, std_err = stats.linregress(
+    df.loc[start_date:end_date, 'COAWST_Vbar'].values, df.loc[start_date:end_date,'CBIBS_V'].values)
+xs = np.array([xmin, xmax])
+ax[0].plot(xs, slope*xs+intercept, linestyle='-', color='k')
+ax[0].plot([-1,1],[-1,1],linestyle=':')
+
+a = ax[1].scatter(x=df.loc[start_date:end_date, 'COAWST_Ubar'],y=df.loc[start_date:end_date,'CBIBS_U'],
+                c=df.loc[start_date:end_date].index)#, colormap='viridis')
+#cm = df.loc['2011-08-01':'2011-09-09', ['COAWST_Ubar','CBIBS_U']].plot.scatter(
+#    x='COAWST_Ubar', y='CBIBS_U', c=df.loc['2011-08-01':'2011-09-09'].index, colormap='viridis', ax=ax)
+cbar = fig.colorbar(a, ax=ax[1])
+cbar.ax.set_yticklabels(pd.to_datetime(cbar.get_ticks()).strftime(date_format='%b %d'))
+xmin = np.min([df.loc[start_date:end_date, 'COAWST_Ubar'].min(), df.loc[start_date:end_date,'CBIBS_U'].min()])
+xmax = np.max([df.loc[start_date:end_date, 'COAWST_Ubar'].max(), df.loc[start_date:end_date,'CBIBS_U'].max()])
+ax[1].set_xlim(xmin, xmax)
+ax[1].set_ylim(xmin, xmax)
+ax[1].grid(axis='both')
+ax[1].set_aspect('equal', 'box')
+ax[1].set_ylabel('CBIBS')
+ax[1].set_xlabel('COAWST')
+ax[1].set_title('U - East')
+slope, intercept, r_value, p_value, std_err = stats.linregress(
+    df.loc[start_date:end_date, 'COAWST_Ubar'].values, df.loc[start_date:end_date,'CBIBS_U'].values)
+xs = np.array([xmin, xmax])
+ax[1].plot(xs, slope*xs+intercept, linestyle='-', color='k')
+ax[1].plot([-1,1],[-1,1],linestyle=':')
+plt.suptitle('%s to %s' % (start_date,end_date))
+#ax.grid(True)
+#fig.colorbar(format=DateFormatter('%b %d'))
+#cb.ax.set_yticklabels(df.loc['2011-08-01':'2011-09-09'].index)
+#cb = fig.colorbar(smap,format=DateFormatter('%d %b %y'))
 
 sys.exit()
 ## Make some plots.
