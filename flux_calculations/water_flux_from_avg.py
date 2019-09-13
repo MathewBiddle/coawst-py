@@ -84,6 +84,7 @@ transect['T2']['y'] = np.array([58]*len(transect['T2']['x']))
 #transect['T3']['y'] = np.array([1]*len(transect['T3']['x']))
 
 fig1, (ax1) = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
+fig2, (ax2) = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
 ## Iterate through each transect
 for t in transect: # each transect
     fig, (ax) = plt.subplots(nrows=3, ncols=1, figsize=(12, 12))
@@ -151,14 +152,23 @@ for t in transect: # each transect
     ax[2].xaxis.set_major_formatter(DateFormatter("%m/%d"))
     fig.suptitle(t)
 
-    print('%s max flux = %g m3/s' % (t, transect[t]['fd'].max()))
-    print('%s integrated flux = %g m3/s' % (t, integrate.trapz(transect[t]['fd'])))
+    print('%s max south flux = %g m3/s' % (t, transect[t]['fs'].max()))
+    print('%s integrated south flux = %g m3/s\n' % (t, integrate.trapz(transect[t]['fs'])))
+
+    print('%s max downstream flux = %g m3/s' % (t, transect[t]['fd'].max()))
+    print('%s integrated downstream flux = %g m3/s\n\n' % (t, integrate.trapz(transect[t]['fd'])))
 
     ax1.plot_date(datetime_list, transect[t]['fd'], label=t, linestyle='-', linewidth=1, marker='')
     ax1.legend()
     ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
     ax1.xaxis.set_major_formatter(DateFormatter("%m/%d"))
     ax1.set_ylabel('Total downstream flux m3/s')
+
+    ax2.plot_date(datetime_list, transect[t]['fs'], label=t, linestyle='-', linewidth=1, marker='')
+    ax2.legend()
+    ax2.xaxis.set_major_locator(mdates.DayLocator(interval=10))
+    ax2.xaxis.set_major_formatter(DateFormatter("%m/%d"))
+    ax2.set_ylabel('Total south flux m3/s')
     #ax1.set_yscale('log')
 #fig.tight_layout()
 

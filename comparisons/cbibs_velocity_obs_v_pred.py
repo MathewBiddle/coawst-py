@@ -95,6 +95,7 @@ for time in df.index:
     df.loc[time] = [cbibs_date[cbibs_idx],cbibs_u[cbibs_idx],cbibs_v[cbibs_idx],
                   datetime_list[coawst_idx],ubar[coawst_idx],vbar[coawst_idx]]
     i+=1
+
 df.dropna(how='any', inplace=True)
 df['CBIBS_U'] = pd.to_numeric(df['CBIBS_U'])
 df['CBIBS_V'] = pd.to_numeric(df['CBIBS_V'])
@@ -104,7 +105,7 @@ df['COAWST_Ubar'] = pd.to_numeric(df['COAWST_Ubar'])
 start_date = '2011-08-01'
 end_date = '2011-09-01'
 
-fig, (ax) = plt.subplots(nrows=2, ncols=1, sharex=False, figsize=(6, 12))
+fig, (ax) = plt.subplots(nrows=2, ncols=1, figsize=(6, 12))
 
 a = ax[0].scatter(x=df.loc[start_date:end_date, 'COAWST_Vbar'],y=df.loc[start_date:end_date,'CBIBS_V'],
                 c=df.loc[start_date:end_date].index)#, colormap='viridis')
