@@ -22,13 +22,12 @@ else:
 river_frc = dir+'/river_frc.nc'
 f_river = netCDF4.Dataset(river_frc, 'r')
 river_time = f_river.variables['river_time'][:]
-river_transport = f_river.variables['river_transport'][:, 3]
+river_transport = f_river.variables['river_transport'][:, 3] # middle of water column
 river_datetime_list=[]
 for sec in river_time:
     river_datetime_list.append(
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 #river_transport = f_river.variables['river_transport'][:] # (river_time, river)
-
 
 
 inputfile = dir+'/upper_ches_his.nc'
