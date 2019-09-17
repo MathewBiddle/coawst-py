@@ -46,9 +46,6 @@ Hvom = f.variables['Hvom'][tstart:tend,:,:,:]  # lon_v north-south (from panoply
 
 mask_rho = f.variables['mask_rho'][:]
 
-#tx1 = 1202
-#tx2 = 1466
-#srho_angle = 3
 datetime_list=[]
 for sec in ocean_time:
     datetime_list.append(
@@ -65,7 +62,29 @@ for sec in river_time:
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 #river_transport = f_river.variables['river_transport'][:] # (river_time, river)
 
-#sys.exit()
+## TODO look for first match then exctract by appropriate increment for one hour
+# currently river data is 30 seconds?
+# river_datetime_list[:5]
+# [real_datetime(2011, 7, 1, 4, 0), real_datetime(2011, 7, 1, 4, 0, 30), real_datetime(2011, 7, 1, 4, 1),
+# real_datetime(2011, 7, 1, 4, 1, 30), real_datetime(2011, 7, 1, 4, 2)]
+# something like river_datetime_list[:121:] should work, skip every 120 values (1 hour @30 secs).
+sys.exit()
+i=0
+idx=[]
+for time in datetime_list:
+    print("searching for time: %s" % time)
+    river_idx = coawstpy.nearest_ind(river_datetime_list,time)
+    print("Found river time: %s" % river_datetime_list[river_idx])
+    coawst_idx = coawstpy.nearest_ind(datetime_list,time)
+    if river_idx in idx:
+        continue
+    idx.append(river_idx)
+    print("Found ROMS time: %s\n" % datetime_list[coawst_idx])
+    #df.loc[time] = [cbibs_date[cbibs_idx],cbibs_u[cbibs_idx],cbibs_v[cbibs_idx],
+    #              datetime_list[coawst_idx],ubar[coawst_idx],vbar[coawst_idx]]
+    i+=1
+
+sys.exit()
 ## Now build transects
 transect = dict()
 ##############################
