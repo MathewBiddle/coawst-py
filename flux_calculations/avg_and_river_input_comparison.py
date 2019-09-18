@@ -60,31 +60,12 @@ river_datetime_list=[]
 for sec in river_time:
     river_datetime_list.append(
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
-#river_transport = f_river.variables['river_transport'][:] # (river_time, river)
 
-## TODO look for first match then exctract by appropriate increment for one hour
-# currently river data is 30 seconds?
-# river_datetime_list[:5]
-# [real_datetime(2011, 7, 1, 4, 0), real_datetime(2011, 7, 1, 4, 0, 30), real_datetime(2011, 7, 1, 4, 1),
-# real_datetime(2011, 7, 1, 4, 1, 30), real_datetime(2011, 7, 1, 4, 2)]
-# something like river_datetime_list[:121:] should work, skip every 120 values (1 hour @30 secs).
-sys.exit()
-i=0
-idx=[]
-for time in datetime_list:
-    print("searching for time: %s" % time)
-    river_idx = coawstpy.nearest_ind(river_datetime_list,time)
-    print("Found river time: %s" % river_datetime_list[river_idx])
-    coawst_idx = coawstpy.nearest_ind(datetime_list,time)
-    if river_idx in idx:
-        continue
-    idx.append(river_idx)
-    print("Found ROMS time: %s\n" % datetime_list[coawst_idx])
-    #df.loc[time] = [cbibs_date[cbibs_idx],cbibs_u[cbibs_idx],cbibs_v[cbibs_idx],
-    #              datetime_list[coawst_idx],ubar[coawst_idx],vbar[coawst_idx]]
-    i+=1
+initial_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[0])
+final_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[-1])+1 # have to add one for slicing to include last number
+river_datetime_list_subset = river_datetime_list[initial_riv_idx : final_riv_idx : 120]
+river_transport_subset = river_transport[initial_riv_idx : final_riv_idx : 120,:]
 
-sys.exit()
 ## Now build transects
 transect = dict()
 ##############################
@@ -206,11 +187,14 @@ for t in transect: # each transect
     #ax1.set_yscale('log')
 #fig.tight_layout()
 
-ax2.plot_date(river_datetime_list,np.sum(river_transport,1),label='river transport m3/s',linestyle='-', linewidth=1, marker='')
+ax2.plot_date(river_datetime_list_subset,np.sum(river_transport_subset,1),label='river transport m3/s',linestyle='-', linewidth=1, marker='')
 ax2.legend()
 
-ax1.plot_date(river_datetime_list,np.sum(river_transport,1),label='river transport m3/s',linestyle='-', linewidth=1, marker='')
+ax1.plot_date(river_datetime_list_subset,np.sum(river_transport_subset,1),label='river transport m3/s',linestyle='-', linewidth=1, marker='')
 ax1.legend()
+
+print('River max flux (discharge) = %g m3/s' % (np.sum(river_transport_subset,1).max()))
+print('River integrated flux (discharge) = %g m3/s\n' % (integrate.trapz(np.sum(river_transport_subset,1))))
 
 plt.figure()
 plt.pcolor(lon, lat, mask_rho, edgecolors='k', cmap='PuBu')
