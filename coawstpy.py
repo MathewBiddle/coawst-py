@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import scipy.integrate as integrate
+#import scipy.integrate as integrate
 
 
 def stick_plot(time, u, v, **kw):
@@ -96,3 +96,27 @@ def nearest_ind(items, value):
     '''
     diff = np.abs([item - value for item in items])
     return diff.argmin(0)
+
+
+def time_periods():
+    '''
+    Provides the following time periods for subsetting:
+
+    typical =  '2011-08-01' to '2011-08-06'
+    Irene =  '2011-08-27' to '2011-08-30'
+    Lee = '2011-09-07' to '2011-09-16'
+    post-Lee = '2011-10-13' to '2011-10-24'
+
+    :return:
+    A dictionary of time periods for the different events
+    Each event key returns a list of start and end dates.
+
+    times[key] = [start,end]
+    '''
+    times = dict()
+    times['typical'] = ['2011-08-01', '2011-08-06']
+    times['Irene'] = ['2011-08-27', '2011-08-30']
+    times['Lee'] = ['2011-09-07', '2011-09-16']
+    times['post-Lee'] = ['2011-10-13', '2011-10-24']
+    return times
+

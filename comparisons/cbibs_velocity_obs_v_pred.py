@@ -103,7 +103,7 @@ df['COAWST_Vbar'] = pd.to_numeric(df['COAWST_Vbar'])
 df['COAWST_Ubar'] = pd.to_numeric(df['COAWST_Ubar'])
 
 start_date = '2011-08-01'
-end_date = '2011-09-01'
+end_date = '2011-11-01'
 
 fig, (ax) = plt.subplots(nrows=2, ncols=1, figsize=(6, 12))
 
