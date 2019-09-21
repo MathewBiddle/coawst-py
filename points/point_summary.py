@@ -62,21 +62,21 @@ for sec in ocean_time:
             netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
 
-#river_frc = dir+'/river_frc.nc'
-#f_river = netCDF4.Dataset(river_frc, 'r')
-#river_time = f_river.variables['river_time'][:]
-#river_transport = (f_river.variables['river_transport'][:, 0] + (0.2 * f_river.variables['river_transport'][:, 0])) * \
-#                  f_river.variables['river_transport'].shape[1]
-#river_datetime_list=[]
-#for sec in river_time:
+river_frc = dir+'/river_frc.nc'
+f_river = netCDF4.Dataset(river_frc, 'r')
+river_time = f_river.variables['river_time'][54120:353761:120]
+river_transport = (f_river.variables['river_transport'][54120:353761:120, 0] + (0.2 * f_river.variables['river_transport'][54120:353761:120, 0])) * \
+                  f_river.variables['river_transport'].shape[1]
+river_datetime_list=[]
+for sec in river_time:
 #    ts = sec/(12*3600)
-#    river_datetime_list.append(
-#        netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
+    river_datetime_list.append(
+        netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 
 #initial_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[0])
 #final_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[-1])+1 # have to add one for slicing to include last number
-#river_datetime_list_subset = river_datetime_list[initial_riv_idx : final_riv_idx : 120]
-#river_transport_subset = river_transport[initial_riv_idx : final_riv_idx : 120]
+#river_datetime_list_subset = river_datetime_list[: : 120]
+#river_transport_subset = river_transport[: : 120]
 
 
 ptsfile = dir+"/tripod_wave.pts"
@@ -101,8 +101,8 @@ for event in times:
     sites = ['CBIBS','3','4','Tripod','Lee7']
     for site in sites:
         point_data[event][site] = pd.DataFrame(columns=['swan_time','X-Windv','Y-Windv',
-                                             'ocean_time','Pwave_Top','Hwave','mud','sand','bed_thickness','ubar','vbar'])
-        #                                              'river_time','river_transport',
+                                             'ocean_time','Pwave_Top','Hwave','mud','sand','bed_thickness','ubar','vbar',
+                                             'river_time','river_transport'])
 
         lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
         try:
@@ -118,8 +118,8 @@ for event in times:
         point_data[event][site]['swan_time'] = ptsdf['Time'][start:end]
         point_data[event][site]['X-Windv'] = ptsdf['X-Windv'][start:end]
         point_data[event][site]['Y-Windv'] = ptsdf['Y-Windv'][start:end]
-        #point_data[event][site]['river_time'] = river_datetime_list_subset[start:end]
-        #point_data[event][site]['river_transport'] = river_transport_subset[start:end]
+        point_data[event][site]['river_time'] = river_datetime_list[start:end]
+        point_data[event][site]['river_transport'] = river_transport[start:end]
         point_data[event][site]['ocean_time'] = datetime_list[start:end]
         point_data[event][site]['Pwave_Top'] = f.variables['Pwave_top'][start:end, x, y]
         point_data[event][site]['Hwave'] = f.variables['Hwave'][start:end,x,y]
