@@ -113,11 +113,13 @@ def time_periods():
 
     times[key] = [start,end]
     '''
+    import datetime
     times = dict()
-    times['typical'] = ['2011-08-01', '2011-08-06']
-    times['Irene'] = ['2011-08-27', '2011-08-30']
-    times['Lee'] = ['2011-09-07', '2011-09-16']
-    times['post-Lee'] = ['2011-10-13', '2011-10-24']
+    fmt = '%Y-%m-%d'
+    times['typical'] = [datetime.datetime.strptime('2011-08-01',fmt), datetime.datetime.strptime('2011-08-06',fmt)]
+    times['Irene'] = [datetime.datetime.strptime('2011-08-27',fmt), datetime.datetime.strptime('2011-08-30',fmt)]
+    times['Lee'] = [datetime.datetime.strptime('2011-09-07',fmt), datetime.datetime.strptime('2011-09-16',fmt)]
+    times['post-Lee'] = [datetime.datetime.strptime('2011-10-13',fmt), datetime.datetime.strptime('2011-10-24',fmt)]
     return times
 
 
@@ -160,7 +162,7 @@ def get_sed_flux_data(run,transect_indexes):
     transect = {'T1': {...}, 'T2': {...}, 'time': [...]}
     '''
     import netCDF4
-    import scipy.integrate as integrate
+
     import copy
 
     # bring in the data
@@ -209,7 +211,7 @@ def get_sed_flux_data(run,transect_indexes):
             transect[t]['Huon_sum_%s' % sed] = np.sum(transect[t]['Huon_%s' % sed], axis=(1, 2)) # kg/s
             transect[t]['Huon_sum_%s_units' % sed] = 'kg/s'
 
-            transect[t]['Huon_%s_integrated' % sed] = (integrate.trapz(transect[t]['Huon_sum_%s' % sed]) * 3600)/1000 # integrate per hour (tons)
-            transect[t]['Huon_%s_integrated_units' % sed] = 'tons'
+            #transect[t]['Huon_%s_integrated' % sed] = (integrate.trapz(transect[t]['Huon_sum_%s' % sed]) * 3600)/1000 # integrate per hour (tons)
+            #transect[t]['Huon_%s_integrated_units' % sed] = 'tons'
 
     return transect
