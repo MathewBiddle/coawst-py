@@ -16,6 +16,9 @@ Computes the water flux across transects by computing the flux sum in North and 
 along and cross channel fluxes.
 
 Also computes the input flux from the ROMS river file
+
+The figures produced from this script show that the raw South flux values we get from ROMS are the flux values we 
+should be using during our sediment flux calculations
 '''
 
 # bring in the data

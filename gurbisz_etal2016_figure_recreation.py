@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import coawstpy
 import matplotlib.dates as mdates
-import matplotlib.dates as mdates #import DateFormatter
 import numpy as np
 
 '''

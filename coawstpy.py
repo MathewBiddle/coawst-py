@@ -120,3 +120,96 @@ def time_periods():
     times['post-Lee'] = ['2011-10-13', '2011-10-24']
     return times
 
+
+def get_transect_indexes():
+    ###########################
+    # Susquehanna River mouth #
+    ###########################
+    transect=dict()
+    transect['T1'] = dict()
+    transect['T1']['x'] = np.array(list(range(27, 34)))
+    transect['T1']['y'] = np.array([10] * len(transect['T1']['x']))
+
+    ###############################
+    # Turkey Point to Sandy Point #
+    ###############################
+    transect['T2'] = dict()
+    transect['T2']['x'] = np.array(list(range(40, 69)))
+    transect['T2']['y'] = np.array([58] * len(transect['T2']['x']))
+    return transect
+
+
+def get_sed_flux_data(run,transect_indexes):
+    '''
+    Computes the sediment flux across transects by computing the flux sum in South and East direction.
+
+    :param run: Select which run to grab the data for.
+    Options are:
+    'noveg'
+    'veg'
+
+    :param transects: a dictionary of transect indexes
+    {'T1': {'x': array([ ]),
+        'y': array([ ])},
+
+     'T2': {'x': array([ ]),
+        'y': array([ ])}
+    }
+    :return:
+    transect - a dictionary of the sediment flux data for each transect
+    transect = {'T1': {...}, 'T2': {...}, 'time': [...]}
+    '''
+    import netCDF4
+    import scipy.integrate as integrate
+    import copy
+
+    # bring in the data
+    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    if run == 'noveg':
+        direct = runs_dir+'Full_20110719T23_20111101_final_noveg'
+    elif run == 'veg':
+        direct = runs_dir+'Full_20110719T23_20111101_final'
+    inputfile = direct+'/upper_ches_avg.nc'
+    print('Reading %s %s...' % (inputfile.split("/")[-1],run))
+    f = netCDF4.Dataset(inputfile, 'r')
+
+    # Get the data we want
+    ocean_time = f.variables['ocean_time'][:]
+    lat = f.variables['lat_rho'][:]
+    lon = f.variables['lon_rho'][:]
+    mask_rho = f.variables['mask_rho'][:]
+
+    Huon = dict()
+    # sand
+    Huon['sand'] = f.variables['Huon_sand_01'][:] # South
+
+    # mud
+    Huon['mud'] = f.variables['Huon_mud_01'][:] # South
+
+    transect = copy.deepcopy(transect_indexes)
+    transect['time'] = []
+    for sec in ocean_time:
+        transect['time'].append(
+            netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
+
+    sediment_type = ['sand','mud']
+    ## Iterate through each transect
+    for t in transect: # each transect
+        if t == 'time':
+            continue
+        # get index of interest
+        x = transect[t]['x']
+        y = transect[t]['y']
+        mask_rho[x, y] = 5
+
+        for sed in sediment_type:
+            transect[t]['Huon_%s' % sed] = Huon[sed][:, :, x, y] # kg/s
+            transect[t]['Huon_%s_units' % sed] = 'kg/s'
+
+            transect[t]['Huon_sum_%s' % sed] = np.sum(transect[t]['Huon_%s' % sed], axis=(1, 2)) # kg/s
+            transect[t]['Huon_sum_%s_units' % sed] = 'kg/s'
+
+            transect[t]['Huon_%s_integrated' % sed] = (integrate.trapz(transect[t]['Huon_sum_%s' % sed]) * 3600)/1000 # integrate per hour (tons)
+            transect[t]['Huon_%s_integrated_units' % sed] = 'tons'
+
+    return transect
