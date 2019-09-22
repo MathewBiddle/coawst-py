@@ -4,6 +4,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 import netCDF4
 
+
 def stick_plot(time, u, v, **kw):
     '''
     :param time:
@@ -162,7 +163,8 @@ def get_point_locations():
         ['Lee0', 39.061, -76.328, ''],
         ['LeeS2', 38.757, -76.473, ''],
         ['CBIBS', 39.5396, -76.0741, 'CBIBS Susquehanna Flats'],
-        ['Tripod', 39.4931, -76.0341, 'Larry tripod site']
+        ['Tripod', 39.4931, -76.0341, 'Larry tripod site'],
+        ['S', 39.475, -76.0341, 'Matts South of bed']
     ]
 
     i = 0

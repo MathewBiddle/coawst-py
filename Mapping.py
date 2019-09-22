@@ -14,21 +14,6 @@ import numpy as np
 import netCDF4
 import coawstpy
 
-# Cindy's locations
-# locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
-# locs['Site'] = ['1','2','3','4','5',
-#                 'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
-#                 'CBIBS','Tripod']
-# locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
-#                39.414,39.380,39.346,39.197,39.135,39.061,38.757,
-#                39.5396,39.4931]
-# locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
-#                -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
-#                -76.0741,-76.0341]
-# locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
-#                    '','','','','','','',
-#                    'CBIBS Susquehanna Flats','Larry tripod site']
-
 locs = coawstpy.get_point_locations()
 
 # setup Lambert Conformal basemap.
@@ -44,10 +29,10 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
 # add background
 m.arcgisimage(service="Canvas/World_Light_Gray_Base",xpixels = 3000)
 
+direct = \
+'/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
-
-inputfile = dir+'/upper_ches_his.nc'
+inputfile = direct+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
@@ -77,20 +62,23 @@ m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3,
 #m.pcolormesh(lon, lat, plant_height_orig, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
 
 ## Do mapping for points
-lon=list(locs['lon'])
-lat=list(locs['lat'])
+#lon=list(locs['lon'])
+#lat=list(locs['lat'])
 
-x,y = m(lon,lat)
+#x,y = m(lon,lat)
 
 # plot stations
-plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
-for label, xpt, ypt in zip(locs['Site'], x, y):
-    if label not in ['Lee5','Lee2.5','Lee2','Lee0','LeeS2']:
+#plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
+for label in locs['Site']:
+    if label in ['CBIBS','3','Tripod','S']:
+        lon = locs.loc[locs['Site'] == label,'lon'].values
+        lat = locs.loc[locs['Site'] == label,'lat'].values
+        x,y = m(lon,lat)
+        plt.scatter(x, y, s=50, marker='.', color='r', edgecolors='k', linewidths=0.3)
         if label == 'Tripod':
-            plt.text(xpt+500,ypt-200, label, fontdict=dict(size=5))
+            plt.text(x+500,y-200, label, fontdict=dict(size=5))
         else:
-            plt.text(xpt+500, ypt, label, fontdict=dict(size=5))
-
+            plt.text(x+500, y, label, fontdict=dict(size=5))
 
 # Transects
 transects = coawstpy.get_transect_indexes()
@@ -105,31 +93,6 @@ for transect in transects:
     xm, ym = m(lon, lat)
     m.plot(xm, ym, '-', color='k', linewidth=2)
     plt.text(xm[0]-1000,ym[0],t_name, fontdict=dict(size=5))
-
-sys.exit()
-# identify the points to extract data
-# Susquehanna River mouth
-t1_name = 'S.R. Mouth'
-t1x = np.array([29, 33])
-t1y = np.array([13, 9])
-t1lon=[f.variables['lon_rho'][t1x[0], t1y[0]], f.variables['lon_rho'][t1x[1], t1y[1]]]
-t1lat=[f.variables['lat_rho'][t1x[0], t1y[0]], f.variables['lat_rho'][t1x[1], t1y[1]]]
-
-t1xm, t1ym = m(t1lon, t1lat)
-m.plot(t1xm, t1ym, '-', color='k', linewidth=2)
-plt.text(np.max(t1xm)+100, np.max(t1ym)+100, 'T1', fontdict=dict(size=5))
-
-# Turkey Point to Sandy Point
-t2_name = 'Turkey Pt to Sandy Pt'
-t2x = np.array([42,67])  #
-t2y = np.array([58, 58])
-t2lon=[f.variables['lon_rho'][t2x[0], t2y[0]], f.variables['lon_rho'][t2x[1], t2y[1]]]
-t2lat=[f.variables['lat_rho'][t2x[0], t2y[0]], f.variables['lat_rho'][t2x[1], t2y[1]]]
-
-t2xm, t2ym = m(t2lon, t2lat)
-m.plot(t2xm, t2ym, '-', color='k', linewidth=2)
-plt.text(np.min(t2xm)-1000, np.mean(t2ym), 'T2', fontdict=dict(size=5))
-
 
 plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
