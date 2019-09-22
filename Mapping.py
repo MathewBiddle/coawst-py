@@ -12,21 +12,24 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import netCDF4
+import coawstpy
 
 # Cindy's locations
-locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
-locs['Site'] = ['1','2','3','4','5',
-                'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
-                'CBIBS','Tripod']
-locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
-               39.414,39.380,39.346,39.197,39.135,39.061,38.757,
-               39.5396,39.4931]
-locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
-               -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
-               -76.0741,-76.0341]
-locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
-                   '','','','','','','',
-                   'CBIBS Susquehanna Flats','Larry tripod site']
+# locs = pd.DataFrame(columns=['Site', 'lat', 'lon'])
+# locs['Site'] = ['1','2','3','4','5',
+#                 'Lee7','Lee6','Lee5','Lee2.5','Lee2','Lee0','LeeS2',
+#                 'CBIBS','Tripod']
+# locs['lat'] = [39.527,39.533,39.515,39.505,39.497,
+#                39.414,39.380,39.346,39.197,39.135,39.061,38.757,
+#                39.5396,39.4931]
+# locs['lon'] = [-76.061,-76.061,-76.051,-76.039,-76.036,
+#                -76.079,-76.088,-76.197,-76.311,-76.328,-76.328,-76.473,
+#                -76.0741,-76.0341]
+# locs['comment'] = ['Russ and Palinkas 2018','','Middle of bed','','',
+#                    '','','','','','','',
+#                    'CBIBS Susquehanna Flats','Larry tripod site']
+
+locs = coawstpy.get_point_locations()
 
 # setup Lambert Conformal basemap.
 lat_max = locs.loc[locs['Site'] == '3','lat']+.08
@@ -41,13 +44,9 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
 # add background
 m.arcgisimage(service="Canvas/World_Light_Gray_Base",xpixels = 3000)
 
-#dir='/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110702_20111101'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110906_20110926'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
-#dir = '/Volumes/Documents/COAWST_34_UPPER_CHES_FULL'
-#inputfile = dir+'/upper_ches_his.nc'
-#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110714201800_20111031231800'
+
+dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+
 inputfile = dir+'/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
@@ -94,6 +93,20 @@ for label, xpt, ypt in zip(locs['Site'], x, y):
 
 
 # Transects
+transects = coawstpy.get_transect_indexes()
+for transect in transects:
+    t_name = transect
+    x_start = transects[transect]['x'][0]
+    y_start = transects[transect]['y'][0]
+    x_end = transects[transect]['x'][-1]
+    y_end = transects[transect]['y'][-1]
+    lon = [f.variables['lon_rho'][x_start,y_start],f.variables['lon_rho'][x_end,y_end]]
+    lat = [f.variables['lat_rho'][x_start,y_start],f.variables['lat_rho'][x_end,y_end]]
+    xm, ym = m(lon, lat)
+    m.plot(xm, ym, '-', color='k', linewidth=2)
+    plt.text(xm[0]-1000,ym[0],t_name, fontdict=dict(size=5))
+
+sys.exit()
 # identify the points to extract data
 # Susquehanna River mouth
 t1_name = 'S.R. Mouth'

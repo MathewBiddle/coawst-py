@@ -10,14 +10,14 @@ Plots the sediment flux across transects.
 '''
 
 transect_indexes = coawstpy.get_transect_indexes()
-times = coawstpy.time_periods()
+times = coawstpy.get_time_periods()
 transect_data = coawstpy.get_sed_flux_data('veg',transect_indexes)
 
 sediment_type = ['mud','sand']
 
 for event in times:
     start = coawstpy.nearest_ind(transect_data['time'],times[event][0])
-    end = coawstpy.nearest_ind(transect_data['time'],times[event][1])
+    end = coawstpy.nearest_ind(transect_data['time'],times[event][1])+1
     fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(12, 6))
     for t in transect_data:
         if t == 'time':
