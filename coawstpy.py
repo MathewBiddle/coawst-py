@@ -259,6 +259,7 @@ def get_point_data(run):
 
     inputfile = direct + '/upper_ches_his.nc'
     f = netCDF4.Dataset(inputfile, 'r')
+    print("Retrieving %s %s" % (inputfile.split("/")[-1],run))
     ocean_time = f.variables['ocean_time'][:]
     lat = f.variables['lat_rho'][:]
     lon = f.variables['lon_rho'][:]
@@ -307,7 +308,7 @@ def get_point_data(run):
     locs = get_point_locations()
 
     # collect data for site of choice
-    sites = ['CBIBS', '3', 'Tripod']
+    sites = ['CBIBS', '3', 'S']
     for site in sites:
         point_data[site] = pd.DataFrame(columns=['X-Windv', 'Y-Windv',
                                                         'Pwave_Top', 'Hwave', 'mud_bar','sand_bar', 'bed_thickness',
