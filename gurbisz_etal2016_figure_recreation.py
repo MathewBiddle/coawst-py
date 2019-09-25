@@ -104,7 +104,7 @@ ax[3].xaxis.set_major_formatter(myFmt)
 ax[3].set_xlim(xlim)
 ax[3].set_ylabel('Water surface [m]')
 
-time_periods = coawstpy.time_periods()
+time_periods = coawstpy.get_time_periods()
 # add verical bars:
 for i in ax:
     for time_period in time_periods:
@@ -114,7 +114,7 @@ for i in ax:
     #i.axvspan('2011-09-07', '2011-09-16', facecolor='0.5', alpha=0.3) # Lee discharge
     #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
 
-ax[0].text('2011-07-31 12:00',100,'Typical')
+ax[0].text('2011-07-31 12:00',100,'Before Irene')
 ax[0].text('2011-08-26 12:00',100,'Irene')
 ax[0].text('2011-09-10',100,'Lee')
-ax[0].text('2011-10-14',100,'Wind Event')
+ax[0].text('2011-10-14',100,'post-Lee')
