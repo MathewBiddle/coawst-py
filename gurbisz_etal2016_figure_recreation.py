@@ -13,6 +13,34 @@ Large Submersed Plant Bed. Estuaries and Coasts 39, 951–966. https://doi.org/1
 '''
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 
+# Get SSC data
+inputfile = dir + '/upper_ches_his.nc'
+f = netCDF4.Dataset(inputfile, 'r')
+print("Retrieving %s" % (inputfile.split("/")[-1]))
+ocean_time = f.variables['ocean_time'][:]
+datetime_list = []
+for sec in ocean_time:
+    if sec == 0.0:
+        datetime_list.append(
+            netCDF4.num2date(sec + 0.0000000000000001, units=f.variables['ocean_time'].units,
+                             calendar=f.variables['ocean_time'].calendar))
+    else:
+        datetime_list.append(
+            netCDF4.num2date(sec, units=f.variables['ocean_time'].units,
+                             calendar=f.variables['ocean_time'].calendar))
+lat = f.variables['lat_rho'][:]
+lon = f.variables['lon_rho'][:]
+point_data = dict()
+locs = coawstpy.get_point_locations()
+sites = ['CBIBS', '3']
+for site in sites:
+    point_data[site] = pd.DataFrame()
+    lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
+    x = np.abs(lon[:, 1] - lon_pt).argmin()
+    y = np.abs(lat[1, :] - lat_pt).argmin()
+    point_data[site]['mud_bar'] = np.average(f.variables['mud_01'][:, :, x, y], axis=1)
+    point_data[site]['sand_bar'] = np.average(f.variables['sand_01'][:, :, x, y], axis=1)
+
 
 ## river data
 print("Reading river data...")
@@ -51,7 +79,7 @@ for sec in bry_time:
 
 ## plotting
 print("Creating plots...")
-fig, (ax) = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(12, 8))
+fig, (ax) = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.1)
 myFmt = mdates.DateFormatter("%b")
 months = mdates.MonthLocator()  # every month
@@ -99,10 +127,18 @@ ax[2].set_ylabel('Wind')
 
 ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
-ax[3].xaxis.set_major_locator(months)
-ax[3].xaxis.set_major_formatter(myFmt)
 ax[3].set_xlim(xlim)
 ax[3].set_ylabel('Water surface [m]')
+
+ax[4].plot_date(datetime_list,point_data['CBIBS']['mud_bar']+point_data['CBIBS']['sand_bar'],label='CBIBS',
+                linestyle='-', linewidth=0.5, marker='', markersize=1)
+ax[4].plot_date(datetime_list,point_data['3']['mud_bar']+point_data['3']['sand_bar'],label='3',
+                linestyle='-', linewidth=0.5, marker='', markersize=1)
+ax[4].legend()
+ax[4].set_yscale('log')
+ax[4].set_ylabel('Depth average SSC [kg/m3]')
+ax[4].xaxis.set_major_locator(months)
+ax[4].xaxis.set_major_formatter(myFmt)
 
 time_periods = coawstpy.get_time_periods()
 # add verical bars:
@@ -118,3 +154,5 @@ ax[0].text('2011-07-31 12:00',100,'Before Irene')
 ax[0].text('2011-08-26 12:00',100,'Irene')
 ax[0].text('2011-09-10',100,'Lee')
 ax[0].text('2011-10-14',100,'post-Lee')
+
+#ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
