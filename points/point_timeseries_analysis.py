@@ -13,7 +13,7 @@ vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
 i=0
 for site in point_data_veg:
        for event in times:
-              if event != 'Lee':
+              if event != 'post-Lee':
                      continue
               if site != 'S':
                      continue
