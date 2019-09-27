@@ -32,8 +32,8 @@ lat = f.variables['lat_rho'][:]
 lon = f.variables['lon_rho'][:]
 point_data = dict()
 locs = coawstpy.get_point_locations()
-sites = ['CBIBS', '3']
-for site in sites:
+#sites = ['CBIBS', '3', 'SUS', 'FLT']
+for site in locs['Site']:
     point_data[site] = pd.DataFrame()
     lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
     x = np.abs(lon[:, 1] - lon_pt).argmin()
@@ -130,12 +130,12 @@ ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth
 ax[3].set_xlim(xlim)
 ax[3].set_ylabel('Water surface [m]')
 
-ax[4].plot_date(datetime_list,point_data['CBIBS']['mud_bar']+point_data['CBIBS']['sand_bar'],label='CBIBS',
+ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
                 linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[4].plot_date(datetime_list,point_data['3']['mud_bar']+point_data['3']['sand_bar'],label='3',
+ax[4].plot_date(datetime_list,point_data['FLT']['mud_bar']+point_data['FLT']['sand_bar'],label='FLT',
                 linestyle='-', linewidth=0.5, marker='', markersize=1)
 ax[4].legend()
-ax[4].set_yscale('log')
+#ax[4].set_yscale('log')
 ax[4].set_ylabel('Depth average SSC [kg/m3]')
 ax[4].xaxis.set_major_locator(months)
 ax[4].xaxis.set_major_formatter(myFmt)

@@ -164,7 +164,9 @@ def get_point_locations():
         ['LeeS2', 38.757, -76.473, ''],
         ['CBIBS', 39.5396, -76.0741, 'CBIBS Susquehanna Flats'],
         ['Tripod', 39.4931, -76.0341, 'Larry tripod site'],
-        ['S', 39.475, -76.0341, 'Matts South of bed']
+        ['S', 39.475, -76.0341, 'Matts South of bed'],
+        ['FLT', 39.5053, -76.0414, 'Eyes on the Bay Susquehann Flats station'],
+        ['SUS', 39.5478, -76.0848, 'Eyes on the Bay Havre de Grace']
     ]
 
     i = 0
@@ -308,7 +310,7 @@ def get_point_data(run):
     locs = get_point_locations()
 
     # collect data for site of choice
-    sites = ['CBIBS', '3', 'S']
+    sites = ['CBIBS', '3', 'S', 'FLT', 'SUS']
     for site in sites:
         point_data[site] = pd.DataFrame(columns=['X-Windv', 'Y-Windv',
                                                         'Pwave_Top', 'Hwave', 'mud_bar','sand_bar', 'bed_thickness',
