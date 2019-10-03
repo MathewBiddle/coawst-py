@@ -2,20 +2,22 @@ import os
 os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
 import coawstpy
 import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use('MacOSX')
 
 run = 'veg'
 point_data_veg = coawstpy.get_point_data(run)
 point_data_noveg = coawstpy.get_point_data('noveg')
 times = coawstpy.get_time_periods()
 vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
-       'bed_thickness', 'river_transport',
-       'Windv', 'depth', 'current_bar']
+        'river_transport',
+       'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag']
 i=0
 for site in point_data_veg:
        for event in times:
-              if event != 'post-Lee':
+              if event != 'Irene':
                      continue
-              if site != 'S':
+              if site != '3':
                      continue
               start = coawstpy.nearest_ind(point_data_veg['CBIBS'].index, times[event][0])
               end = coawstpy.nearest_ind(point_data_veg['CBIBS'].index, times[event][1]) + 1

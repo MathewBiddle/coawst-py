@@ -312,10 +312,10 @@ def get_point_data(run):
     # collect data for site of choice
     sites = ['CBIBS', '3', 'S', 'FLT', 'SUS']
     for site in sites:
-        point_data[site] = pd.DataFrame(columns=['X-Windv', 'Y-Windv',
-                                                        'Pwave_Top', 'Hwave', 'mud_bar','sand_bar', 'bed_thickness',
-                                                        'ubar_eastward', 'vbar_northward',
-                                                        'river_transport'])
+        point_data[site] = pd.DataFrame()#columns=['X-Windv', 'Y-Windv',
+                                          #              'Pwave_Top', 'Hwave', 'mud_bar','sand_bar', 'bed_thickness',
+                                          #              'ubar_eastward', 'vbar_northward',
+                                          #              'river_transport','bstress_mag','Uwave_rms'])
 
         lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
         print("Using geo-coords lat, lon = (%f, %f)" % (lat_pt, lon_pt))
@@ -341,6 +341,8 @@ def get_point_data(run):
         point_data[site]['vbar_northward'] = f.variables['vbar_northward'][:, x, y]
         point_data[site]['current_bar'] = np.sqrt((f.variables['vbar_northward'][:, x, y] ** 2) + (
                     f.variables['ubar_eastward'][:, x, y] ** 2))
+        point_data[site]['bstress_mag'] = f.variables['bstrcwmax'][:, x, y]
+        point_data[site]['Uwave_rms'] = f.variables['Uwave_rms'][:, x, y]
         point_data[site].index = pd.to_datetime(datetime_list[:])
         point_data[site]['X_index'] = x
         point_data[site]['Y_index'] = y
