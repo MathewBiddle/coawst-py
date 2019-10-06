@@ -8,7 +8,7 @@ import netCDF4
 import coawstpy
 
 runs = ['veg','noveg']
-event = 'post-Lee'
+event = 'typical'
 #point_data = coawstpy.get_point_data(run)
 times = coawstpy.get_time_periods()
 locs = coawstpy.get_point_locations()
@@ -72,14 +72,15 @@ for run in runs:
     #set up map
     m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
         resolution='i', projection='merc', ax=ax[i])
-    m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[i])
-    m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[i])
+    #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[i])
+    #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[i])
     #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
 
     # pcolor variable of interest
     cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
-                        vmin=-0.7,vmax=0.7,cmap='jet', ax=ax[i])
-
+                        vmin=-0.05,vmax=0.05,cmap='jet', ax=ax[i])
+    contour = m.contour(lon, lat, data_diff, 0,
+                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
     #cbar = fig.colorbar(cax)
     #cbar.set_label('Bed evolution [cm]')
     #m.scatter(-76.079,39.414,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
@@ -90,5 +91,6 @@ fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
 cbar = fig.colorbar(cax, cax=cbar_ax)
 cbar.set_label('Bed evolution [cm]')
+cbar.add_lines(contour)
 #m.colorbar(cax)
 plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
