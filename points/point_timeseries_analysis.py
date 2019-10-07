@@ -15,7 +15,7 @@ vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
 i=0
 for site in point_data_veg:
        for event in times:
-              if event != 'Irene':
+              if event != 'post-Lee':
                      continue
               if site != '3':
                      continue
@@ -32,6 +32,12 @@ for site in point_data_veg:
                      ax[i].yaxis.set_label_position("right")
                      i+=1
               print('')
+              #writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/for_larry_20191007/'
+              #writevegfile = writedir+"%s_%s_veg.csv" % (site,event)
+              #writenovegfile = writedir+"%s_%s_noveg.csv" % (site,event)
+              #point_data_veg[site][vars2plot][start:end].to_csv(writevegfile)
+              #point_data_noveg[site][vars2plot][start:end].to_csv(writenovegfile)
+
 
 #for event in times:
 #    start = coawstpy.nearest_ind(point_data['CBIBS'].index, times[event][0])
