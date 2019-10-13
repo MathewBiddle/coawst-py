@@ -1,5 +1,5 @@
 import os
-os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
+os.environ["PROJ_LIB"] = "/User/mbiddle/anaconda3/envs/coawst/share/proj/"
 import coawstpy
 import matplotlib.pyplot as plt
 #import matplotlib

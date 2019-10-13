@@ -6,7 +6,7 @@ Created on Thu Mar 30 20:25:09 2017
 """
 
 import os
-os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
+os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
