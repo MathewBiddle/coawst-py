@@ -13,7 +13,7 @@ import scipy.integrate as integrate
 
 ## Read COAWST data
 runs = ['veg','noveg']
-event = 'post-Lee'
+event = 'typical'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
