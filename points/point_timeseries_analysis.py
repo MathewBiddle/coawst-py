@@ -17,14 +17,15 @@ for site in point_data_veg:
        for event in times:
               if event != 'typical':
                      continue
-              if site != 'S':
+              if site != 'FLT':
                      continue
               start = coawstpy.nearest_ind(point_data_veg['CBIBS'].index, times[event][0])
               end = coawstpy.nearest_ind(point_data_veg['CBIBS'].index, times[event][1]) + 1
               print('Site: %s %s' % (site, event))
-              print(point_data_veg[site][vars2plot][start:end].describe().T[['min','max','mean']])
-              ax = point_data_veg[site][vars2plot][:].plot(subplots=True,sharex=True,linewidth=0.5,legend=False,linestyle='-')
-              point_data_noveg[site][vars2plot][:].plot(ax=ax, subplots=True, sharex=True,linestyle='--',linewidth=0.5,legend=False)
+              print("\nveg:\n",point_data_veg[site][vars2plot][start:end].describe().T[['min','max','mean']])
+              print("\nnoveg:\n", point_data_noveg[site][vars2plot][start:end].describe().T[['min', 'max', 'mean']])
+              ax = point_data_veg[site][vars2plot][start:end].plot(subplots=True,sharex=True,linewidth=0.5,legend=False,linestyle='-')
+              point_data_noveg[site][vars2plot][start:end].plot(ax=ax, subplots=True, sharex=True,linestyle='--',linewidth=0.5,legend=False)
               ax[0].legend(['veg','noveg'],loc=3,ncol=2, bbox_to_anchor=(.25,1.02,.5,.102), mode='expand',borderaxespad=0)
               plt.suptitle('%s %s' % (event, site))
               for v in vars2plot:
