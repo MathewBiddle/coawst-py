@@ -95,8 +95,8 @@ cbar.add_lines(contour)
 #m.colorbar(cax)
 plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
-image_name = '%s_elevation_map.png' % event
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=1000)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
+#image_name = '%s_elevation_map.png' % event
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=1000)

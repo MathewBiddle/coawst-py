@@ -13,7 +13,7 @@ import scipy.integrate as integrate
 
 ## Read COAWST data
 runs = ['veg','noveg']
-event = 'typical'
+event = 'post-Lee'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
@@ -254,3 +254,9 @@ for run in runs:
     #plt.subplots_adjust(wspace=0.005)
     plt.suptitle('%s %s mass evolution' % (event, run))
     #fig.title('%s %s mass evolution' % (event, run))
+
+    writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/mass_change_maps/'
+    image_name = '%s_%s_mass_map.png' % (event, run)
+    outfile = writedir+image_name
+    print("Saving image to %s" % outfile)
+    plt.savefig(outfile, bbox_inches='tight', dpi=1000)
