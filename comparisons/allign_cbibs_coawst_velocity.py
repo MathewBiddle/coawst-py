@@ -77,10 +77,8 @@ mag_vel = np.sqrt(ubar**2 + vbar**2)
 
 
 print('Matching nearest data...')
-# TODO index = coawstpy.nearest_ind(datelist,value)
 df = pd.DataFrame(columns=['CBIBS_time','CBIBS_U','CBIBS_V','COAWST_time','COAWST_Ubar','COAWST_Vbar'],
                   index=pd.date_range(start='2011-07-19T23:00:00', end='2011-11-01T00:00:00',freq='1H'))
-## TODO build out data frame here!
 i=0
 idx=[]
 for time in df.index:

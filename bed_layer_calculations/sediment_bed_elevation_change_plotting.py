@@ -8,7 +8,7 @@ import netCDF4
 import coawstpy
 
 runs = ['veg','noveg']
-event = 'Lee'
+event = 'typical'
 #point_data = coawstpy.get_point_data(run)
 times = coawstpy.get_time_periods()
 locs = coawstpy.get_point_locations()
@@ -78,7 +78,7 @@ for run in runs:
 
     # pcolor variable of interest
     cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
-                        vmin=-10,vmax=10,cmap='jet', ax=ax[i])
+                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
     contour = m.contour(lon, lat, data_diff, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
     #cbar = fig.colorbar(cax)
@@ -94,3 +94,9 @@ cbar.set_label('Bed evolution [cm]')
 cbar.add_lines(contour)
 #m.colorbar(cax)
 plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
+
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
+image_name = '%s_elevation_map.png' % event
+outfile = writedir+image_name
+print("Saving image to %s" % outfile)
+plt.savefig(outfile, bbox_inches='tight', dpi=1000)
