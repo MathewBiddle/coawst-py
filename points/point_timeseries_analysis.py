@@ -12,10 +12,10 @@ times = coawstpy.get_time_periods()
 vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
         'river_transport','bed_thickness',
        'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag']
-i=0
+#i=0
 for site in point_data_veg:
        for event in times:
-              if event != 'typical':
+              if event != 'post-Lee':
                      continue
               if site != 'FLT':
                      continue
@@ -28,6 +28,7 @@ for site in point_data_veg:
               point_data_noveg[site][vars2plot][start:end].plot(ax=ax, subplots=True, sharex=True,linestyle='--',linewidth=0.5,legend=False)
               ax[0].legend(['veg','noveg'],loc=3,ncol=2, bbox_to_anchor=(.25,1.02,.5,.102), mode='expand',borderaxespad=0)
               plt.suptitle('%s %s' % (event, site))
+              i=0
               for v in vars2plot:
                      ax[i].set_ylabel(v,rotation=0,labelpad=20)
                      ax[i].yaxis.set_label_position("right")
@@ -35,6 +36,11 @@ for site in point_data_veg:
               print('')
               #writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/for_larry_20191007/'
               #writevegfile = writedir+"%s_%s_veg.csv" % (site,event)
+              #writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
+              #image_name = '%s_%s_timeseries.png' % (event, site)
+              #outfile = writedir+image_name
+              #print("Saving image to %s" % outfile)
+              #plt.savefig(outfile, bbox_inches='tight', dpi=1000)
               #writenovegfile = writedir+"%s_%s_noveg.csv" % (site,event)
               #point_data_veg[site][vars2plot][start:end].to_csv(writevegfile)
               #point_data_noveg[site][vars2plot][start:end].to_csv(writenovegfile)
