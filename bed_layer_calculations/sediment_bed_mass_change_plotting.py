@@ -18,6 +18,8 @@ transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
 
+fig, (ax) = plt.subplots(nrows=2, ncols=2,sharex=True, sharey=True, figsize=(10, 10))
+i=0
 for run in runs:
     runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
     if run == 'noveg':
@@ -58,6 +60,9 @@ for run in runs:
     #sand_mass=np.ma.masked_where(plant_height != 5, sand_mass)
 
     hm = np.ma.masked_where(mask_rho == 0, h)  # initial masked water depth at rho points
+
+    lonm = np.ma.masked_where(plant_height != 5, lon)
+    latm = np.ma.masked_where(plant_height != 5, lat)
 
     SA = (1/pm) * (1/pn) # m2
     SAm = np.ma.masked_where(mask_rho == 0, SA) # mask land
@@ -108,155 +113,67 @@ for run in runs:
     mud_mass_deposited = mud_mass_deposition * SAm # kg/m^2 * m^2 = kg
     mud_mass_eroded = mud_mass_erosion * SAm # kg/m^3 * m^2 = kg
 
-    ## using sed mass
-    mass_eroded = sand_mass_eroded + mud_mass_eroded
-    mass_deposited = sand_mass_deposited + mud_mass_deposited
-    print('Event: %s %s' % (event, run))
-    print('mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
-    print('mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
-    #sys.exit()
 
     ## Plotting
-    #plt.figure()
-    #plt.pcolor(f.variables['lon_rho'][:], f.variables['lat_rho'][:], plant_height)
-    #plt.title('Transects')
-
     # set up figure
-    fig, (ax) = plt.subplots(nrows=1, ncols=2, figsize=(10, 6))
+
 
     # set up map
-    m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-        resolution='i', projection='merc', ax=ax[0])
-    #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[0,0])
-    #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[0,0])
-    #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
+    m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
+        resolution='i', projection='merc', ax=ax[0,i])
 
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
-                        cmap='jet', ax=ax[0])
+                        cmap='jet', ax=ax[0,i],
+                        vmin=-1.5,vmax=0.5)
+                        # Lee vmin=-1,vmax=5)
+                        # Irene vmin=-1,vmax=0.5)
+                        # typical vmin=-0.35,vmax=0.15)
     contour = m.contour(lon, lat, mud_mass_diff_ma, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[0])
-    cbar = m.colorbar(cax0, ax=ax[0], location='bottom')
+                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[0,i])
+    cbar = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
     cbar.add_lines(contour)
     cbar.set_label('mud mass diff [kg/m2]')
-    #plt.title('%s mud mass evolution' % run)
-    #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
-
-    # set up figure
-    #fig, ax = plt.subplots(figsize=(8, 6))
-
+    ax[0,i].set_title('%s %s' % (event, run))
+    #i+=1
     # set up map
-    m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-        resolution='i', projection='merc', ax=ax[1])
-    #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[0,1])
-    #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[0,1])
-    #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
+    m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
+        resolution='i', projection='merc', ax=ax[1,i])
 
     # pcolor variable of interest
     cax1 = m.pcolormesh(lon, lat, sand_mass_diff_ma, latlon=True,
-                        cmap='jet', ax=ax[1])
+                        cmap='jet', ax=ax[1,i],
+                        vmin=-10,vmax=10)
+                        # Lee vmin=-500,vmax=100)
+                        # Irene vmin=-4,vmax=1)
+                        # typical vmin=-1.5,vmax=0.5)
     contour = m.contour(lon, lat, sand_mass_diff_ma, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1])
-    cbar = m.colorbar(cax1,ax=ax[1], location='bottom')
+                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
+
+    cbar = m.colorbar(cax1, ax=ax[1, i], location='right', shrink=0.6)
     cbar.add_lines(contour)
     cbar.set_label('sand mass diff [kg/m2]')
-    #plt.title('%s sand mass evolution' % run)
-    #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
+    ax[1,i].set_title('%s %s' % (event, run))
+    #plt.suptitle('%s %s mass evolution' % (event, run))
+    i+=1
+    ## print out some values
+    mass_eroded = sand_mass_eroded + mud_mass_eroded
+    mass_deposited = sand_mass_deposited + mud_mass_deposited
+    print('\n\nEvent: %s %s' % (event, run))
+    print('total mass eroded    = %e tons' % (np.sum(mass_eroded) / 1000))
+    print('total mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
+    print('\ntotal sand eroded    = %e tons' % (np.sum(sand_mass_eroded) / 1000))
+    print('total sand deposited = %e tons' % (np.sum(sand_mass_deposited) / 1000))
+    print('\ntotal mud eroded    = %e tons' % (np.sum(mud_mass_eroded) / 1000))
+    print('total mud deposited = %e tons' % (np.sum(mud_mass_deposited) / 1000))
 
-    # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[1,0])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[1,0])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[1,0])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax1 = m.pcolormesh(lon, lat, mud_mass_eroded, latlon=True,
-    #                     cmap='jet', ax=ax[1,0])
-    # cbar = fig.colorbar(cax1,ax=ax[1,0])
-    # cbar.set_label('mud mass eroded [kg]')
-    #
-    #
-    # # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[1,1])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[1,1])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[1,1])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax1 = m.pcolormesh(lon, lat, sand_mass_eroded, latlon=True,
-    #                     cmap='jet', ax=ax[1,1])
-    # cbar = fig.colorbar(cax1,ax=ax[1,1])
-    # cbar.set_label('sand mass eroded [kg]')
-    #
-    # # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[2,0])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[2,0])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[2,0])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax1 = m.pcolormesh(lon, lat, mud_mass_deposited, latlon=True,
-    #                     cmap='jet', ax=ax[2,0])
-    # cbar = fig.colorbar(cax1,ax=ax[2,0])
-    # cbar.set_label('mud mass deposited [kg]')
-    #
-    #
-    # # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[2,1])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[2,1])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[2,1])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax1 = m.pcolormesh(lon, lat, sand_mass_deposited, latlon=True,
-    #                     cmap='jet', ax=ax[2,1])
-    # cbar = fig.colorbar(cax1,ax=ax[2,1])
-    # cbar.set_label('sand mass deposited [kg]')
-    # # set up figure
-    # #fig, ax = plt.subplots(figsize=(8, 6))
-    #
-    # # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[3,0])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[3,0])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[3,0])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax2 = m.pcolormesh(lon, lat, mass_eroded, latlon=True,
-    #                     cmap='jet', ax=ax[3,0])
-    # cbar = fig.colorbar(cax2,ax=ax[3,0])
-    # cbar.set_label('Total bed mass eroded [kg]')
-    # #plt.title('%s total mass eroded = %e tons' % (run, np.sum(mass_eroded) / 1000))
-    # #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
-    #
-    # # set up figure
-    # #fig, ax = plt.subplots(figsize=(8, 6))
-    #
-    # # set up map
-    # m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-    #     resolution='i', projection='merc', ax=ax[3,1])
-    # #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[3,1])
-    # #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[3,1])
-    # #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
-    #
-    # # pcolor variable of interest
-    # cax3 = m.pcolormesh(lon, lat, mass_deposited, latlon=True,
-    #                     cmap='jet', ax=ax[3,1])
-    # cbar = fig.colorbar(cax3,ax=ax[3,1])
-    # cbar.set_label('Total bed mass deposited [kg]')
-    #plt.title('%s total mass deposited = %e tons' % (run, np.sum(mass_deposited) / 1000))
-    #plt.title("%s through %s"%(datetime_list[0],datetime_list[-1]))
-    #plt.subplots_adjust(wspace=0.005)
-    plt.suptitle('%s %s mass evolution' % (event, run))
-    #fig.title('%s %s mass evolution' % (event, run))
+    #cbar = m.colorbar(cax0, ax=ax[i,0], location='bottom')
 
-    writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/mass_change_maps/'
-    image_name = '%s_%s_mass_map.png' % (event, run)
-    outfile = writedir+image_name
-    print("Saving image to %s" % outfile)
-    plt.savefig(outfile, bbox_inches='tight', dpi=1000)
+
+
+
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/mass_change_maps/'
+image_name = '%s_mass_map.png' % event
+outfile = writedir+image_name
+print("Saving image to %s" % outfile)
+plt.savefig(outfile, bbox_inches='tight', dpi=500)
