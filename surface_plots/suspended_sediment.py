@@ -11,7 +11,8 @@ import datetime
 runs = ['veg','noveg']
 event = 'typical'
 #point_data = coawstpy.get_point_data(run)
-date = datetime.datetime(2011, 10, 20, 15, 00)
+#date = datetime.datetime(2011, 10, 20, 15, 00) # post-Lee
+date = datetime.datetime(2011, 8, 2, 21, 00)
 #locs = coawstpy.get_point_locations()
 
 i=0
@@ -58,10 +59,10 @@ for run in runs:
     # pick data to plot
     datetime_list = datetime_list[time]
     #dvar = 'bed_thickness'
-    mud = f.variables['mud_01'][time, :, :]
-    sand = f.variables['sand_01'][time, :, :]
+    #mud = f.variables['mud_01'][time, :, :]
+    mud = np.mean(f.variables['sand_01'][time,:, :, :],axis=0)
 
-    bstress_magm = np.ma.masked_where(plant_height != 5,)
+    mudm = np.ma.masked_where(plant_height != 5,mud)
 
     #curr_mag = np.sqrt((ubarm**2)+(vbarm**2))
     #print('Maximum current: %f' % curr_mag.max())
@@ -76,7 +77,7 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[i])
 
     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, bstress_magm, latlon=True, ax=ax[i])#,vmin=0,vmax=0.5)
+    caxm = m.pcolormesh(lon, lat, mudm, latlon=True, ax=ax[i],vmin=0,vmax=0.015)
     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -88,14 +89,14 @@ for run in runs:
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.125, 0.17, 0.675, 0.03])
 cbar = fig.colorbar(caxm, cax=cbar_ax, orientation='horizontal')
-cbar.set_label('max wave and current bottom stress magnitude on %s [N/m^2]' % date)
+cbar.set_label('depth averaged mud concentration on %s [kg/m^3]' % date)
 #cbar.add_lines(contour)
 #m.colorbar(cax)
 #plt.suptitle("%s" % date)
 
 
-#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/bottom_stress_maps/'
-#image_name = '%s_map.png' % date
-#outfile = writedir+image_name
-#print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=500)
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/suspended_sediment_maps/'
+image_name = 'mud_%s_map.png' % date
+outfile = writedir+image_name
+print("Saving image to %s" % outfile)
+plt.savefig(outfile, bbox_inches='tight', dpi=500)

@@ -11,7 +11,7 @@ import datetime
 runs = ['veg','noveg']
 #event = 'typical'
 #point_data = coawstpy.get_point_data(run)
-date = datetime.datetime(2011, 9, 9, 4, 12)
+date = datetime.datetime(2011, 9, 9, 4, 12)  # Lee
 #locs = coawstpy.get_point_locations()
 
 i=0
@@ -96,8 +96,8 @@ cbar.set_label('Depth average current on %s [m/s]' % date)
 #plt.suptitle("%s" % date)
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
-image_name = '%s_map.png' % date
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
+#image_name = '%s_map.png' % date
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
