@@ -6,15 +6,16 @@ import pandas as pd
 import numpy as np
 import netCDF4
 import coawstpy
+import datetime
 
 runs = ['veg','noveg']
 event = 'typical'
 #point_data = coawstpy.get_point_data(run)
-times = coawstpy.get_time_periods()
-locs = coawstpy.get_point_locations()
+date = datetime.datetime(2011, 10, 20, 15, 00)
+#locs = coawstpy.get_point_locations()
 
 i=0
-fig, ax = plt.subplots(ncols=2,figsize=(8, 6),sharey=True,sharex=True)
+fig, ax = plt.subplots(ncols=2,figsize=(20, 10),sharey=True,sharex=True)
 for run in runs:
     runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
     if run == 'noveg':
@@ -51,52 +52,50 @@ for run in runs:
         datetime_list.append(
             netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
-    start = coawstpy.nearest_ind(datetime_list, times[event][0])
-    end = coawstpy.nearest_ind(datetime_list, times[event][1]) + 1
+    time = coawstpy.nearest_ind(datetime_list, date)
+#    end = coawstpy.nearest_ind(datetime_list, times[event][1]) + 1
 
     # pick data to plot
-    datetime_list = datetime_list[start:end]
-    dvar = 'bed_thickness'
-    data = f.variables[dvar][start:end, :, :, :]
+    datetime_list = datetime_list[time]
+    #dvar = 'bed_thickness'
+    mud = f.variables['mud_01'][time, :, :]
+    sand = f.variables['sand_01'][time, :, :]
 
-    data_init=np.sum(data[0,:,:,:],axis=0) # total from all layers
-    data_init = np.ma.masked_where(plant_height != 5,data_init)
+    bstress_magm = np.ma.masked_where(plant_height != 5,)
 
-    data_final=np.sum(data[-1,:,:,:],axis=0) # total from all layers
-    data_final = np.ma.masked_where(plant_height != 5,data_final)
-
-    data_diff = (data_final-data_init)*100 # cm
+    #curr_mag = np.sqrt((ubarm**2)+(vbarm**2))
+    #print('Maximum current: %f' % curr_mag.max())
+#    data_diff = (data_final-data_init)*100 # cm
     # set up figure
 
+    lonm = np.ma.masked_where(plant_height != 5, lon)
+    latm = np.ma.masked_where(plant_height != 5, lat)
 
     #set up map
-    m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
+    m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
         resolution='i', projection='merc', ax=ax[i])
-    #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[i])
-    #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[i])
-    #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
 
     # pcolor variable of interest
-    cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
-                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
-    contour = m.contour(lon, lat, data_diff, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
-    #cbar = fig.colorbar(cax)
-    #cbar.set_label('Bed evolution [cm]')
-    #m.scatter(-76.079,39.414,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
-    #m.scatter(-76.088,39.380,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
+    caxm = m.pcolormesh(lon, lat, bstress_magm, latlon=True, ax=ax[i])#,vmin=0,vmax=0.5)
+    #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
+#                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
+
+    #contour = m.contour(lon, lat, data_diff, 0,
+    #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
+
     ax[i].set_title("%s" % run)
     i+=1
 fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-cbar = fig.colorbar(cax, cax=cbar_ax)
-cbar.set_label('Bed evolution [cm]')
-cbar.add_lines(contour)
+cbar_ax = fig.add_axes([0.125, 0.17, 0.675, 0.03])
+cbar = fig.colorbar(caxm, cax=cbar_ax, orientation='horizontal')
+cbar.set_label('max wave and current bottom stress magnitude on %s [N/m^2]' % date)
+#cbar.add_lines(contour)
 #m.colorbar(cax)
-plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
+#plt.suptitle("%s" % date)
 
-#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
-#image_name = '%s_elevation_map.png' % event
+
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/bottom_stress_maps/'
+#image_name = '%s_map.png' % date
 #outfile = writedir+image_name
 #print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=1000)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)

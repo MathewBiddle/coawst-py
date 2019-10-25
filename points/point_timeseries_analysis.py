@@ -13,9 +13,11 @@ vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
         'river_transport','bed_thickness','X-Windv','Y-Windv',
        'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag']
 #i=0
+#fig, ax = plt.subplots(figsize=(20, 18))#,sharey=True,sharex=True)
+#plt.figure(figsize=(20,18))
 for site in point_data_veg:
        for event in times:
-              if event != 'post-Lee':
+              if event != 'Irene':
                      continue
               if site != 'FLT':
                      continue
@@ -40,7 +42,7 @@ for site in point_data_veg:
               #image_name = '%s_%s_timeseries.png' % (event, site)
               #outfile = writedir+image_name
               #print("Saving image to %s" % outfile)
-              #plt.savefig(outfile, bbox_inches='tight', dpi=1000)
+              #plt.savefig(outfile, bbox_inches='tight', dpi=500)
               #writenovegfile = writedir+"%s_%s_noveg.csv" % (site,event)
               #point_data_veg[site][vars2plot][start:end].to_csv(writevegfile)
               #point_data_noveg[site][vars2plot][start:end].to_csv(writenovegfile)
