@@ -70,7 +70,7 @@ m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3,
 # plot stations
 #plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
 for label in locs['Site']:
-    if label in ['CBIBS','3','Tripod','S','SUS','FLT']:
+    if label in ['CBIBS','Tripod','SUS','FLT']:
         lon = locs.loc[locs['Site'] == label,'lon'].values
         lat = locs.loc[locs['Site'] == label,'lat'].values
         x,y = m(lon,lat)
@@ -96,6 +96,6 @@ for transect in transects:
 
 plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations_w_EOTB.png'
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
 
 plt.savefig(outfile, bbox_inches='tight', dpi = 1000)

@@ -8,13 +8,13 @@ import netCDF4
 import coawstpy
 
 runs = ['veg','noveg']
-event = 'typical'
+event = 'post-Lee'
 #point_data = coawstpy.get_point_data(run)
 times = coawstpy.get_time_periods()
 locs = coawstpy.get_point_locations()
 
 i=0
-fig, ax = plt.subplots(ncols=2,figsize=(8, 6),sharey=True,sharex=True)
+fig, ax = plt.subplots(ncols=2,figsize=(20, 6),sharey=True,sharex=True)
 for run in runs:
     runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
     if run == 'noveg':
@@ -68,17 +68,23 @@ for run in runs:
     data_diff = (data_final-data_init)*100 # cm
     # set up figure
 
+    lonm = np.ma.masked_where(plant_height != 5, lon)
+    latm = np.ma.masked_where(plant_height != 5, lat)
 
+    # set up map
+    m = Basemap(llcrnrlon=lonm.min() - 0.01, llcrnrlat=latm.min() - 0.01, urcrnrlon=lonm.max() + 0.01,
+                urcrnrlat=latm.max() + 0.01,
+                resolution='i', projection='merc', ax=ax[i])
     #set up map
-    m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
-        resolution='i', projection='merc', ax=ax[i])
+    #m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
+    #    resolution='i', projection='merc', ax=ax[i])
     #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax[i])
     #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax[i])
     #m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 3000)
 
     # pcolor variable of interest
     cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
-                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
+                        vmin=-0.7,vmax=0.7,cmap='jet', ax=ax[i])
     contour = m.contour(lon, lat, data_diff, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
     #cbar = fig.colorbar(cax)
@@ -88,15 +94,17 @@ for run in runs:
     ax[i].set_title("%s" % run)
     i+=1
 fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
-cbar = fig.colorbar(cax, cax=cbar_ax)
-cbar.set_label('Bed evolution [cm]')
+#cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+cbar_ax = fig.add_axes([0.125, 0.07, 0.675, 0.03])
+cbar = fig.colorbar(cax, cax=cbar_ax, orientation='horizontal')
+#cbar = fig.colorbar(cax, cax=cbar_ax)
+cbar.set_label('Bed elevation difference [cm]')
 cbar.add_lines(contour)
 #m.colorbar(cax)
 plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
 
-#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
-#image_name = '%s_elevation_map.png' % event
-#outfile = writedir+image_name
-#print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=1000)
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
+image_name = '%s_elevation_map.png' % event
+outfile = writedir+image_name
+print("Saving image to %s" % outfile)
+plt.savefig(outfile, bbox_inches='tight', dpi=500)

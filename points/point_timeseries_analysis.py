@@ -10,14 +10,14 @@ point_data_veg = coawstpy.get_point_data(run)
 point_data_noveg = coawstpy.get_point_data('noveg')
 times = coawstpy.get_time_periods()
 vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
-        'river_transport','bed_thickness','X-Windv','Y-Windv',
-       'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag']
+        'river_transport','bed_thickness',
+       'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag'] #'X-Windv','Y-Windv',
 #i=0
 #fig, ax = plt.subplots(figsize=(20, 18))#,sharey=True,sharex=True)
 #plt.figure(figsize=(20,18))
 for site in point_data_veg:
        for event in times:
-              if event != 'Irene':
+              if event != 'post-Lee':
                      continue
               if site != 'FLT':
                      continue
