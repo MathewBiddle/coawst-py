@@ -166,7 +166,9 @@ def get_point_locations():
         ['Tripod', 39.4931, -76.0341, 'Larry tripod site'],
         ['S', 39.475, -76.0341, 'Matts South of bed'],
         ['FLT', 39.5053, -76.0414, 'Eyes on the Bay Susquehann Flats station'],
-        ['SUS', 39.5478, -76.0848, 'Eyes on the Bay Havre de Grace']
+        ['SUS', 39.5478, -76.0848, 'Eyes on the Bay Havre de Grace'],
+        ['TOL', 39.2133, -76.2450, 'Tolchester Beach Tide point'],
+        ['SHAD', 39.3600375, -76.1448925, 'Shad Battery CBOFS Tide point']
     ]
 
     i = 0

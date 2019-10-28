@@ -96,6 +96,6 @@ for transect in transects:
 
 plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
 
-plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
+#plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
