@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 #import matplotlib
 #matplotlib.use('MacOSX')
 
+
+## TODO change Windv-X, Windv-Y, and WindV to single stick plots
 run = 'veg'
 point_data_veg = coawstpy.get_point_data(run)
 point_data_noveg = coawstpy.get_point_data('noveg')

@@ -48,10 +48,11 @@ plant_height_orig = np.ma.masked_outside(plant_height_raw,0.3,1)
 #plant_height = np.ma.masked_less(plant_height, 0.3)
 
 # shift plant distribution to right by one cell
-zeroes = np.zeros((1, 100))
-plant_height = np.concatenate((zeroes,plant_height_orig),0)
-plant_height = np.delete(plant_height, 100, 0)
-plant_height = np.ma.masked_outside(plant_height,0.3,1)
+#zeroes = np.zeros((1, 100))
+#plant_height = np.concatenate((zeroes,plant_height_orig),0)
+#plant_height = np.delete(plant_height, 100, 0)
+#plant_height = np.ma.masked_outside(plant_height,0.3,1)
+plant_height = plant_height_orig
 
 # plot bathymetry
 m.pcolormesh(lon, lat, h, latlon=True, cmap='viridis_r')
@@ -103,4 +104,4 @@ plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations_CBOFS_conowingo.png'
 
-plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
