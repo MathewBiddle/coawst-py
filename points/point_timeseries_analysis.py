@@ -52,14 +52,18 @@ for site in point_data_veg:
               #point_data_noveg[site][vars2plot][start:end].to_csv(writenovegfile)
 
 ## Put figure in the Windv axis #6
+ticks = ax[6].get_xticklabels()
 ax[6].clear()
 q = coawstpy.stick_plot(point_data_veg[site].index[start:end],point_data_veg[site]['X-Windv'][start:end],
                     point_data_veg[site]['Y-Windv'][start:end], ax=ax[6], scale=500)
 ref = 10
 qk = ax[6].quiverkey(q, -0.04, 0.15, ref,
-                  "%s m$/$s" % ref,
-                  labelpos='N', coordinates='axes',fontproperties={'size':'xx-small'})
-
+                  "%s m/s" % ref,
+                  labelpos='N', coordinates='axes', fontproperties={'size': 'xx-small'})
+ax[6].set_ylabel('wind',rotation=0,labelpad=20)
+#ticks = ax[10].get_xticklabels()
+#ax[6].set_xticklabels(ticks)#x[7].get_xticklabels())
+#ax[10].set_xticklabels(ticks)
 #for event in times:
 #    start = coawstpy.nearest_ind(point_data['CBIBS'].index, times[event][0])
 #    end = coawstpy.nearest_ind(point_data['CBIBS'].index, times[event][1]) + 1

@@ -37,6 +37,7 @@ def stick_plot(time, u, v, **kw):
 
     ax.axes.get_yaxis().set_ticks([])
     #ax.axes.get_yaxis().set_visible(False)
+    #ax.axes.set_xticklabels('')
     ax.xaxis_date()
     return q
 
