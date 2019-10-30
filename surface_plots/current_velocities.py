@@ -8,11 +8,14 @@ import netCDF4
 import coawstpy
 import datetime
 
+## TODO Fiddle with bounds to capture typical, Irene, Lee, and post-Lee
+# typical, Irene, and post-Lee could probably do 0-0.5
+# try nipy_spectral?
 runs = ['veg','noveg']
 #event = 'typical'
 #point_data = coawstpy.get_point_data(run)
 #date = datetime.datetime(2011, 9, 9, 4, 12)  # Lee
-date = datetime.datetime(2011, 10, 21, 0, 0) # post-Lee
+date = datetime.datetime(2011, 8, 28, 4, 0) # post-Lee
 #locs = coawstpy.get_point_locations()
 
 i=0
@@ -97,8 +100,8 @@ cbar.set_label('Depth average current on %s [m/s]' % date)
 #plt.suptitle("%s" % date)
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
-image_name = '%s_map.png' % date
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
+#image_name = '%s_map.png' % date
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)

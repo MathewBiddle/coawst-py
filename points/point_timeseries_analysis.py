@@ -19,7 +19,7 @@ vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
 #plt.figure(figsize=(20,18))
 for site in point_data_veg:
        for event in times:
-              if event != 'post-Lee':
+              if event != 'Irene':
                      continue
               if site != 'FLT':
                      continue

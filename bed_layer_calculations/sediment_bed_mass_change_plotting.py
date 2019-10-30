@@ -13,7 +13,7 @@ import scipy.integrate as integrate
 
 ## Read COAWST data
 runs = ['veg','noveg']
-event = 'post-Lee'
+event = 'typical'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
@@ -125,15 +125,15 @@ for run in runs:
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[0,i],
-                        vmin=-1.5,vmax=0.5)
-                        # Lee vmin=-1,vmax=5)
-                        # Irene vmin=-1,vmax=0.5)
+                        vmin=-0.3, vmax=0.3)
+                        # post-Lee and Irene vmin=-1,vmax=0.6)
+                        # Lee vmin=-4,vmax=4)
                         # typical vmin=-0.35,vmax=0.15)
-    contour = m.contour(lon, lat, mud_mass_diff_ma, 0,
+    contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[0,i])
-    cbar = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
-    cbar.add_lines(contour)
-    cbar.set_label('mud mass diff [kg/m2]')
+    # cbar0 = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
+    # cbar0.add_lines(contour0)
+    # cbar0.set_label('mud mass diff [kg/m2]')
     ax[0,i].set_title('%s %s' % (event, run))
     #i+=1
     # set up map
@@ -143,16 +143,16 @@ for run in runs:
     # pcolor variable of interest
     cax1 = m.pcolormesh(lon, lat, sand_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[1,i],
-                        vmin=-10,vmax=10)
-                        # Lee vmin=-500,vmax=100)
-                        # Irene vmin=-4,vmax=1)
+                        vmin=-0.4, vmax=0.4)
+                        # post-Lee and Irene vmin=-6, vmax=6)
+                        # Lee vmin=-100,vmax=100)
                         # typical vmin=-1.5,vmax=0.5)
-    contour = m.contour(lon, lat, sand_mass_diff_ma, 0,
+    contour1 = m.contour(lon, lat, sand_mass_diff_ma, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
 
-    cbar = m.colorbar(cax1, ax=ax[1, i], location='right', shrink=0.6)
-    cbar.add_lines(contour)
-    cbar.set_label('sand mass diff [kg/m2]')
+    # cbar1 = m.colorbar(cax1, ax=ax[1, i], location='right', shrink=0.6)
+    # cbar1.add_lines(contour1)
+    # cbar1.set_label('sand mass diff [kg/m$^{2}$]')
     ax[1,i].set_title('%s %s' % (event, run))
     #plt.suptitle('%s %s mass evolution' % (event, run))
     i+=1
@@ -168,12 +168,19 @@ for run in runs:
     print('total mud deposited = %e tons' % (np.sum(mud_mass_deposited) / 1000))
 
     #cbar = m.colorbar(cax0, ax=ax[i,0], location='bottom')
+fig.subplots_adjust(right=0.8)
+cbar_ax0 = fig.add_axes([0.125, 0.545, 0.675, 0.015])
+cbar0 = fig.colorbar(cax0, cax=cbar_ax0, orientation='horizontal', extend='max')
+cbar0.set_label('mud mass diff [kg/m$^{2}$]')
+cbar0.add_lines(contour0)
 
+cbar_ax1 = fig.add_axes([0.125, 0.126, 0.675, 0.015])
+cbar1 = fig.colorbar(cax1, cax=cbar_ax1, orientation='horizontal', extend='both')
+cbar1.set_label('sand mass diff [kg/m$^{2}$]')
+cbar1.add_lines(contour1)
 
-
-
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/mass_change_maps/'
-image_name = '%s_mass_map.png' % event
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/mass_change_maps/'
+#image_name = '%s_mass_map.png' % event
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
