@@ -79,7 +79,7 @@ for sec in bry_time:
 
 ## plotting
 print("Creating plots...")
-fig, (ax) = plt.subplots(nrows=5, ncols=1, sharex=True, figsize=(12, 8))
+fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.1)
 myFmt = mdates.DateFormatter("%b")
 months = mdates.MonthLocator()  # every month
@@ -87,19 +87,19 @@ months = mdates.MonthLocator()  # every month
 dayint=10
 xlim= (ptsdf['Time'].min(), ptsdf['Time'].max())
 
-ax[0].plot_date(river_datetime_list,
-                np.sum(f_river.variables['river_sand_01'],axis=(1,2)), label='sand',
-                xdate=True, linestyle='-', linewidth=0.5,
-                marker='', markersize=1)
-ax[0].plot_date(river_datetime_list,
-                np.sum(f_river.variables['river_mud_01'],axis=(1,2)), label='mud',
-                xdate=True, linestyle='-', linewidth=0.5,
-                marker='', markersize=1)
-ax[0].xaxis.set_major_locator(months)
-#ax[0].xaxis.set_major_formatter(myFmt)
-ax[0].set_xlim(xlim)
-ax[0].legend()
-ax[0].set_ylabel('River SSC (kg/m3)')
+# ax[1].plot_date(river_datetime_list,
+#                 np.sum(f_river.variables['river_sand_01'],axis=(1,2)), label='sand',
+#                 xdate=True, linestyle='-', linewidth=0.5,
+#                 marker='', markersize=1)
+# ax[1].plot_date(river_datetime_list,
+#                 np.sum(f_river.variables['river_mud_01'],axis=(1,2)), label='mud',
+#                 xdate=True, linestyle='-', linewidth=0.5,
+#                 marker='', markersize=1)
+# ax[1].xaxis.set_major_locator(months)
+# #ax[0].xaxis.set_major_formatter(myFmt)
+# ax[1].set_xlim(xlim)
+# ax[1].legend()
+# ax[1].set_ylabel('River SSC (kg/m3)')
 
 
 ax[1].plot_date(river_datetime_list,
@@ -109,13 +109,17 @@ ax[1].plot_date(river_datetime_list,
 ax[1].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel('Discharge (m3/s)')
+ax[1].set_ylabel('Discharge (m$^{3}$/s)')
 
-coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2])
-ax[2].xaxis.set_major_locator(months)
+q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[0],scale=200)
+ref = 10
+qk = ax[0].quiverkey(q, 0.04, 0.15, ref,
+                  "%s m$/$s" % ref,
+                  labelpos='N', coordinates='axes',fontproperties={'size':'medium'})
+ax[0].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
-ax[2].set_xlim(xlim)
-ax[2].set_ylabel('Wind')
+ax[0].set_xlim(xlim)
+ax[0].set_ylabel('Wind')
 
 #ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
 #                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
@@ -125,20 +129,22 @@ ax[2].set_ylabel('Wind')
 #ax[2].set_ylabel('Wind Speed [m/s]')
 
 
-ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
+ax[2].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
-ax[3].set_xlim(xlim)
-ax[3].set_ylabel('Water surface [m]')
+ax[2].set_xlim(xlim)
+ax[2].set_ylabel('Water surface (m)')
 
-ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[4].plot_date(datetime_list,point_data['FLT']['mud_bar']+point_data['FLT']['sand_bar'],label='FLT',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[4].legend()
-#ax[4].set_yscale('log')
-ax[4].set_ylabel('Depth average SSC [kg/m3]')
-ax[4].xaxis.set_major_locator(months)
-ax[4].xaxis.set_major_formatter(myFmt)
+
+# ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
+#                 linestyle='-', linewidth=0.5, marker='', markersize=1)
+# ax[4].plot_date(datetime_list,point_data['FLT']['mud_bar']+point_data['FLT']['sand_bar'],label='FLT',
+#                 linestyle='-', linewidth=0.5, marker='', markersize=1)
+# ax[4].legend()
+# #ax[4].set_yscale('log')
+# ax[4].set_ylabel('Depth average SSC [kg/m3]')
+
+ax[2].xaxis.set_major_locator(months)
+ax[2].xaxis.set_major_formatter(myFmt)
 
 time_periods = coawstpy.get_time_periods()
 # add verical bars:
@@ -150,9 +156,9 @@ for i in ax:
     #i.axvspan('2011-09-07', '2011-09-16', facecolor='0.5', alpha=0.3) # Lee discharge
     #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
 
-ax[0].text('2011-07-31 12:00',100,'Before Irene')
-ax[0].text('2011-08-26 12:00',100,'Irene')
-ax[0].text('2011-09-10',100,'Lee')
-ax[0].text('2011-10-14',100,'post-Lee')
+ax[0].text('2011-07-29 12:00',0.045,'Before Irene')
+ax[0].text('2011-08-26 12:00',0.045,'Irene')
+ax[0].text('2011-09-10',0.045,'Lee')
+ax[0].text('2011-10-14',0.045,'post-Lee')
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
