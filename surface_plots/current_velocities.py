@@ -14,8 +14,9 @@ import datetime
 runs = ['veg','noveg']
 #event = 'typical'
 #point_data = coawstpy.get_point_data(run)
+#date = datetime.datetime(2011, 8, 2, 21, 0) # typical
 #date = datetime.datetime(2011, 9, 9, 4, 12)  # Lee
-date = datetime.datetime(2011, 8, 28, 4, 0) # post-Lee
+date = datetime.datetime(2011, 10, 21, 0, 0) # post-Lee
 #locs = coawstpy.get_point_locations()
 
 i=0
@@ -82,7 +83,7 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[i])
 
     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, curr_mag, latlon=True, ax=ax[i],vmin=0,vmax=0.5)
+    caxm = m.pcolormesh(lon, lat, curr_mag, latlon=True, ax=ax[i],vmin=0,vmax=2.5, cmap='gist_ncar')
     m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -93,15 +94,15 @@ for run in runs:
     i+=1
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.125, 0.17, 0.675, 0.03])
-cbar = fig.colorbar(caxm, cax=cbar_ax, orientation='horizontal')
+cbar = fig.colorbar(caxm, cax=cbar_ax, orientation='horizontal', extend='max')
 cbar.set_label('Depth average current on %s [m/s]' % date)
 #cbar.add_lines(contour)
 #m.colorbar(cax)
 #plt.suptitle("%s" % date)
 
 
-#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
-#image_name = '%s_map.png' % date
-#outfile = writedir+image_name
-#print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=500)
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
+image_name = '%s_map.png' % date
+outfile = writedir+image_name
+print("Saving image to %s" % outfile)
+plt.savefig(outfile, bbox_inches='tight', dpi=500)

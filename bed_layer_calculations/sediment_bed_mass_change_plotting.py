@@ -13,7 +13,7 @@ import scipy.integrate as integrate
 
 ## Read COAWST data
 runs = ['veg','noveg']
-event = 'typical'
+event = 'Irene'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
@@ -164,8 +164,10 @@ for run in runs:
     print('total mass deposited = %e tons' % (np.sum(mass_deposited) / 1000))
     print('\ntotal sand eroded    = %e tons' % (np.sum(sand_mass_eroded) / 1000))
     print('total sand deposited = %e tons' % (np.sum(sand_mass_deposited) / 1000))
+    print('Sand change = %f tons' % ((np.sum(sand_mass_eroded)+np.sum(sand_mass_deposited))/ 1000))
     print('\ntotal mud eroded    = %e tons' % (np.sum(mud_mass_eroded) / 1000))
     print('total mud deposited = %e tons' % (np.sum(mud_mass_deposited) / 1000))
+    print('Mud change = %f tons' % ((np.sum(mud_mass_eroded)+np.sum(mud_mass_deposited))/ 1000))
 
     #cbar = m.colorbar(cax0, ax=ax[i,0], location='bottom')
 fig.subplots_adjust(right=0.8)
