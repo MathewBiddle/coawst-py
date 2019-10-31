@@ -10,10 +10,14 @@ import datetime
 
 runs = ['veg','noveg']
 event = 'typical'
-#point_data = coawstpy.get_point_data(run)
-date = datetime.datetime(2011, 8, 28, 13, 00) # Irene
-#date = datetime.datetime(2011, 10, 20, 19, 00) # Post-Lee
+point_data = coawstpy.get_point_data('veg')
+
+date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
+#date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
 #locs = coawstpy.get_point_locations()
+u = point_data['CBIBS'].loc[date,'X-Windv']
+v = point_data['CBIBS'].loc[date,'Y-Windv']
+#coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[0],scale=200)
 
 i=0
 fig, ax = plt.subplots(ncols=2,figsize=(20, 10),sharey=True,sharex=True)
@@ -85,6 +89,12 @@ for run in runs:
 
     ax[i].set_title("%s" % run)
     i+=1
+
+x,y=m(lonm.min()+.01,latm.min()+.01)
+m.quiver(x, y, u, v, scale=200, ax=ax[0])
+m.quiver(x, y, u, v, scale=200, ax=ax[1])
+#coawstpy.stick_plot(date,u,v, ax=caxm)
+
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.125, 0.17, 0.675, 0.03])
 cbar = fig.colorbar(caxm, cax=cbar_ax, orientation='horizontal')
