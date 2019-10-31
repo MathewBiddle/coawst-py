@@ -6,14 +6,14 @@ import matplotlib.pyplot as plt
 #matplotlib.use('MacOSX')
 
 
-## TODO change Windv-X, Windv-Y, and WindV to single stick plots
+## TODO change Windv-X, Windv-Y, and WindV to single stick plots fix x-axis label
 run = 'veg'
 point_data_veg = coawstpy.get_point_data(run)
 point_data_noveg = coawstpy.get_point_data('noveg')
 times = coawstpy.get_time_periods()
 vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
         'river_transport','bed_thickness',
-       'Windv', 'depth', 'current_bar','Uwave_rms','bstress_mag'] #'X-Windv','Y-Windv',
+        'depth', 'current_bar','Uwave_rms','bstress_mag','Windv'] #'X-Windv','Y-Windv',
 #i=0
 #fig, ax = plt.subplots(figsize=(20, 18))#,sharey=True,sharex=True)
 #plt.figure(figsize=(20,18))
@@ -52,15 +52,17 @@ for site in point_data_veg:
               #point_data_noveg[site][vars2plot][start:end].to_csv(writenovegfile)
 
 ## Put figure in the Windv axis #6
-ticks = ax[6].get_xticklabels()
-ax[6].clear()
+ticks = ax[10].get_xticklabels()
+ax[10].clear()
 q = coawstpy.stick_plot(point_data_veg[site].index[start:end],point_data_veg[site]['X-Windv'][start:end],
-                    point_data_veg[site]['Y-Windv'][start:end], ax=ax[6], scale=500)
+                    point_data_veg[site]['Y-Windv'][start:end], ax=ax[10], scale=500)
 ref = 10
-qk = ax[6].quiverkey(q, -0.04, 0.15, ref,
+# todo adjust key location to next to last panel
+qk = ax[10].quiverkey(q, -0.04, 0.15, ref,
                   "%s m/s" % ref,
                   labelpos='N', coordinates='axes', fontproperties={'size': 'xx-small'})
-ax[6].set_ylabel('wind',rotation=0,labelpad=20)
+ax[10].set_ylabel('wind',rotation=0,labelpad=20)
+ax[10].tick_params(axis='x', rotation=45, labelright=True)
 #ticks = ax[10].get_xticklabels()
 #ax[6].set_xticklabels(ticks)#x[7].get_xticklabels())
 #ax[10].set_xticklabels(ticks)
