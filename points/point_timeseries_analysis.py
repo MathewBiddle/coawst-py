@@ -76,8 +76,8 @@ for label in ax[10].get_xmajorticklabels():
 #        point_data[site][vars2plot][start:end].plot()
 #        plt.suptitle('%s %s' % (event, site))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
-image_name = '%s_%s_timeseries.png' % (evnt, st)
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
+#image_name = '%s_%s_timeseries.png' % (evnt, st)
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)

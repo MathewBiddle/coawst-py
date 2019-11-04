@@ -9,11 +9,11 @@ import coawstpy
 import datetime
 
 runs = ['veg','noveg']
-event = 'typical'
+event = 'post-Lee'
 point_data = coawstpy.get_point_data('veg')
 
-date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
-#date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
+#date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
+date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
 #locs = coawstpy.get_point_locations()
 u = point_data['CBIBS'].loc[date,'X-Windv']
 v = point_data['CBIBS'].loc[date,'Y-Windv']
@@ -63,12 +63,13 @@ for run in runs:
     # pick data to plot
     datetime_list = datetime_list[time]
     #dvar = 'bed_thickness'
-    bstress_mag = f.variables['Hwave'][time, :, :]
+    Hwave = f.variables['Hwave'][time, :, :]
 
-    bstress_magm = np.ma.masked_where(plant_height != 5,bstress_mag)
+    Hwavem = np.ma.masked_where(plant_height != 5,Hwave)
 
-    #curr_mag = np.sqrt((ubarm**2)+(vbarm**2))
-    #print('Maximum current: %f' % curr_mag.max())
+    #curr_mag = np.sqrt((ubarm**2)+(vbrm**2))
+    print(run)
+    print('Maximum wave: %f' % Hwavem.max())
 #    data_diff = (data_final-data_init)*100 # cm
     # set up figure
 
@@ -80,7 +81,7 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[i])
 
     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, bstress_magm, latlon=True, ax=ax[i],vmin=0,vmax=0.5)
+    caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[i],vmin=0,vmax=0.5)
     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -104,8 +105,8 @@ cbar.set_label('significant wave height %s [m]' % date)
 #plt.suptitle("%s" % date)
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/significant_wave_height_maps/'
-image_name = '%s_map.png' % datetime_list
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/significant_wave_height_maps/'
+#image_name = '%s_map.png' % datetime_list
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
