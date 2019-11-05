@@ -45,13 +45,13 @@ for grid in ['rho']:
     m = Basemap(llcrnrlon=lon_min-0.01, llcrnrlat=lat_min-0.02, urcrnrlon=lon_max+0.01, urcrnrlat=lat_max+0.02,
                 resolution='i', projection='merc', ax=ax, epsg=3395)
     m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=500)#3000)
-    cax = m.pcolor(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], f.variables['mask_%s' % grid][:],
-                   latlon=True, facecolor='none', ax=ax, edgecolors='k', cmap='binary_r')
-    #cax = m.pcolormesh(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], np.ones((100,100)),
-    #               latlon=True, facecolor='none', ax=ax, edgecolor='black', linewidth=0.005, alpha=0.5)
+    #cax = m.pcolor(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], f.variables['mask_%s' % grid][:],
+    #               latlon=True, facecolor='none', ax=ax, edgecolors='k', cmap='binary_r')
+    cax = m.pcolormesh(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], np.ones((100,100)),
+                   latlon=True, facecolor='none', ax=ax, edgecolor='black', linewidth=0.005, alpha=0.5)
     #plt.title('%s %s %s' % (f.variables['mask_%s' % grid].long_name,
     #                        f.variables['mask_%s' % grid].location,
     #                        f.variables['mask_%s' % grid].shape))
-    #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/grid/mask_%s.png' % grid
-    #print("Saving to %s" % outfile)
-    #plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
+    outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/grid_%s.png' % grid
+    print("Saving to %s" % outfile)
+    plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)

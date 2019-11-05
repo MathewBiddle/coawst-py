@@ -8,9 +8,6 @@ import netCDF4
 import coawstpy
 import datetime
 
-## TODO Fiddle with bounds to capture typical, Irene, Lee, and post-Lee
-# typical, Irene, and post-Lee could probably do 0-0.5
-# try nipy_spectral?
 runs = ['veg','noveg']
 #event = 'typical'
 #point_data = coawstpy.get_point_data(run)
@@ -84,8 +81,10 @@ for run in runs:
 
     # pcolor variable of interest
     caxm = m.pcolormesh(lon, lat, curr_mag, latlon=True, ax=ax[i],vmin=0,vmax=2.5, cmap='gist_ncar')
-    m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
+    #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
+    m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], latlon=True, ax=ax[i],
+             pivot='tail', headaxislength=3, width=0.003)
 
     #contour = m.contour(lon, lat, data_diff, 0,
     #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
@@ -101,8 +100,8 @@ cbar.set_label('Depth average current on %s [m/s]' % date)
 #plt.suptitle("%s" % date)
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
-image_name = '%s_map.png' % date
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/current_velocity_maps/'
+#image_name = '%s_map.png' % date
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
