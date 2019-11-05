@@ -3,7 +3,7 @@ This script plots the model grids of the various coordinate systems
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/anaconda3/envs/coawst/share/proj/"
+os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -40,16 +40,18 @@ lat_max = np.min([
     ])
 # set up figure
 
-for grid in ['v', 'u', 'psi', 'rho']:
-    fig, ax = plt.subplots(figsize=(8, 6))
-    m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=lat_max,
-                resolution='i', projection='merc', ax=ax)
-
+for grid in ['rho']:
+    fig, ax = plt.subplots(figsize=(10, 8))
+    m = Basemap(llcrnrlon=lon_min-0.01, llcrnrlat=lat_min-0.02, urcrnrlon=lon_max+0.01, urcrnrlat=lat_max+0.02,
+                resolution='i', projection='merc', ax=ax, epsg=3395)
+    m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=500)#3000)
     cax = m.pcolor(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], f.variables['mask_%s' % grid][:],
-                   latlon=True, cmap='binary_r', ax=ax, edgecolor='k')
-    plt.title('%s %s %s' % (f.variables['mask_%s' % grid].long_name,
-                            f.variables['mask_%s' % grid].location,
-                            f.variables['mask_%s' % grid].shape))
-    outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/grid/mask_%s.png' % grid
-    print("Saving to %s" % outfile)
-    plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
+                   latlon=True, facecolor='none', ax=ax, edgecolors='k', cmap='binary_r')
+    #cax = m.pcolormesh(f.variables['lon_%s' % grid][:], f.variables['lat_%s' % grid][:], np.ones((100,100)),
+    #               latlon=True, facecolor='none', ax=ax, edgecolor='black', linewidth=0.005, alpha=0.5)
+    #plt.title('%s %s %s' % (f.variables['mask_%s' % grid].long_name,
+    #                        f.variables['mask_%s' % grid].location,
+    #                        f.variables['mask_%s' % grid].shape))
+    #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/grid/mask_%s.png' % grid
+    #print("Saving to %s" % outfile)
+    #plt.savefig(outfile, bbox_inches='tight')#, dpi=1000)
