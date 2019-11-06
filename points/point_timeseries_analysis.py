@@ -4,6 +4,7 @@ import coawstpy
 import matplotlib.pyplot as plt
 #import matplotlib
 #matplotlib.use('MacOSX')
+import numpy as np
 
 
 run = 'veg'
@@ -21,7 +22,7 @@ labels =['$T_p$','$H_s$','$\\widebar{SSC_{f}}$','$\\widebar{SSC_{c}}$','$Q$','$h
 alpha = 'a'
 for site in point_data_veg:
        for event in times:
-              if event != 'post-Lee':
+              if event != 'Irene':
                      continue
               if site != 'FLT':
                      continue
@@ -79,6 +80,8 @@ for label in ax[10].get_xmajorticklabels():
 # remove the exponent for bed thickness
 ax[5].get_yaxis().get_major_formatter().set_useOffset(False)
 
+# add critical shear stress line
+ax[9].plot_date(point_data_veg[site][vars2plot][start:end].index,np.ones(end-start)*0.049,':',linewidth=0.5,c='black')
 # squash all x-axis together
 plt.subplots_adjust(hspace=0)
 #ax[10].tick_params(axis='x', rotation=45, labelright=True)
@@ -92,8 +95,8 @@ plt.subplots_adjust(hspace=0)
 #        point_data[site][vars2plot][start:end].plot()
 #        plt.suptitle('%s %s' % (event, site))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
-image_name = '%s_%s_timeseries.png' % (evnt, st)
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
+#image_name = '%s_%s_timeseries.png' % (evnt, st)
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
