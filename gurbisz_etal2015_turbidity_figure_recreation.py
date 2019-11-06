@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import coawstpy
 import matplotlib.dates as mdates
 import numpy as np
+import datetime
 
 '''
 This script recreates the figure in Gurbisz et al 2015, adding model data
@@ -108,6 +109,18 @@ months = mdates.MonthLocator()  # every month
 dayint=10
 xlim= (ptsdf['Time'].min(), ptsdf['Time'].max())
 
+##
+time_periods = coawstpy.get_time_periods()
+# add verical bars:
+for i in ax:
+    for time_period in time_periods:
+        i.axvspan(time_periods[time_period][0],time_periods[time_period][1], facecolor='0.5', alpha=0.3)  # Typical low-flow conditions
+    #i.axvspan('2011-08-01','2011-08-06', facecolor='0.5', alpha=0.3) # Typical low-flow conditions
+    #i.axvspan('2011-08-27','2011-08-30', facecolor='0.5', alpha=0.3) # Irene wind event
+    #i.axvspan('2011-09-07', '2011-09-16', facecolor='0.5', alpha=0.3) # Lee discharge
+    #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
+
+
 # ax[0].plot_date(river_datetime_list,
 #                 np.sum(f_river.variables['river_sand_01'],axis=(1,2)), label='sand',
 #                 xdate=True, linestyle='-', linewidth=0.5,
@@ -123,20 +136,27 @@ xlim= (ptsdf['Time'].min(), ptsdf['Time'].max())
 # ax[0].set_ylabel('River SSC (kg/m3)')
 
 
-ax[0].plot_date(river_datetime_list,
+ax[2].plot_date(river_datetime_list,
                 (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
                 xdate=True, linestyle='-', linewidth=0.5,
-                marker='', markersize=1)
-ax[0].xaxis.set_major_locator(months)
+                marker='', markersize=1, c='black')
+ax[2].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
-ax[0].set_xlim(xlim)
-ax[0].set_ylabel('Discharge (m3/s)')
+ax[2].set_xlim(xlim)
+ax[2].set_ylabel('$Q$')
+ax[2].set_yticks([0,8000,16000])
+ax[2].set_yticklabels([0,8000,16000], va='center', rotation=90)
+#ax[0].set_yticks(rotation='horizontal')
 
-coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[1])
-ax[1].xaxis.set_major_locator(months)
+q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[3])
+ax[3].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
-ax[1].set_xlim(xlim)
-ax[1].set_ylabel('Wind')
+ax[3].set_xlim(xlim)
+ax[3].set_ylabel('$U_{10}$',labelpad=20)
+ref = 10
+qk = ax[3].quiverkey(q, 0.04, 0.1, ref,
+                  "%s m/s" % ref,
+                  labelpos='N', coordinates='axes', fontproperties={'size': 'xx-small'})
 
 #ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
 #                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
@@ -151,42 +171,42 @@ ax[1].set_ylabel('Wind')
 # ax[3].set_xlim(xlim)
 # ax[3].set_ylabel('Water surface [m]')
 
-ax[2].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[2].plot_date(datetime_list,point_data['FLT']['mud_bar']+point_data['FLT']['sand_bar'],label='FLT',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[2].legend(loc='upper left')
+ax[0].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
+                linestyle='-', linewidth=0.5, marker='', markersize=1, c='black')
+ax[0].plot_date(datetime_list,point_data['FLT']['mud_bar']+point_data['FLT']['sand_bar'],label='FLT',
+                linestyle='-', linewidth=0.5, marker='', markersize=1, c='grey')
+#ax[0].legend(loc='upper left')
 #ax[4].set_yscale('log')
-ax[2].set_ylabel('Total SSC_bar [kg/m3]')
-ax[2].xaxis.set_major_locator(months)
+ax[0].set_ylabel('$\\widebar{SSC}_{tot}$')
+ax[0].xaxis.set_major_locator(months)
 #ax[4].xaxis.set_major_formatter(myFmt)
 
 # eyes on the bay data
-ax[3].plot_date(eotb_SUS_date,eotb_SUS_turb,label='EOTB_SUS',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[3].plot_date(eotb_FLT_date,eotb_FLT_turb,label='EOTB_FLT',
-                linestyle='-', linewidth=0.5, marker='', markersize=1)
-ax[3].legend(loc='upper left')
+ax[1].plot_date(eotb_SUS_date,eotb_SUS_turb,label='EOTB_SUS',
+                linestyle='-', linewidth=0.5, marker='', markersize=1, c='black')
+ax[1].plot_date(eotb_FLT_date,eotb_FLT_turb,label='EOTB_FLT',
+                linestyle='-', linewidth=0.5, marker='', markersize=1, c='grey')
+#ax[1].legend(loc='upper left')
 #ax[4].set_yscale('log')
-ax[3].set_ylabel('Turbidity [NTU]')
-ax[3].xaxis.set_major_locator(months)
-ax[3].xaxis.set_major_formatter(myFmt)
+ax[1].set_ylim([0,650])
+ax[1].set_ylabel('$Turb$')
+ax[1].set_yticks([0,200,400,600])
+ax[1].set_yticklabels([0,200,400,600], va='center', rotation=90)
+ax[1].xaxis.set_major_locator(months)
+ax[1].xaxis.set_major_formatter(myFmt)
 
 
-##
-time_periods = coawstpy.get_time_periods()
-# add verical bars:
-for i in ax:
-    for time_period in time_periods:
-        i.axvspan(time_periods[time_period][0],time_periods[time_period][1], facecolor='0.5', alpha=0.3)  # Typical low-flow conditions
-    #i.axvspan('2011-08-01','2011-08-06', facecolor='0.5', alpha=0.3) # Typical low-flow conditions
-    #i.axvspan('2011-08-27','2011-08-30', facecolor='0.5', alpha=0.3) # Irene wind event
-    #i.axvspan('2011-09-07', '2011-09-16', facecolor='0.5', alpha=0.3) # Lee discharge
-    #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
 
-ax[0].text('2011-07-31 12:00',20000,'Before Irene')
-ax[0].text('2011-08-26 12:00',20000,'Irene')
-ax[0].text('2011-09-10',20000,'Lee')
-ax[0].text('2011-10-14',20000,'post-Lee')
+ax[0].text('2011-07-30 00:00',2.5,'Before Irene')
+ax[0].text('2011-08-26 12:00',2.50000,'Irene')
+ax[0].text('2011-09-10',2.50000,'Lee')
+ax[0].text('2011-10-15',2.50000,'post-Lee')
+
+ax[0].text('2011-07-21',2.6,'a',fontsize=18)
+ax[1].text('2011-07-21',525,'b',fontsize=18)
+ax[2].text('2011-07-21',18000,'c',fontsize=18)
+ax[3].text('2011-07-21',0.035,'d',fontsize=18)
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Gurbisz_2016_turbidity_fig_recreation.png'
+#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
