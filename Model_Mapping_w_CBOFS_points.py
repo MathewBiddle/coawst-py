@@ -80,9 +80,13 @@ for label in locs['Site']:
         lon = locs.loc[locs['Site'] == label,'lon'].values
         lat = locs.loc[locs['Site'] == label,'lat'].values
         x,y = m(lon,lat)
-        plt.scatter(x, y, s=50, marker='.', color='r', edgecolors='k', linewidths=0.3)
+        plt.scatter(x, y, s=40, marker='.', color='r', edgecolors='k', linewidths=0.3)
         if label == 'Tripod':
             plt.text(x+500,y-200, label, fontdict=dict(size=5))
+        elif label == 'SUS':
+            plt.text(x-2500,y-500, label, fontdict=dict(size=5))
+        elif label == 'SHAD':
+            plt.text(x+500, y-500, label, fontdict=dict(size=5))
         else:
             plt.text(x+500, y, label, fontdict=dict(size=5))
 
@@ -98,10 +102,16 @@ for transect in transects:
     lat = [f.variables['lat_rho'][x_start,y_start],f.variables['lat_rho'][x_end,y_end]]
     xm, ym = m(lon, lat)
     m.plot(xm, ym, '-', color='k', linewidth=2)
-    plt.text(xm[0]-1000,ym[0],t_name, fontdict=dict(size=5))
+    plt.text(xm[-1]+500,ym[0],t_name, fontdict=dict(size=5))
 
+# add conowingo sensor location
+latc = 39.658
+lonc = -76.1744
+xc, yc = m(lonc, latc)
+plt.scatter(xc, yc, s=40, marker='.', color='r', edgecolors='k', linewidths=0.3)
+plt.text(xc-1500,yc-500, 'C', fontdict=dict(size=5))
 plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations_CBOFS_conowingo.png'
 
-#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+plt.savefig(outfile, bbox_inches='tight', dpi = 500)

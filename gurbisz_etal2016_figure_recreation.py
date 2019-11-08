@@ -109,7 +109,7 @@ ax[1].plot_date(river_datetime_list,
 ax[1].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel('Discharge (m$^{3}$/s)')
+ax[1].set_ylabel('$Q$ (m$^{3}$/s)')
 
 q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[0],scale=200)
 ref = 10
@@ -119,7 +119,7 @@ qk = ax[0].quiverkey(q, 0.04, 0.15, ref,
 ax[0].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
 ax[0].set_xlim(xlim)
-ax[0].set_ylabel('Wind')
+ax[0].set_ylabel('$U_{10}$')
 
 #ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
 #                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
@@ -132,7 +132,7 @@ ax[0].set_ylabel('Wind')
 ax[2].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1)
 ax[2].set_xlim(xlim)
-ax[2].set_ylabel('Water surface (m)')
+ax[2].set_ylabel('$d$ (m)')
 
 
 # ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',

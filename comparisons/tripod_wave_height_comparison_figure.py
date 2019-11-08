@@ -56,7 +56,7 @@ ax[0].plot_date(obs_df['mtime'], obs_df['Hsig'], label='Observed', xdate=True, l
 ax[0].plot_date(SWAN_df['Time'], SWAN_df['Hsig'],label='Predicted', xdate=True, linestyle='-', linewidth=0.5, c='k',
                      marker='', markersize=1)
 #ax[0].legend()
-ax[0].set_ylabel('Sig. Wave Height (m)')
+ax[0].set_ylabel('$H_s$ (m)')
 ax[0].text(datetime.datetime(2013,7,4,20,00),0.32,'a',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
 
 ax[1].plot_date(obs_df['mtime'], obs_df['Tp'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='grey',
@@ -65,11 +65,11 @@ ax[1].plot_date(SWAN_df['Time'], SWAN_df['RTpeak'].astype(float), label='Predict
                      linewidth=0.5, c='k', marker='', markersize=1)
 ax[1].legend()
 ax[1].set_ylim(0, 6)
-ax[1].set_ylabel('Peak Period (s)')
+ax[1].set_ylabel('$T_p$ (s)')
 ax[1].text(datetime.datetime(2013,7,4,20,00),5,'b',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
 
 q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[2])
-ax[2].set_ylabel('Wind')
+ax[2].set_ylabel('$U_{10}$')
 ref = 10
 ax[2].quiverkey(q, 0.06, 0.15, ref,
                   "%s m/s" % ref,
