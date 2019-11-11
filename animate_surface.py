@@ -11,6 +11,7 @@ import datetime
 import coawstpy
 
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
 ## READ SWAN PTS data (for wind)
 #ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
 ptsfile = dir+"/tripod_wave.pts"
@@ -48,12 +49,17 @@ for sec in ocean_time:
     datetime_list.append(
         netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
+
+# to subset time series
 start_date = datetime.datetime(2011,8,15)
 end_date = datetime.datetime(2011,9,15)
 
-
 start_idx = coawstpy.nearest_ind(datetime_list, start_date)
 end_idx = coawstpy.nearest_ind(datetime_list, end_date)
+
+# to do entire time series
+# start_idx = 1 # zero screws up cause velocities are zero
+# end_idx = -1
 
 datetime_list = datetime_list[start_idx:end_idx]
 mud_01 = mud_01[start_idx:end_idx, :, :]
@@ -79,18 +85,28 @@ cbar.set_label('$\\widebar{SSC}_{f}$ (kg $m^{-3}$)')
 #init wind vector
 x, y = m(-75.979,39.38)
 dax = m.quiver(x,y,ptsdf['X-Windv'].iloc[0],ptsdf['Y-Windv'].iloc[0])
+#barb_increments = dict({'half':1,'full':5,'flag':15})
+#dax = m.barbs(x,y,ptsdf['X-Windv'].iloc[0],ptsdf['Y-Windv'].iloc[0], barb_increments=barb_increments)
 
-eax = m.quiver(lon[::2], lat[::2], ubar[0,::2], vbar[0,::2], latlon=True,
-             pivot='tail', headaxislength=3, width=0.003)
+#eax = m.quiver(lon[::1], lat[::1], ubar[0,::1], vbar[0,::1], latlon=True,
+#             pivot='middle', headaxislength=3, width=0.003)
+
+xr, yr = m(lon[23,1], lat[23,1])
+eax = m.quiver(xr, yr, ubar[0,23,1], vbar[0,23,1])#, pivot='middle', headaxislength=3, width=0.003)#, latlon=True)
+#             pivot='middle', headaxislength=3, width=0.003)
 
 fax = m.contour(lon, lat, plant_height, levels=[0], colors='k', linewidths=.5, latlon=True, corner_mask=True)
 
+xt, yt = m(lon[5,90], lat[5,90])
+gax = m.quiver(xt, yt, ubar[0,5,90], vbar[0,5,90])
 
 #sys.exit()
 def animate(i):
     # pcolor variable
     cax.set_array(mud_01[i, :-1, :-1].flatten())
-    eax.set_UVC(ubar[i,::2], vbar[i,::2])
+    #eax.set_UVC(ubar[i,::1], vbar[i,::1])
+    eax.set_UVC(ubar[i,23,1], vbar[i,23,1])
+    gax.set_UVC(ubar[i,5,90], vbar[i,5,90])
     # add wind vector
     dax.set_UVC(ptsdf['X-Windv'].iloc[i], ptsdf['Y-Windv'].iloc[i])
     plt.title('%s'% (datetime_list[i]))
@@ -102,8 +118,8 @@ anim = animation.FuncAnimation(fig, animate, frames=len(datetime_list))
 #plt.draw()
 #plt.show()
 print("Saving animation...")
-outdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Presentations/defense/'
-anim.save(outdir+'mud_irene_lee.mp4', fps=20)
+outdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/'
+anim.save(outdir+'mud_irene_lee_simple.mp4', fps=15)
 #anim.save('out.gif', writer='imagemagick', fps=10)
 
 print("Done.")
