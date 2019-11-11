@@ -79,7 +79,7 @@ for sec in bry_time:
 
 ## plotting
 print("Creating plots...")
-fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 8))
+fig, (ax) = plt.subplots(nrows=2, ncols=1, sharex=True, figsize=(12, 4))
 fig.subplots_adjust(hspace=0.1)
 myFmt = mdates.DateFormatter("%b")
 months = mdates.MonthLocator()  # every month
@@ -129,10 +129,10 @@ ax[0].set_ylabel('$U_{10}$')
 #ax[2].set_ylabel('Wind Speed [m/s]')
 
 
-ax[2].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
-                     marker='', markersize=1)
-ax[2].set_xlim(xlim)
-ax[2].set_ylabel('$d$ (m)')
+# ax[2].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
+#                      marker='', markersize=1)
+# ax[2].set_xlim(xlim)
+# ax[2].set_ylabel('$d$ (m)')
 
 
 # ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
@@ -143,22 +143,25 @@ ax[2].set_ylabel('$d$ (m)')
 # #ax[4].set_yscale('log')
 # ax[4].set_ylabel('Depth average SSC [kg/m3]')
 
-ax[2].xaxis.set_major_locator(months)
-ax[2].xaxis.set_major_formatter(myFmt)
+ax[1].xaxis.set_major_locator(months)
+ax[1].xaxis.set_major_formatter(myFmt)
 
 time_periods = coawstpy.get_time_periods()
 # add verical bars:
 for i in ax:
     for time_period in time_periods:
-        i.axvspan(time_periods[time_period][0],time_periods[time_period][1], facecolor='0.5', alpha=0.3)  # Typical low-flow conditions
-    #i.axvspan('2011-08-01','2011-08-06', facecolor='0.5', alpha=0.3) # Typical low-flow conditions
+        if (time_period == 'blah') or (time_period == 'Lee'):
+            i.axvspan(time_periods[time_period][0],time_periods[time_period][1], facecolor='0.5', alpha=0.3)  # Typical low-flow conditions
+#    i.axvspan('2011-09-16','2011-10-13', facecolor='0.5', alpha=0.3) # Typical low-flow conditions
     #i.axvspan('2011-08-27','2011-08-30', facecolor='0.5', alpha=0.3) # Irene wind event
     #i.axvspan('2011-09-07', '2011-09-16', facecolor='0.5', alpha=0.3) # Lee discharge
     #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
 
-ax[0].text('2011-07-29 12:00',0.045,'Before Irene')
-ax[0].text('2011-08-26 12:00',0.045,'Irene')
+#ax[0].text('2011-07-29 12:00',0.045,'Before Irene')
+#ax[0].text('2011-08-26 12:00',0.045,'Irene')
 ax[0].text('2011-09-10',0.045,'Lee')
-ax[0].text('2011-10-14',0.045,'post-Lee')
+#ax[0].text('2011-10-14',0.045,'post-Lee')
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Presentations/defense/forcings_hl_Lee.png'
+plt.savefig(outfile, bbox_inches='tight', dpi = 500)

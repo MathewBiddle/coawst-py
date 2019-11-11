@@ -46,10 +46,10 @@ plant_height_orig = np.ma.masked_outside(plant_height_orig,0.3,1)
 #plant_height = np.ma.masked_less(plant_height, 0.3)
 
 # shift plant distribution to right by one cell
-zeroes = np.zeros((1, 100))
-plant_height = np.concatenate((zeroes,plant_height_orig),0)
-plant_height = np.delete(plant_height, 100, 0)
-plant_height = np.ma.masked_outside(plant_height,0.3,1)
+#zeroes = np.zeros((1, 100))
+#plant_height = np.concatenate((zeroes,plant_height_orig),0)
+#plant_height = np.delete(plant_height, 100, 0)
+plant_height = np.ma.masked_outside(plant_height_orig,0.3,1)
 
 # plot bathymetry
 m.pcolormesh(lon, lat, h, latlon=True, cmap='viridis_r')
@@ -67,18 +67,22 @@ m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3,
 
 #x,y = m(lon,lat)
 
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Presentations/defense/bathy_veg_map.png'
+#plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
+#sys.exit()
 # plot stations
 #plt.scatter(x,y,s=50,marker='.',color='r',edgecolors='k',linewidths=0.3)
-for label in locs['Site']:
-    if label in ['CBIBS','Tripod','SUS','FLT']:
-        lon = locs.loc[locs['Site'] == label,'lon'].values
-        lat = locs.loc[locs['Site'] == label,'lat'].values
-        x,y = m(lon,lat)
-        plt.scatter(x, y, s=50, marker='.', color='r', edgecolors='k', linewidths=0.3)
-        if label == 'Tripod':
-            plt.text(x+500,y-200, label, fontdict=dict(size=5))
-        else:
-            plt.text(x+500, y, label, fontdict=dict(size=5))
+# for label in locs['Site']:
+#     if label in ['Tripod']:#,'Tripod','SUS','FLT']:
+#         site=label
+#         lon = locs.loc[locs['Site'] == label,'lon'].values
+#         lat = locs.loc[locs['Site'] == label,'lat'].values
+#         x,y = m(lon,lat)
+#         plt.scatter(x, y, s=50, marker='.', color='r', edgecolors='k', linewidths=0.3)
+#         if label == 'Tripod':
+#             plt.text(x+500,y-200, label, fontdict=dict(size=5))
+#         else:
+#             plt.text(x+500, y, label, fontdict=dict(size=5))
 
 # Transects
 transects = coawstpy.get_transect_indexes()
@@ -94,8 +98,8 @@ for transect in transects:
     m.plot(xm, ym, '-', color='k', linewidth=2)
     plt.text(xm[0]-1000,ym[0],t_name, fontdict=dict(size=5))
 
-plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
+#plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations.png'
-
-#plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Presentations/defense/transects_map.png'
+plt.savefig(outfile, bbox_inches='tight', dpi = 1000)
