@@ -109,12 +109,12 @@ ax[1].plot_date(river_datetime_list,
 ax[1].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel('$Q$ (m$^{3}$/s)')
+ax[1].set_ylabel('$Q$ (m$^{3}$ $s^{-1}$)')
 
 q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[0],scale=200)
 ref = 10
-qk = ax[0].quiverkey(q, 0.04, 0.15, ref,
-                  "%s m$/$s" % ref,
+qk = ax[0].quiverkey(q, 0.04, 0.05, ref,
+                  "%s m $s^{-1}$" % ref,
                   labelpos='N', coordinates='axes',fontproperties={'size':'medium'})
 ax[0].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
@@ -163,5 +163,5 @@ ax[0].text('2011-09-10',0.045,'Lee')
 #ax[0].text('2011-10-14',0.045,'post-Lee')
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Presentations/defense/forcings_hl_Lee.png'
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Lee.png'
 plt.savefig(outfile, bbox_inches='tight', dpi = 500)
