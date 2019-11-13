@@ -150,7 +150,7 @@ time_periods = coawstpy.get_time_periods()
 # add verical bars:
 for i in ax:
     for time_period in time_periods:
-        if (time_period == 'blah') or (time_period == 'Lee'):
+        if (time_period == 'Irene') or (time_period == 'post-Lee'):
             i.axvspan(time_periods[time_period][0],time_periods[time_period][1], facecolor='0.5', alpha=0.3)  # Typical low-flow conditions
 #    i.axvspan('2011-09-16','2011-10-13', facecolor='0.5', alpha=0.3) # Typical low-flow conditions
     #i.axvspan('2011-08-27','2011-08-30', facecolor='0.5', alpha=0.3) # Irene wind event
@@ -158,10 +158,10 @@ for i in ax:
     #i.axvspan('2011-10-13', '2011-10-24', facecolor='0.5', alpha=0.3)  # End wind event
 
 #ax[0].text('2011-07-29 12:00',0.045,'Before Irene')
-#ax[0].text('2011-08-26 12:00',0.045,'Irene')
-ax[0].text('2011-09-10',0.045,'Lee')
-#ax[0].text('2011-10-14',0.045,'post-Lee')
+ax[0].text('2011-08-26 12:00',0.045,'Irene')
+#ax[0].text('2011-09-10',0.045,'Lee')
+ax[0].text('2011-10-14',0.045,'post-Lee')
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Lee.png'
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Irene_post-Lee.png'
 plt.savefig(outfile, bbox_inches='tight', dpi = 500)

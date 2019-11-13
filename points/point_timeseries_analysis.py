@@ -14,18 +14,18 @@ times = coawstpy.get_time_periods()
 #vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
 #        'river_transport','bed_thickness',
 #        'depth', 'current_bar','Uwave_rms','bstress_mag','Windv'] #'X-Windv','Y-Windv',
-vars2plot = ['river_transport','mud_bar','sand_bar','current_bar','bstress_mag']
+vars2plot = ['river_transport','mud_bar','sand_bar','current_bar','bstress_mag','Windv']
 #i=0
 #fig, ax = plt.subplots(figsize=(20, 18))#,sharey=True,sharex=True)
 #plt.figure(figsize=(20,18))
 #labels =['$T_p$','$H_s$','$\\widebar{SSC_{f}}$','$\\widebar{SSC_{c}}$','$Q$','$h_b$','$d$','$|\\widebar{\\upsilon}|$',
 #         '$\\upsilon_{bo}$','$|\\tau_b|$','$U_{10}$']
 labels = ['$Q$ ($m^3$ $s^{-1}$)','$\\widebar{SSC}_{f}$ (kg $m^{-3}$)','$\\widebar{SSC}_{c}$ (kg $m^{-3}$)',
-          '$|\\widebar{\\upsilon}|$ (m $s^{-1}$)','$|\\tau_b|$ (N $m^{-2}$)']
+          '$|\\widebar{\\upsilon}|$ (m $s^{-1}$)','$|\\tau_b|$ (N $m^{-2}$)','$U_{10}$']
 alpha = 'a'
 for site in point_data_veg:
        for event in times:
-              if event != 'typical':
+              if event != 'post-Lee':
                      continue
               if site != 'FLT':
                      continue
@@ -99,8 +99,8 @@ plt.subplots_adjust(hspace=0.2)
 #        plt.suptitle('%s %s' % (event, site))
 
 #writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/timeseries/'
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/'
-image_name = '%s_%s_timeseries.png' % (evnt, st)
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/'
+# image_name = '%s_%s_timeseries.png' % (evnt, st)
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+# plt.savefig(outfile, bbox_inches='tight', dpi=500)
