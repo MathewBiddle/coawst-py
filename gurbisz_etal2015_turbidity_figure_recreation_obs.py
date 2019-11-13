@@ -101,7 +101,7 @@ eotb_depth = 1.0
 
 ## plotting
 print("Creating plots...")
-fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 8))
+fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(10, 6))
 fig.subplots_adjust(hspace=0.1)
 myFmt = mdates.DateFormatter("%b")
 months = mdates.MonthLocator()  # every month
@@ -138,7 +138,7 @@ xlim= (ptsdf['Time'].min(), ptsdf['Time'].max())
 
 ax[1].plot_date(river_datetime_list,
                 (river_transport + (0.2 * river_transport)) * f_river.variables['river_transport'].shape[1],
-                xdate=True, linestyle='-', linewidth=0.5,
+                xdate=True, linestyle='-', linewidth=2,
                 marker='', markersize=1, c='black')
 ax[1].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
@@ -149,7 +149,7 @@ ax[1].set_yticklabels([0,8000,16000], va='center', rotation=90)
 ax[1].patch.set_facecolor('white')
 #ax[0].set_yticks(rotation='horizontal')
 
-q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2])
+q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[2],scale=200)
 ax[2].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
 ax[2].set_xlim(xlim)
@@ -164,7 +164,7 @@ ax[2].patch.set_facecolor('white')
 #ax[2].xaxis.set_major_locator(mdates.DayLocator(interval=dayint))
 #ax[2].xaxis.set_major_formatter(myFmt)
 #ax[2].set_xlim(xlim)
-#ax[2].set_ylabel('Wind Speed [m/s]')
+ax[2].set_xlabel('2011',fontdict=dict(size='large'))
 
 
 # ax[3].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
@@ -184,9 +184,9 @@ ax[2].patch.set_facecolor('white')
 
 # eyes on the bay data
 ax[0].plot_date(eotb_SUS_date,eotb_SUS_turb,label='EOTB_SUS',
-                linestyle='-', linewidth=0.5, marker='', markersize=1, c='blue')
+                linestyle='-', linewidth=2, marker='', markersize=1, c='blue')
 ax[0].plot_date(eotb_FLT_date,eotb_FLT_turb,label='EOTB_FLT',
-                linestyle='-', linewidth=0.5, marker='', markersize=1, c='green')
+                linestyle='-', linewidth=2, marker='', markersize=1, c='green')
 #ax[1].legend(loc='upper left')
 #ax[4].set_yscale('log')
 ax[0].set_ylim([0,650])
@@ -197,7 +197,7 @@ ax[0].xaxis.set_major_locator(months)
 ax[0].xaxis.set_major_formatter(myFmt)
 ax[0].patch.set_facecolor('white')
 
-
+ax[0].set_title('Effect of Wind on Turbidity')
 # ax[0].text('2011-07-30 00:00',2.5,'Before Irene')
 # ax[0].text('2011-08-26 12:00',2.50000,'Irene')
 # ax[0].text('2011-09-10',2.50000,'Lee')

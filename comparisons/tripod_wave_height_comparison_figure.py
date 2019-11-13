@@ -51,31 +51,31 @@ obs_df['mtime']=obs_df['mtime'].dt.tz_localize('US/Eastern')# obs_data['DWV'].me
 #obs_df.plot(kind='line', x='mtime', y=['Hsig', 'Tp'])
 
 fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 8))
-ax[0].plot_date(obs_df['mtime'], obs_df['Hsig'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='grey',
-                     marker='.', markersize=1)
-ax[0].plot_date(SWAN_df['Time'], SWAN_df['Hsig'],label='Predicted', xdate=True, linestyle='-', linewidth=0.5, c='k',
+ax[1].plot_date(obs_df['mtime'], obs_df['Hsig'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='red',
+                     marker='.', markersize=3)
+ax[1].plot_date(SWAN_df['Time'], SWAN_df['Hsig'],label='Predicted', xdate=True, linestyle='-', linewidth=2, c='k',
                      marker='', markersize=1)
 #ax[0].legend()
-ax[0].set_ylabel('$H_s$ (m)')
-ax[0].text(datetime.datetime(2013,7,4,20,00),0.32,'a',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
+ax[1].set_ylabel('$H_s$ (m)')
+#ax[0].text(datetime.datetime(2013,7,4,20,00),0.32,'a',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
 
-ax[1].plot_date(obs_df['mtime'], obs_df['Tp'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='grey',
-                     marker='.', markersize=1)
-ax[1].plot_date(SWAN_df['Time'], SWAN_df['RTpeak'].astype(float), label='Predicted', xdate=True, linestyle='-',
-                     linewidth=0.5, c='k', marker='', markersize=1)
-ax[1].legend()
-ax[1].set_ylim(0, 6)
-ax[1].set_ylabel('$T_p$ (s)')
-ax[1].text(datetime.datetime(2013,7,4,20,00),5,'b',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
+ax[2].plot_date(obs_df['mtime'], obs_df['Tp'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='red',
+                     marker='.', markersize=3)
+ax[2].plot_date(SWAN_df['Time'], SWAN_df['RTpeak'].astype(float), label='Predicted', xdate=True, linestyle='-',
+                     linewidth=2, c='k', marker='', markersize=1)
+ax[2].legend()
+ax[2].set_ylim(0, 6)
+ax[2].set_ylabel('$T_p$ (s)')
+#ax[1].text(datetime.datetime(2013,7,4,20,00),5,'b',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
 
-q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[2])
-ax[2].set_ylabel('$U_{10}$')
+q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[0])
+ax[0].set_ylabel('$U_{10}$')
 ref = 10
-ax[2].quiverkey(q, 0.06, 0.15, ref,
+ax[0].quiverkey(q, 0.06, 0.15, ref,
                   "%s m/s" % ref,
                   labelpos='N', coordinates='axes', fontproperties={'size': 'medium'})
 
-ax[2].text(datetime.datetime(2013,7,4,20,00),0.04,'c',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
+#ax[2].text(datetime.datetime(2013,7,4,20,00),0.04,'c',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
 #plt.xlabel(plt.rcParams['timezone'])
 #triplon = metadata.location[1]
 #triplon = -1*(float(triplon.split(" ")[0])+(float(triplon.split(" ")[2])/60))
@@ -83,5 +83,5 @@ ax[2].text(datetime.datetime(2013,7,4,20,00),0.04,'c',fontdict=dict(weight="bold
 #triplat = float(triplat.split(" ")[0])+(float(triplat.split(" ")[1])/60)
 #plt.suptitle("Tripod @ %.4f %.3f\nSWAN  @ %s %s" % (triplat, triplon, SWAN_df['Yp'].unique()[0],SWAN_df['Xp'].unique()[0]))
 plt.subplots_adjust(hspace=0.05)
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/2013_SWAN_wave_comparison.png'
+outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/2013_SWAN_wave_comparison.png'
 plt.savefig(outfile, bbox_inches='tight', dpi = 500)

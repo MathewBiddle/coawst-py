@@ -69,13 +69,13 @@ start_date_3 = '2011-09-20'
 end_date_3 = '2011-10-31'
 
 #fig, ((ax),(ax2,ax3)) = plt.subplots(nrows=2, ncols=2, figsize=(10, 5))
-plt.figure(figsize=(12,10))
+plt.figure(figsize=(12,8))
 ax1 = plt.subplot(211)
 ax2 = plt.subplot(223)
 ax3 = plt.subplot(224)
 
 ax1.plot_date(datetime_list,mag_vel,label='Predicted',
-              xdate=True, linestyle='-', linewidth=1,
+              xdate=True, linestyle='-', linewidth=2,
               marker='', markersize=1, color='k')
 
 xlim = ax1.get_xlim()
@@ -87,10 +87,10 @@ colormap = np.array(['b','k','o','y','r'])
 #ax1.scatter(cbibs_date,cbibs_mag, label='CBIBS',c=colormap[cbibs_flag],s=0.5)
  #             xdate=True, linestyle='', linewidth=0.5,
  #             marker='.', markersize=0.5, cmap=cbibs_flag)
-ax1.scatter(cbibs_date,cbibs_mag, label='Observed',c='grey',s=0.5)
+ax1.scatter(cbibs_date,cbibs_mag, label='Observed',c='grey',s=3)
 indx1 = coawstpy.nearest_ind(cbibs_date,datetime.datetime.strptime(start_date_2,'%Y-%m-%d'))
 indx2 = coawstpy.nearest_ind(cbibs_date,datetime.datetime.strptime(end_date_2,'%Y-%m-%d'))
-ax1.scatter(cbibs_date[indx1:indx2],cbibs_mag[indx1:indx2], c='r', s=0.5)
+ax1.scatter(cbibs_date[indx1:indx2],cbibs_mag[indx1:indx2], c='grey', s=3)
 ax1.xaxis.set_major_locator(mdates.DayLocator(interval=10))
 ax1.xaxis.set_major_formatter(DateFormatter("%m/%d"))
 
@@ -100,9 +100,9 @@ ax1.set_ylabel('Water Velocity [m/s]')
 ax1.legend(loc='upper left')
 #a = ax[0].scatter(x=df.loc[start_date:end_date, 'COAWST_Vbar'],y=df.loc[start_date:end_date,'CBIBS_V'],
 #                c=df.loc[start_date:end_date].index)#, colormap='viridis')
-a = ax2.scatter(x=df.loc[start_date_1:end_date_1, 'COAWST_Vbar'],y=df.loc[start_date_1:end_date_1,'CBIBS_V'],marker='.',c='grey',s=0.5,label='other times')
-a = ax2.scatter(x=df.loc[start_date_3:end_date_3, 'COAWST_Vbar'],y=df.loc[start_date_3:end_date_3,'CBIBS_V'],marker='.',c='grey',s=0.5)
-a = ax2.scatter(x=df.loc[start_date_2:end_date_2, 'COAWST_Vbar'],y=df.loc[start_date_2:end_date_2,'CBIBS_V'],marker='.',c='r',s=0.5,label='09/06 - 09/20')
+a = ax2.scatter(x=df.loc[start_date_1:end_date_1, 'COAWST_Vbar'],y=df.loc[start_date_1:end_date_1,'CBIBS_V'],marker='.',c='grey',s=5,label='other times')
+a = ax2.scatter(x=df.loc[start_date_3:end_date_3, 'COAWST_Vbar'],y=df.loc[start_date_3:end_date_3,'CBIBS_V'],marker='.',c='grey',s=5)
+a = ax2.scatter(x=df.loc[start_date_2:end_date_2, 'COAWST_Vbar'],y=df.loc[start_date_2:end_date_2,'CBIBS_V'],marker='.',c='grey',s=5,label='09/06 - 09/20')
 
 #cm = df.loc['2011-08-01':'2011-09-09', ['COAWST_Ubar','CBIBS_U']].plot.scatter(
 #    x='COAWST_Ubar', y='CBIBS_U', c=df.loc['2011-08-01':'2011-09-09'].index, colormap='viridis', ax=ax)
@@ -126,9 +126,9 @@ ax2.plot([-2,2],[-2,2],linestyle=':')
 
 #a = ax[1].scatter(x=df.loc[start_date:end_date, 'COAWST_Ubar'],y=df.loc[start_date:end_date,'CBIBS_U'],
 #                c=df.loc[start_date:end_date].index)#, colormap='viridis')
-a = ax3.scatter(x=df.loc[start_date_1:end_date_1, 'COAWST_Ubar'],y=df.loc[start_date_1:end_date_1,'CBIBS_U'],marker='.',c='grey',s=0.5,label='other times')
-a = ax3.scatter(x=df.loc[start_date_3:end_date_3, 'COAWST_Ubar'],y=df.loc[start_date_3:end_date_3,'CBIBS_U'],marker='.',c='grey',s=0.5)
-a = ax3.scatter(x=df.loc[start_date_2:end_date_2, 'COAWST_Ubar'],y=df.loc[start_date_2:end_date_2,'CBIBS_U'],marker='.',c='r',s=1,label='09/06 - 09/20')
+a = ax3.scatter(x=df.loc[start_date_1:end_date_1, 'COAWST_Ubar'],y=df.loc[start_date_1:end_date_1,'CBIBS_U'],marker='.',c='grey',s=5,label='other times')
+a = ax3.scatter(x=df.loc[start_date_3:end_date_3, 'COAWST_Ubar'],y=df.loc[start_date_3:end_date_3,'CBIBS_U'],marker='.',c='grey',s=5)
+a = ax3.scatter(x=df.loc[start_date_2:end_date_2, 'COAWST_Ubar'],y=df.loc[start_date_2:end_date_2,'CBIBS_U'],marker='.',c='grey',s=5,label='09/06 - 09/20')
 #cm = df.loc['2011-08-01':'2011-09-09', ['COAWST_Ubar','CBIBS_U']].plot.scatter(
 #    x='COAWST_Ubar', y='CBIBS_U', c=df.loc['2011-08-01':'2011-09-09'].index, colormap='viridis', ax=ax)
 #cbar = fig.colorbar(a, ax=ax[1])
@@ -149,15 +149,15 @@ xs = np.array([xmin, xmax])
 ax3.plot(xs, slope*xs+intercept, linestyle='-', color='k')
 ax3.plot([-1,1],[-1,1],linestyle=':')
 
-ax2.legend(bbox_to_anchor=(1.01, 0), loc='upper left', borderaxespad=0.)
+#ax2.legend(bbox_to_anchor=(1.1, 1), loc='upper left', borderaxespad=0.)
 #plt.suptitle('%s to %s' % (start_date,end_date))
 #ax.grid(True)
 #fig.colorbar(format=DateFormatter('%b %d'))
 #cb.ax.set_yticklabels(df.loc['2011-08-01':'2011-09-09'].index)
 #cb = fig.colorbar(smap,format=DateFormatter('%d %b %y'))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/'
-image_name = 'CBIBS_Velocity_comparison_combined.png'
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/'
+image_name = 'CBIBS_Velocity_comparison_combined_grey.png'
 outfile = writedir+image_name
 print("Saving image to %s" % outfile)
 plt.savefig(outfile, bbox_inches='tight', dpi=500)

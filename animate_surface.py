@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import netCDF4
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from matplotlib.animation import FuncAnimation
 import matplotlib.animation as animation
 import datetime
@@ -74,11 +76,15 @@ m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrn
     resolution='i', projection='merc', ax=ax, epsg=3395)
 #m.drawparallels(np.arange(39.3,39.6,0.05),labels=[1,0,0,0],ax=ax)
 #m.drawmeridians(np.arange(-76.15,-75.90,0.05),labels=[0,0,0,1],ax=ax)
-m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 300)
+#m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels = 300)
 
 # pcolor variable of interest
+#cax = m.pcolormesh(lon, lat, mud_01[0, :-1, :-1], latlon=True,
+#                    vmin=0, vmax=0.6, cmap='gist_ncar', ax=ax)
+terrainBig = cm.get_cmap('terrain',512)
+new_terrain = ListedColormap(terrainBig(np.linspace(0.05, 1, 256)))
 cax = m.pcolormesh(lon, lat, mud_01[0, :-1, :-1], latlon=True,
-                    vmin=0, vmax=0.6, cmap='gist_ncar', ax=ax)
+                    vmin=0, vmax=0.2, cmap=new_terrain, ax=ax)
 cbar = fig.colorbar(cax, extend='max')
 cbar.set_label('$\\widebar{SSC}_{f}$ (kg $m^{-3}$)')
 
