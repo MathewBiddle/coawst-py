@@ -6,11 +6,14 @@ import matplotlib.dates as mdates
 import numpy as np
 
 '''
-This script recreates the figure in Gurbisz et al 2016 using the model forcing data
-Citation:
-Gurbisz, C., Kemp, W.M., Sanford, L.P., Orth, R.J., 2016. Mechanisms of Storm-Related Loss and Resilience in a 
-Large Submersed Plant Bed. Estuaries and Coasts 39, 951–966. https://doi.org/10.1007/s12237-016-0074-4
+Biddle et al 2020 manuscript Figure 2:
+Caption:
+Stacked plot of the model forcing used throughout the simulation with the events from Table 1 highlighted in grey. 
+The top panel represents a stick vector plot of the wind velocities at the NOAA-NOS CBIBS Susquehanna station (U10). 
+The middle panel represents the river discharge observations from the USGS sensor at Conowingo Dam (Q). The bottom 
+panel represents the phase adjusted Tolchester Beach water surface elevation observations (d) MLLW.
 '''
+
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 
 # Get SSC data
