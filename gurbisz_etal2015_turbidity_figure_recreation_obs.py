@@ -209,5 +209,5 @@ ax[0].set_title('Effect of Wind on Turbidity')
 # ax[3].text('2011-07-21',0.035,'d',fontsize=18)
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/Gurbisz_2016_turbidity_fig_recreation_obs.png'
-plt.savefig(outfile, bbox_inches='tight', dpi = 500, facecolor=ax[0].get_facecolor(), edgecolor='none')#transparent=True)
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/Gurbisz_2016_turbidity_fig_recreation_obs.png'
+#plt.savefig(outfile, bbox_inches='tight', dpi = 500, facecolor=ax[0].get_facecolor(), edgecolor='none')#transparent=True)
