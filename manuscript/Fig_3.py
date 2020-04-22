@@ -1,3 +1,16 @@
+'''
+Biddle et al 2020 manuscript Figure 3:
+Caption:
+Timeseries (top panel) of the magnitude of the water velocity (m/s) from CBIBS bin 2 ADCP observations (dots)
+and the respective location within the model grid (black line). The bottom two panels are comparisons between
+the observations (y-axis) and the model predictions (x-axis) (m/s), for the North (left panel) and East (right
+panel) components of the water velocity (m/s). The red dots indicate the velocities between 6 September and 20
+September and the black dots are the observations outside that time interval. The solid line is the linear
+regression of the observed and predicted velocity components for the entire simulation (black and red dots
+combined) and the dashed line is the 1:1 line.
+
+@author: Mathew Biddle
+'''
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.dates import DateFormatter

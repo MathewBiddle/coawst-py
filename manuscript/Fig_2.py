@@ -12,6 +12,8 @@ Stacked plot of the model forcing used throughout the simulation with the events
 The top panel represents a stick vector plot of the wind velocities at the NOAA-NOS CBIBS Susquehanna station (U10). 
 The middle panel represents the river discharge observations from the USGS sensor at Conowingo Dam (Q). The bottom 
 panel represents the phase adjusted Tolchester Beach water surface elevation observations (d) MLLW.
+
+@author: Mathew Biddle
 '''
 
 dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'

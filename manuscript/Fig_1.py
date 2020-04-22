@@ -10,7 +10,7 @@ transects used in the flux calculations at the entrance and exit of the system, 
 the NOAA NOS MLLW bathymetry, in meters, scaling from shallow water (yellow) to deep water (green), used for model
 initialization. The vegetation patch supplied to the model is the grey shaded region. Model grid included...
 
-@author: matt
+@author: Mathew Biddle
 """
 
 import os
