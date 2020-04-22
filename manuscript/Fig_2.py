@@ -126,7 +126,7 @@ ax[1].plot_date(river_datetime_list,
 ax[1].xaxis.set_major_locator(months)
 #ax[1].xaxis.set_major_formatter(myFmt)
 ax[1].set_xlim(xlim)
-ax[1].set_ylabel('$Q$ (m$^{3}$ $s^{-1}$)')
+ax[1].set_ylabel('$Q$ ($m^{3}$ $s^{-1}$)')
 
 #ax[2].plot_date(ptsdf['Time'], np.sqrt(ptsdf['X-Windv']**2 + ptsdf['Y-Windv']**2),
 #                xdate=True, linestyle='-', linewidth=0.5, marker='', markersize=1)
@@ -139,7 +139,7 @@ ax[1].set_ylabel('$Q$ (m$^{3}$ $s^{-1}$)')
 ax[2].plot_date(bry_datetime_list,bry_zeta, xdate=True, linestyle='-', linewidth=0.5,
                      marker='', markersize=1, color='k')
 ax[2].set_xlim(xlim)
-ax[2].set_ylabel('$d$ (m)')
+ax[2].set_ylabel('$d$ ($m$)')
 
 
 # ax[4].plot_date(datetime_list,point_data['SUS']['mud_bar']+point_data['SUS']['sand_bar'],label='SUS',
@@ -172,4 +172,4 @@ ax[0].text('2011-10-14',0.045,'post-Lee')
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Irene_post-Lee.png'
 outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_2.png'
-plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+plt.savefig(outfile, bbox_inches='tight', dpi=500)
