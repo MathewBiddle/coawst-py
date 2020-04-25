@@ -176,7 +176,7 @@ cbar.set_label('significant wave height %s ($m$)' % date)
 cbar_axb = fig.add_axes([0.125, 0.09, 0.675, 0.02])
 cbarb = fig.colorbar(cax0, cax=cbar_axb, orientation='horizontal')
 #cbar = fig.colorbar(cax, cax=cbar_ax)
-cbarb.set_label('mud mass diff ($kg$ $m^{-2}$)')
+cbarb.set_label('$\\Delta m_{f}$ ($kg$ $m^{-2}$)') # change in mud mass
 cbarb.add_lines(contour0)
 #m.colorbar(cax)
 #plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
@@ -185,7 +185,7 @@ cbarb.add_lines(contour0)
 
 
 
-#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/significant_wave_height_maps/'
+writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/significant_wave_height_maps/'
 writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
 image_name = 'Fig_6.png'
 #image_name = '%s_map.png' % datetime_list
