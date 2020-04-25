@@ -118,7 +118,7 @@ def get_time_periods():
     import datetime
     times = dict()
     fmt = '%Y-%m-%d'
-    times['typical'] = [datetime.datetime.strptime('2011-08-01',fmt), datetime.datetime.strptime('2011-08-06',fmt)]
+    times['Typical'] = [datetime.datetime.strptime('2011-08-01',fmt), datetime.datetime.strptime('2011-08-06',fmt)]
     times['Irene'] = [datetime.datetime.strptime('2011-08-27',fmt), datetime.datetime.strptime('2011-08-30',fmt)]
     times['Lee'] = [datetime.datetime.strptime('2011-09-07',fmt), datetime.datetime.strptime('2011-09-16',fmt)]
     times['post-Lee'] = [datetime.datetime.strptime('2011-10-13',fmt), datetime.datetime.strptime('2011-10-24',fmt)]
