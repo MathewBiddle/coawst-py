@@ -1,7 +1,7 @@
 '''
 Biddle et al 2020 manuscript Figure 6:
 Caption:
-Spatial distribution of the mud mass difference (top and bottom two panels) (kg/m2) between the final and
+Spatial distribution of the mud mass difference (bottom two panels) (kg/m2) between the final and
 initial mass in the bed layer sum over the time period associated with the Irene event, under vegetative
 (left) and non-vegetative (right) conditions. Coloring indicates removal of mass (blues and greens) and
 addition of mass (reds) over the time period. A dashed line is included in both panels to indicate the
