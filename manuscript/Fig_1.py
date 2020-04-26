@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
+'''
 Biddle et al 2020 manuscript Figure 1:
 Caption:
 Map of study region with points denoting the locations of USGS Conowingo Dam discharge observations (C),
@@ -11,7 +10,7 @@ the NOAA NOS MLLW bathymetry, in meters, scaling from shallow water (yellow) to 
 initialization. The vegetation patch supplied to the model is the grey shaded region. Model grid included...
 
 @author: Mathew Biddle
-"""
+'''
 
 import os
 os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"

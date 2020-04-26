@@ -1,8 +1,8 @@
 '''
-Biddle et al 2020 manuscript Figure 6:
+Biddle et al 2020 manuscript Figure 10:
 Caption:
 Spatial distribution of the mud mass difference (bottom two panels) (kg/m2) between the final and
-initial mass in the bed layer sum over the time period associated with the Irene event, under vegetative
+initial mass in the bed layer sum over the time period associated with the Post-Lee event, under vegetative
 (left) and non-vegetative (right) conditions. Coloring indicates removal of mass (blues and greens) and
 addition of mass (reds) over the time period. A dashed line is included in both panels to indicate the
 delineation between removal and addition of mass. Bottom two panels are the spatial distribution of
@@ -24,12 +24,12 @@ import coawstpy
 import datetime
 
 runs = ['veg','noveg']
-event = 'Irene'
+event = 'post-Lee'
 point_data = coawstpy.get_point_data('veg')
 times = coawstpy.get_time_periods()
 transects = coawstpy.get_transect_indexes()
-date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
-#date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
+#date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
+date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
 #locs = coawstpy.get_point_locations()
 u = point_data['CBIBS'].loc[date,'X-Windv']
 v = point_data['CBIBS'].loc[date,'Y-Windv']
@@ -186,8 +186,7 @@ cbarb.add_lines(contour0)
 
 
 writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_6.png'
-#image_name = '%s_map.png' % datetime_list
+image_name = 'Fig_10.png'
 outfile = writedir+image_name
 print("Saving image to %s" % outfile)
 plt.savefig(outfile, bbox_inches='tight', dpi=500)
