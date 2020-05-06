@@ -121,13 +121,16 @@ plt.text(xc-1500,yc-500, 'C', fontdict=dict(size=5))
 # Make the plot fancy for manuscript
 
 # labels = [left,right,top,bottom]
-parallels = np.arange(lat_min.get_values(),lat_max.get_values(),0.1)
-m.drawparallels(parallels,labels=[True,False,True,False],fmt='%4.2f', fontdict=dict(size=5),linewidth=0.2,
-                dashes=[1, 10])
-meridians = np.arange(lon_min.get_values(),lon_max.get_values(),0.1)
-m.drawmeridians(meridians,labels=[True,False,False,True],fmt='%4.2f', fontdict=dict(size=5),linewidth=0.2,
-                dashes=[1, 10])
+#parallels = np.arange(lat_min.get_values(),lat_max.get_values(),0.1)
+parallels = np.linspace(lat_min.get_values(),lat_max.get_values()-0.001,6).flatten()
+m.drawparallels(parallels,labels=[True,False,True,True],fmt='%4.2f', fontdict=dict(size=5),linewidth=0.5,
+                dashes=[4, 900])
+#meridians = np.arange(lon_min.get_values(),lon_max.get_values(),0.1)
+meridians = np.linspace(lon_min,lon_max,4).flatten()
+m.drawmeridians(meridians,labels=[True,False,False,True],fmt='%4.2f', fontdict=dict(size=5),linewidth=0.5,
+                dashes=[4, 900])
 
+#m.ax.set_xticks([0,1,2])
 # scale
 m.drawmapscale(lon=lon_max.get_values()-0.05, lat=lat_min.get_values()+0.02,
                lon0=lon_max.get_values(), lat0=lat_min.get_values(),
