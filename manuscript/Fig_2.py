@@ -118,7 +118,7 @@ ax[0].text('2011-10-30 12:00',-0.050,'S',fontsize=10,color='grey')
 ax[0].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
 ax[0].set_xlim(xlim)
-ax[0].set_ylabel('$U_{10}$')
+ax[0].set_ylabel('$U_{10}$ (m $s^{-1}$)')
 
 # river discharge
 ax[1].plot_date(river_datetime_list,
