@@ -1,14 +1,16 @@
 '''
 Biddle et al 2020 manuscript Figure 6:
 Caption:
-Spatial distribution of the mud mass difference (bottom two panels) (kg/m2) between the final and
+Top two panels are the spatial distribution of significant wave heights (m), smaller (blue) to larger (yellow),
+during peak winds in Irene, on 29 August 2011 at 13:00, under vegetative (left) and non-vegetative (right) conditions.
+On each panel an arrow is included to indicate wind direction and speed at the specified time. The scale bar for
+these panels ranges from 0 (purple) to 0.5 (yellow) m.
+
+Bottom two panels are the spatial distribution of the mud mass difference (delta m_f kg/m2) between the final and
 initial mass in the bed layer sum over the time period associated with the Irene event, under vegetative
 (left) and non-vegetative (right) conditions. Coloring indicates removal of mass (blues and greens) and
 addition of mass (reds) over the time period. A dashed line is included in both panels to indicate the
-delineation between removal and addition of mass. Bottom two panels are the spatial distribution of
-significant wave heights (m), smaller (blue) to larger (yellow), during peak winds in Irene, on 29 August
-2011 at 13:00, under vegetative (left) and non-vegetative (right) conditions. On each panel an arrow is
-included to indicate wind direction and speed at the specified time
+delineation between removal and addition of mass. The scale bar for these panels ranges from -1 (blue) to 0.6 (red) kg m^-2.
 
 @author: Mathew Biddle
 '''
