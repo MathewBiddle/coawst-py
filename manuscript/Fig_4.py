@@ -1,8 +1,10 @@
 '''
 Biddle et al 2020 manuscript Figure 4:
 Caption:
-Comparison of (a) significant wave height (Hs) and (b) peak wave period (Tp) for (c) observed winds (U10) from
-the tripod platform (grey dots) and SWAN model predictions for the same location (black line).
+Comparison of observed (b) significant wave height (Hs) and (c) peak wave period (Tp) for (a) observed winds as exported
+from SWAN at (U10) every 30 mins from the tripod platform (grey dots) and SWAN model predictions for the same location
+(black line). In panel (a) the N indicates winds going to the Sorth, where S indicates winds going towards
+the South.
 
 @author: Mathew Biddle
 '''
@@ -76,7 +78,7 @@ ax[2].set_ylim(0, 6)
 ax[2].set_ylabel('$T_p$ ($s$)')
 
 q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[0])
-ax[0].set_ylabel('$U_{10}$')
+ax[0].set_ylabel('$U_{10}$ (m $s^{-1}$)')
 ref = 10
 ax[0].quiverkey(q, 0.06, 0.15, ref,
                   "%s m $s^{-1}$" % ref,
@@ -85,9 +87,11 @@ ax[0].text('2013-07-14 20:00',0.043,'N',fontsize=12,color='grey')
 ax[0].text('2013-07-14 20:00',-0.050,'S',fontsize=12,color='grey')
 
 # add letting for panels
-ax[0].text(datetime.datetime(2013,7,5,3,00),0.037,'a',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
-ax[1].text(datetime.datetime(2013,7,5,3,00),0.32,'b',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
-ax[2].text(datetime.datetime(2013,7,5,3,00),5,'c',fontdict=dict(weight="bold"),bbox=dict(fc="none",lw=2))
+ax[0].text(datetime.datetime(2013,7,5,3,00),0.037,'a',fontdict=dict(size=18))
+ax[1].text(datetime.datetime(2013,7,5,3,00),0.32,'b',fontdict=dict(size=18))
+ax[2].text(datetime.datetime(2013,7,5,3,00),5,'c',fontdict=dict(size=18))
+
+ax[2].set_xlabel('day in July 2013')
 
 ax[2].set_xlim([SWAN_df['Time'].min(),SWAN_df['Time'].max()])
 myFmt = mdates.DateFormatter('%d') # here you can format your datetick labels as desired
