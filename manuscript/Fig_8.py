@@ -7,7 +7,8 @@ with velocity vectors, to indicate direction, during the peak discharge event fr
 distribution of the elevation difference (cm) between the final and initial bed thickness over the Lee time period,
 under vegetative (left) and non-vegetative (right) conditions. Coloring indicates removal of elevation (blues) and
 addition of elevation (reds) over the time period. A dashed line at zero is included in both panels to indicate the
-delineation between removal and addition of elevation.
+delineation between removal and addition of elevation. A black dot is included in the map to indicate the location of
+station FLT.
 
 @author: Mathew Biddle
 '''
@@ -28,7 +29,10 @@ event = 'Lee'
 #date = datetime.datetime(2011, 8, 2, 21, 0) # typical
 date = datetime.datetime(2011, 9, 9, 4, 12)  # Lee
 #date = datetime.datetime(2011, 10, 21, 0, 0) # post-Lee
-#locs = coawstpy.get_point_locations()
+locs = coawstpy.get_point_locations()
+flt_lon = locs.loc[locs['Site'] == 'FLT', 'lon'].values
+flt_lat = locs.loc[locs['Site'] == 'FLT', 'lat'].values
+
 times = coawstpy.get_time_periods()
 
 #init figure
@@ -96,12 +100,21 @@ for run in runs:
     m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
         resolution='i', projection='merc', ax=ax[0,i])
 
-    # pcolor variable of interest
+#     # pcolor variable of interest
     caxm = m.pcolormesh(lon, lat, curr_mag, latlon=True, ax=ax[0,i],vmin=0,vmax=2.5, cmap='gist_ncar')
-    #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
-#                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
+#     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
+# #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
     m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], latlon=True, ax=ax[0,i],
-             pivot='tail', headaxislength=3, width=0.003)
+             pivot='tail', headaxislength=4, headwidth=4, width=0.002)
+
+    ## testing unit vector
+    # caxm = m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], np.sqrt(ubarm[::3]**2+vbarm[::3]**2),
+    #                 latlon=True, ax=ax[0, i], clim=(0, 2.5), pivot='tail', cmap='gist_ncar',
+    #                 angles='xy', scale_units='xy', scale=1,
+    #                 width=0.01, headwidth=1, headlength=10, minshaft=5)
+
+    # add FLT point
+    m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[0, i])
 
     #contour = m.contour(lon, lat, data_diff, 0,
     #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
@@ -151,6 +164,9 @@ for run in runs:
                        vmin=-10, vmax=10, cmap='jet', ax=ax[1,i])
     contour = m.contour(lon, lat, data_diff, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
+
+    #add FLT point
+    m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[1, i])
 
     i+=1
 fig.subplots_adjust(right=0.8)
