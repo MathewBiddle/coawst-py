@@ -156,7 +156,7 @@ q = coawstpy.stick_plot(ptsdf['Time'],ptsdf['X-Windv'],ptsdf['Y-Windv'], ax=ax[0
 ax[0].xaxis.set_major_locator(months)
 #ax[2].xaxis.set_major_formatter(myFmt)
 ax[0].set_xlim(xlim)
-ax[0].set_ylabel('$U_{10}$',labelpad=20)
+ax[0].set_ylabel('$U_{10}$ (m $s^{-1}$)',labelpad=20)
 ref = 10
 qk = ax[0].quiverkey(q, 0.05, 0.1, ref,
                   "%s m $s^{-1}$" % ref,
@@ -215,8 +215,8 @@ ax[0].text('2011-07-21',0.035,'a',fontsize=18)
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_11.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# image_name = 'Fig_11.png'
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+# plt.savefig(outfile, bbox_inches='tight', dpi=500)
