@@ -5,7 +5,8 @@ Spatial distribution of the mud mass difference (top two panels) and sand mass d
 panels) between the final and initial mass in the bed layer sum over the time period associated with the Lee
 event, under vegetative (left) and non-vegetative (right) conditions. Coloring indicates removal of mass (blues and
 greens) and addition of mass (reds) over the time period. A dashed line is included in all panels to indicate the
-delineation between removal and addition of mass.
+delineation between removal and addition of mass. A black dot is included in the map to indicate the location of
+station FLT.
 
 @author: Mathew Biddle
 '''
@@ -25,6 +26,9 @@ event = 'Lee'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
 #locs = coawstpy.get_point_locations()
+locs = coawstpy.get_point_locations()
+flt_lon = locs.loc[locs['Site'] == 'FLT', 'lon'].values
+flt_lat = locs.loc[locs['Site'] == 'FLT', 'lat'].values
 
 fig, (ax) = plt.subplots(nrows=2, ncols=2,sharex=True, sharey=True, figsize=(12, 10))
 i=0
@@ -143,6 +147,8 @@ for run in runs:
     # cbar0.add_lines(contour0)
     # cbar0.set_label('mud mass diff [kg/m2]')
     ax[0,i].set_title('%s' % (run))
+    m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[0, i])
+
     #i+=1
     # set up map
     m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
@@ -162,6 +168,8 @@ for run in runs:
     # cbar1.add_lines(contour1)
     # cbar1.set_label('sand mass diff [kg/m$^{2}$]')
     ax[1,i].set_title('%s' % (run))
+    m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[1, i])
+
     #plt.suptitle('%s %s mass evolution' % (event, run))
     i+=1
     ## print out some values
