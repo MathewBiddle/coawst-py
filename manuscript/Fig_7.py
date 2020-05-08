@@ -96,7 +96,7 @@ for site in point_data_veg:
 #ax[5].get_yaxis().get_major_formatter().set_useOffset(False)
 
 # add critical shear stress line
-ax[4].plot_date(point_data_veg[site][vars2plot][start:end].index,np.ones(end-start)*0.049,':',linewidth=0.5,c='black')
+ax[5].plot_date(point_data_veg[site][vars2plot][start:end].index,np.ones(end-start)*0.049,':',linewidth=0.5,c='black')
 # squash all x-axis together
 plt.subplots_adjust(hspace=0.2)
 #ax[10].tick_params(axis='x', rotation=45, labelright=True)
