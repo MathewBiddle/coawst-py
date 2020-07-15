@@ -1,5 +1,6 @@
 name: coawst
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - asn1crypto=0.24.0=py37_0
@@ -8,9 +9,9 @@ dependencies:
   - basemap-data-hires=1.2.0=0
   - blas=1.0=mkl
   - bzip2=1.0.6=h1de35cc_5
-  - ca-certificates=2019.5.15=0
+  - ca-certificates=2019.8.28=0
   - cairo=1.14.12=hc4e6be7_4
-  - certifi=2019.6.16=py37_0
+  - certifi=2019.9.11=py37_0
   - cffi=1.12.3=py37hb5b8e2f_0
   - cftime=1.0.3.4=py37h1d22016_0
   - chardet=3.0.4=py37_1
@@ -67,7 +68,7 @@ dependencies:
   - lxml=4.3.3=py37hef8c89e_0
   - mapclassify=2.0.1=py_0
   - markupsafe=1.1.1=py37h1de35cc_0
-  - matplotlib=3.0.3=py37h54f8f79_0
+  - matplotlib=3.1.1=py37h54f8f79_0
   - mkl=2019.3=199
   - mkl_fft=1.0.12=py37h5e564d8_0
   - mkl_random=1.0.2=py37h27c97d8_0
@@ -77,7 +78,7 @@ dependencies:
   - numpy=1.16.3=py37hacdab7b_0
   - numpy-base=1.16.3=py37h6575580_0
   - openjpeg=2.3.0=hb95cd4c_1
-  - openssl=1.0.2s=h1de35cc_0
+  - openssl=1.0.2t=h1de35cc_1
   - pandas=0.24.2=py37h0a44026_0
   - pandas-datareader=0.7.0=py37_0
   - pandas-profiling=1.4.1=py37_0
@@ -115,6 +116,7 @@ dependencies:
   - zlib=1.2.11=h1de35cc_3
   - zstd=1.3.7=h5bba6e5_0
   - pip:
+    - pytides==0.0.4
     - scipy==1.3.0
-prefix: /anaconda3/envs/coawst
+prefix: /Users/mbiddle/anaconda3/envs/coawst
 
