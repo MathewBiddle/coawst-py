@@ -13,7 +13,7 @@ initialization. The vegetation patch supplied to the model is the grey shaded re
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
+#os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -38,10 +38,13 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
 # add background
 m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000)
 
-direct = \
-'/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+mount_point = 'Z:\matt_backups' # windows mapping of external drive
+#mount_point = '/Users/mbiddle' # local on mac machine
 
-inputfile = direct+'/upper_ches_his.nc'
+direct = \
+'\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111101_final'
+
+inputfile = mount_point + direct+'\\upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]
@@ -140,4 +143,4 @@ plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations_CBOFS_conowingo.png'
 outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_1.png'
-plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
