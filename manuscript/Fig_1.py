@@ -38,13 +38,14 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
 # add background
 m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000)
 
-mount_point = 'Z:\matt_backups' # windows mapping of external drive
+#mount_point = 'Z:\matt_backups' # windows mapping of external drive
 #mount_point = '/Users/mbiddle' # local on mac machine
+#root = '\matt_backups\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111102_final'
 
-direct = \
-'\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111101_final'
+#'\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111101_final'
 
-inputfile = mount_point + direct+'\\upper_ches_his.nc'
+#inputfile = direct+'\\upper_ches_his.nc'
+inputfile = coawstpy.get_file_paths()['veg']
 f = netCDF4.Dataset(inputfile, 'r')
 lon = f.variables['lon_rho'][:][:]
 lat = f.variables['lat_rho'][:][:]

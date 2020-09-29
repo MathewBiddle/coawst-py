@@ -15,11 +15,33 @@ import matplotlib.pyplot as plt
 import coawstpy
 import matplotlib.dates as mdates
 import numpy as np
+import os
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+
+# root = '/Documents/BCO-DMO/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#
+# machine = os.environ['USERDOMAIN']
+# if machine == 'MATT-LENOVO':
+#     dir = 'Z:\matt_backups' + root.replace('/', '\\')
+#     inputfile = dir + '\\upper_ches_his.nc'
+#     river_frc = dir + '\\river_frc.nc'
+#     ptsfile = dir + '\\tripod_wave.pts'
+#     bry_file = dir + '\\upper_ches_bry.nc'
+# elif machine == 'Matt-Mac':
+#     dir = '/Users/mbiddle/' + root.replace('\\', '/')
+#     inputfile = dir + '/upper_ches_his.nc'
+#     river_frc = dir + '/river_frc.nc'
+#     ptsfile = dir + '/tripod_wave.pts'
+#     bry_file = dir + '/upper_ches_bry.nc'
+
+inputfile = coawstpy.get_file_paths()['veg']
+river_frc = coawstpy.get_file_paths()['river_frc']
+ptsfile = coawstpy.get_file_paths()['tripod_pts']
+bry_file = coawstpy.get_file_paths()['bry_file']
 
 # Get SSC data
-inputfile = dir + '/upper_ches_his.nc'
+#inputfile = dir + '/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
 print("Retrieving %s" % (inputfile.split("/")[-1]))
 ocean_time = f.variables['ocean_time'][:]
@@ -49,7 +71,7 @@ for site in locs['Site']:
 
 ## river data
 print("Reading river data...")
-river_frc = dir+'/river_frc.nc'
+#river_frc = dir+'/river_frc.nc'
 f_river = netCDF4.Dataset(river_frc, 'r')
 river_time = f_river.variables['river_time'][:]
 river_transport = f_river.variables['river_transport'][:, 0]
@@ -60,7 +82,7 @@ for sec in river_time:
 
 ## wind data
 print("Reading wind data...")
-ptsfile = dir+"/tripod_wave.pts"
+#ptsfile = dir+"/tripod_wave.pts"
 ptsdf = pd.read_fwf(ptsfile, header=4)
 ptsdf.drop([0,1],axis=0,inplace=True)
 ptsdf.rename(columns={'%       Time':'Time'},inplace=True)
@@ -74,7 +96,7 @@ ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
 
 ## tide data
 print("Reading tide data...")
-bry_file = dir + '/upper_ches_bry.nc'
+#bry_file = dir + '/upper_ches_bry.nc'
 f_bry = netCDF4.Dataset(bry_file, 'r')
 bry_time = f_bry.variables['zeta_time'][:]
 bry_zeta = f_bry.variables['zeta_south'][:, 50]
@@ -173,5 +195,5 @@ ax[0].text('2011-10-14',0.045,'post-Lee')
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Irene_post-Lee.png'
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_2.png'
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_2.png'
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)

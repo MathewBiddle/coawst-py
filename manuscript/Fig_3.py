@@ -160,8 +160,8 @@ ax2.legend(bbox_to_anchor=(1.1, 1), loc='upper left', borderaxespad=0.)
 #cb.ax.set_yticklabels(df.loc['2011-08-01':'2011-09-09'].index)
 #cb = fig.colorbar(smap,format=DateFormatter('%d %b %y'))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_3.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# image_name = 'Fig_3.png'
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)

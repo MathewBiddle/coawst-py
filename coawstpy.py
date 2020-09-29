@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import pandas as pd
 import netCDF4
+import os
 
 
 def stick_plot(time, u, v, **kw):
@@ -359,3 +360,23 @@ def get_point_data(run):
         # f.variables[var2plot[i]][:, z_pt, x, y]
     return point_data
 
+# Z:\matt_backups\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111101_final
+def get_file_paths():
+    machine = os.environ['USERDOMAIN']
+    base = '/matt_backups/Documents/BCO-DMO/Graduate_School/Thesis/COAWST'
+    files = {
+        'veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/upper_ches_his.nc',
+        'noveg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg/upper_ches_his.nc',
+        'river_frc': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/river_frc.nc',
+        'tripod_pts': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/tripod_wave.pts',
+        'bry_file': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/upper_ches_bry.nc'
+    }
+
+    if machine == 'MATT-LENOVO':
+        for key in files:
+            files[key] = 'Z:' + files[key].replace('/', '\\')
+        # direct = 'Z:' + root
+    #elif machine == 'Matt-Mac':
+        # direct =
+        #inputfile = coawstpy.get_file_paths()['veg']
+    return files
