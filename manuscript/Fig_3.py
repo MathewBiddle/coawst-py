@@ -22,15 +22,17 @@ import pandas as pd
 from scipy import stats
 
 # bring in the data
-run = 'veg'
+# run = 'veg'
+#
+# if run == 'noveg':
+#     dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
+# else:
+#     dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 
-if run == 'noveg':
-    dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg'
-else:
-    dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
 
-
-inputfile = dir+'/upper_ches_his.nc'
+#inputfile = dir+'/upper_ches_his.nc'
+inputfile = coawstpy.get_file_paths()['veg']
+print("Reading history file %s..." % inputfile)
 f = netCDF4.Dataset(inputfile, 'r')
 ocean_time = f.variables['ocean_time'][:]
 lat = f.variables['lat_rho'][:]
@@ -41,7 +43,9 @@ for sec in ocean_time:
     datetime_list.append(netCDF4.num2date(sec, units=f.variables['ocean_time'].units, calendar=f.variables['ocean_time'].calendar))
 
 ## Raw CBIBS data
-CBIBS_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc'
+CBIBS_file = coawstpy.get_file_paths()['cbibs']
+print("Reading CBIBS file %s" % CBIBS_file)
+#CBIBS_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc'
 fcbibs = netCDF4.Dataset(CBIBS_file, 'r')
 cbibs_lon = -76.0736
 cbibs_lat = 39.5404
@@ -67,7 +71,10 @@ vbar = f.variables['vbar_northward'][:, x, y]
 mag_vel = np.sqrt(ubar**2 + vbar**2)
 
 # load subset CBIBS data
-df = pd.read_csv(dir+'/mid_water_currents.csv', index_col=0, parse_dates=True)
+mid_water_current = coawstpy.get_file_paths()['mid_wtr_current_veg']
+print("Reading mid-water currents %s" % mid_water_current)
+#df = pd.read_csv(dir+'/mid_water_currents.csv', index_col=0, parse_dates=True)
+df = pd.read_csv(mid_water_current, index_col=0, parse_dates=True)
 
 start_date = '2011-08-01'
 end_date = '2011-10-31'
@@ -81,6 +88,7 @@ end_date_2 = '2011-09-20'
 start_date_3 = '2011-09-20'
 end_date_3 = '2011-10-31'
 
+print('Generating figues...')
 #fig, ((ax),(ax2,ax3)) = plt.subplots(nrows=2, ncols=2, figsize=(10, 5))
 plt.figure(figsize=(12, 8))
 ax1 = plt.subplot(211)
@@ -165,3 +173,5 @@ ax2.legend(bbox_to_anchor=(1.1, 1), loc='upper left', borderaxespad=0.)
 # outfile = writedir+image_name
 # print("Saving image to %s" % outfile)
 #plt.savefig(outfile, bbox_inches='tight', dpi=500)
+
+print("Done")

@@ -18,9 +18,11 @@ import datetime
 
 # Get pts file
 #ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/SWAN_20130705_20130715_FRICTION_NOVEG_30SEC_KOMAN_pt4+Bathy'
-ptsfile = ptsdir+"/tripod_wave.pts"
+# ptsdir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/SWAN_20130705_20130715_FRICTION_NOVEG_30SEC_KOMAN_pt4+Bathy'
+# ptsfile = ptsdir+"/tripod_wave.pts"
+ptsfile = coawstpy.get_file_paths()['ptsfile']
 
+print("Reading SWAN pts file %s" % ptsfile)
 SWAN_df = pd.read_fwf(ptsfile, header=4)#,widths=[18,16,16,16,16,16,16,16,16])#,skiprows=range(0,5))
 
 SWAN_df.drop([0,1],axis=0,inplace=True)
@@ -36,9 +38,10 @@ SWAN_df['X-Windv']=SWAN_df['X-Windv'].astype(float)
 SWAN_df['Y-Windv']=SWAN_df['Y-Windv'].astype(float)
 
 # Get observational data
-obs_file = str('/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/'
-               'Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat')
-
+#obs_file = str('/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/'
+#               'Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat')
+obs_file = coawstpy.get_file_paths()['sftripod']
+print("Reading tripod data %s" % obs_file)
 obs_data = sio.loadmat(obs_file, struct_as_record=False, squeeze_me=True)
 
 obs_df = pd.DataFrame(columns=obs_data['DWV']._fieldnames)
@@ -60,7 +63,7 @@ obs_df['mtime']=obs_df['mtime'].dt.tz_localize('US/Eastern')# obs_data['DWV'].me
 
 
 #obs_df.plot(kind='line', x='mtime', y=['Hsig', 'Tp'])
-
+print("Generating figures...")
 fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 6))
 ax[1].plot_date(obs_df['mtime'], obs_df['Hsig'], label='Observed', xdate=True, linestyle='', linewidth=0.5, c='grey',
                      marker='.', markersize=3)
@@ -103,5 +106,7 @@ plt.gca().xaxis.set_major_formatter(myFmt)
 #triplat = float(triplat.split(" ")[0])+(float(triplat.split(" ")[1])/60)
 #plt.suptitle("Tripod @ %.4f %.3f\nSWAN  @ %s %s" % (triplat, triplon, SWAN_df['Yp'].unique()[0],SWAN_df['Xp'].unique()[0]))
 #plt.subplots_adjust(hspace=0.05)
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_4.png'
-plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_4.png'
+#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+print("Done")

@@ -10,8 +10,8 @@ stress of 0.049 N/m2.
 @author: Mathew Biddle
 '''
 
-import os
-os.environ["PROJ_LIB"] = "/User/mbiddle/anaconda3/envs/coawst/share/proj/"
+#import os
+#os.environ["PROJ_LIB"] = "/User/mbiddle/anaconda3/envs/coawst/share/proj/"
 import coawstpy
 import matplotlib.pyplot as plt
 #import matplotlib
@@ -19,8 +19,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-run = 'veg'
-point_data_veg = coawstpy.get_point_data(run)
+#run = 'veg'
+print("Collecting data...")
+point_data_veg = coawstpy.get_point_data('veg')
 point_data_noveg = coawstpy.get_point_data('noveg')
 times = coawstpy.get_time_periods()
 #vars2plot = ['Pwave_Top', 'Hwave', 'mud_bar', 'sand_bar',
@@ -110,8 +111,10 @@ plt.subplots_adjust(hspace=0.2)
 #        point_data[site][vars2plot][start:end].plot()
 #        plt.suptitle('%s %s' % (event, site))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_5.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# image_name = 'Fig_5.png'
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+# plt.savefig(outfile, bbox_inches='tight', dpi=500)
+
+print("Done.")

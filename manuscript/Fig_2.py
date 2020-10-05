@@ -36,14 +36,14 @@ import os
 #     bry_file = dir + '/upper_ches_bry.nc'
 
 inputfile = coawstpy.get_file_paths()['veg']
-river_frc = coawstpy.get_file_paths()['river_frc']
-ptsfile = coawstpy.get_file_paths()['tripod_pts']
-bry_file = coawstpy.get_file_paths()['bry_file']
+river_frc = coawstpy.get_file_paths()['river_frc_veg']
+ptsfile = coawstpy.get_file_paths()['tripod_pts_veg']
+bry_file = coawstpy.get_file_paths()['bry_file_veg']
 
 # Get SSC data
 #inputfile = dir + '/upper_ches_his.nc'
 f = netCDF4.Dataset(inputfile, 'r')
-print("Retrieving %s" % (inputfile.split("/")[-1]))
+print("Retrieving his data from %s" % inputfile)
 ocean_time = f.variables['ocean_time'][:]
 datetime_list = []
 for sec in ocean_time:
@@ -70,7 +70,7 @@ for site in locs['Site']:
 
 
 ## river data
-print("Reading river data...")
+print("Reading river data from %s..." % river_frc)
 #river_frc = dir+'/river_frc.nc'
 f_river = netCDF4.Dataset(river_frc, 'r')
 river_time = f_river.variables['river_time'][:]
@@ -81,7 +81,7 @@ for sec in river_time:
         netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
 
 ## wind data
-print("Reading wind data...")
+print("Reading wind data from %s..." % ptsfile)
 #ptsfile = dir+"/tripod_wave.pts"
 ptsdf = pd.read_fwf(ptsfile, header=4)
 ptsdf.drop([0,1],axis=0,inplace=True)
@@ -95,7 +95,7 @@ ptsdf['X-Windv']=ptsdf['X-Windv'].astype(float)
 ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
 
 ## tide data
-print("Reading tide data...")
+print("Reading tide data from %s..." % bry_file)
 #bry_file = dir + '/upper_ches_bry.nc'
 f_bry = netCDF4.Dataset(bry_file, 'r')
 bry_time = f_bry.variables['zeta_time'][:]
