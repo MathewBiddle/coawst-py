@@ -282,7 +282,7 @@ def get_point_data(run):
 
     #inputfile = direct + '/upper_ches_his.nc'
     f = netCDF4.Dataset(inputfile, 'r')
-    print("Retrieving %s %s" % (inputfile.split("/")[-1],run))
+    print("Retrieving %s" % inputfile)
     ocean_time = f.variables['ocean_time'][:]
     lat = f.variables['lat_rho'][:]
     lon = f.variables['lon_rho'][:]
@@ -301,6 +301,7 @@ def get_point_data(run):
                                  only_use_cftime_datetimes=False))
 
     #river_frc = direct + '/river_frc.nc'
+    print('Retrieving %s' % river_frc)
     f_river = netCDF4.Dataset(river_frc, 'r')
     river_time = f_river.variables['river_time'][54120:353761:120]
     river_transport = (f_river.variables['river_transport'][54120:353761:120, 0] + (
@@ -309,7 +310,11 @@ def get_point_data(run):
     river_datetime_list = []
     for sec in river_time:
         river_datetime_list.append(
-            netCDF4.num2date(sec, units=f_river.variables['river_time'].units, calendar='standard'))
+            netCDF4.num2date(sec,
+                             units=f_river.variables['river_time'].units,
+                             calendar='standard',
+                             only_use_cftime_datetimes=False)
+        )
 
     # initial_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[0])
     # final_riv_idx = coawstpy.nearest_ind(river_datetime_list,datetime_list[-1])+1 # have to add one for slicing to include last number
@@ -318,6 +323,7 @@ def get_point_data(run):
 
     # SWAN wind data
     #ptsfile = direct + "/tripod_wave.pts"
+    print('Retrieving %s' % ptsfile)
     ptsdf = pd.read_fwf(ptsfile, header=4)
     ptsdf.drop([0, 1], axis=0, inplace=True)
     ptsdf.rename(columns={'%       Time': 'Time'}, inplace=True)
@@ -379,6 +385,7 @@ def get_point_data(run):
         # f.variables[var2plot[i]][:, z_pt, x, y]
     return point_data
 
+
 # Z:\matt_backups\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111101_final
 def get_file_paths():
     machine = os.environ['USERDOMAIN']
@@ -407,3 +414,16 @@ def get_file_paths():
         # direct =
         #inputfile = coawstpy.get_file_paths()['veg']
     return files
+
+
+def skill_score(predicted, reference):
+    # from https://github.com/PeterRochford/SkillMetrics/blob/master/skill_metrics/skill_score_murphy.py
+    # Calculate the RMSE
+    rmse2 = np.sqrt(np.sum(np.square(predicted - reference)) / len(predicted))
+    # Calculate standard deviation
+    sdev2 = np.std(reference, ddof=1)**2
+
+    # Calculate skill score
+    ss = 1 - rmse2/sdev2
+
+    return ss
