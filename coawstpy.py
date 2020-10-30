@@ -410,7 +410,10 @@ def get_file_paths():
         for key in files:
             files[key] = 'Z:' + files[key].replace('/', '\\')
         # direct = 'Z:' + root
-    #elif machine == 'Matt-Mac':
+    elif machine == 'NOS':
+        for key in files:
+            files[key] = 'C:\\Users\\Mathew.Biddle\\Documents\\GitProjects\\Thesis_data' + \
+                         files[key].replace(base,'').replace('/', '\\')
         # direct =
         #inputfile = coawstpy.get_file_paths()['veg']
     return files

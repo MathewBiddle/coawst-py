@@ -36,7 +36,7 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
     resolution='i', projection='merc', lat_ts=locs.loc[locs['Site'] == '3', 'lat'], epsg=3395)
 
 # add background
-m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000)
+#m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000)
 
 #mount_point = 'Z:\matt_backups' # windows mapping of external drive
 #mount_point = '/Users/mbiddle' # local on mac machine
@@ -77,7 +77,7 @@ m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3,
 #plant_height_domain = np.delete(plant_height_domain, 100, 0)
 #m.contour(lon, lat, plant_height_domain, 0.305, colors='k', linewidths=.5, latlon=True, corner_mask=False)
 #m.pcolormesh(lon, lat, plant_height_orig, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
-
+m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
 ## Do mapping for points
 #lon=list(locs['lon'])
 #lat=list(locs['lat'])
@@ -126,7 +126,7 @@ plt.text(xc-1500,yc-500, 'C', fontdict=dict(size=5))
 
 # labels = [left,right,top,bottom]
 #parallels = np.arange(lat_min.get_values(),lat_max.get_values(),0.1)
-parallels = np.linspace(lat_min.get_values(),lat_max.get_values()-0.001,6).flatten()
+parallels = np.linspace(lat_min,lat_max-0.001,6).flatten()
 m.drawparallels(parallels,labels=[True,False,True,True],fmt='%4.2f', fontdict=dict(size=5),linewidth=0.5,
                 dashes=[4, 900])
 #meridians = np.arange(lon_min.get_values(),lon_max.get_values(),0.1)
@@ -136,12 +136,13 @@ m.drawmeridians(meridians,labels=[True,False,False,True],fmt='%4.2f', fontdict=d
 
 #m.ax.set_xticks([0,1,2])
 # scale
-m.drawmapscale(lon=lon_max.get_values()-0.05, lat=lat_min.get_values()+0.02,
-               lon0=lon_max.get_values(), lat0=lat_min.get_values(),
+m.drawmapscale(lon=lon_max.max()-0.05, lat=lat_min.min()+0.02,
+               lon0=lon_max.max(), lat0=lat_min.min(),
                units='km', length=5, yoffset=530, linewidth=0.2, fontsize=5, barstyle='simple')
 
 plt.title('Site locations and SAV distribution', fontdict=dict(size=5))
 
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/Site_locations_CBOFS_conowingo.png'
-outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_1.png'
-#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+#outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_1.png'
+outfile = 'Fig_1.png'
+plt.savefig(outfile, bbox_inches='tight', dpi = 500)
