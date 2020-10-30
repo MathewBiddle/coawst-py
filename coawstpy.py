@@ -181,7 +181,7 @@ def get_point_locations():
     return locs
 
 
-def get_sed_flux_data(run,transect_indexes):
+def get_sed_flux_data(run, transect_indexes):
     '''
     Computes the sediment flux across transects by computing the flux sum in South and East direction.
 
@@ -213,21 +213,21 @@ def get_sed_flux_data(run,transect_indexes):
     if run == 'noveg':
         #direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
         inputfile = get_file_paths()['noveg']
-        river_frc = get_file_paths()['river_frc_noveg']
-        ptsfile = get_file_paths()['tripod_pts_noveg']
+        # river_frc = get_file_paths()['river_frc']
+        # ptsfile = get_file_paths()['tripod_pts_noveg']
     elif run == 'veg':
         #direct = runs_dir + 'Full_20110719T23_20111101_final'
         inputfile = get_file_paths()['veg']
-        river_frc = get_file_paths()['river_frc_veg']
-        ptsfile = get_file_paths()['tripod_pts_veg']
+        # river_frc = get_file_paths()['river_frc']
+        # ptsfile = get_file_paths()['tripod_pts_veg']
     #inputfile = direct+'/upper_ches_avg.nc'
     print('Reading %s %s...' % (inputfile, run))
     f = netCDF4.Dataset(inputfile, 'r')
 
     # Get the data we want
     ocean_time = f.variables['ocean_time'][:]
-    lat = f.variables['lat_rho'][:]
-    lon = f.variables['lon_rho'][:]
+    # lat = f.variables['lat_rho'][:]
+    # lon = f.variables['lon_rho'][:]
     mask_rho = f.variables['mask_rho'][:]
 
     Huon = dict()
@@ -268,19 +268,14 @@ def get_sed_flux_data(run,transect_indexes):
 
 def get_point_data(run):
     # bring in the data
-    #runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    river_frc = get_file_paths()['river_frc']
     if run == 'noveg':
-        #direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
         inputfile = get_file_paths()['noveg']
-        river_frc = get_file_paths()['river_frc_noveg']
         ptsfile = get_file_paths()['tripod_pts_noveg']
     elif run == 'veg':
-        #direct = runs_dir + 'Full_20110719T23_20111101_final'
         inputfile = get_file_paths()['veg']
-        river_frc = get_file_paths()['river_frc_veg']
         ptsfile = get_file_paths()['tripod_pts_veg']
 
-    #inputfile = direct + '/upper_ches_his.nc'
     f = netCDF4.Dataset(inputfile, 'r')
     print("Retrieving %s" % inputfile)
     ocean_time = f.variables['ocean_time'][:]
@@ -300,7 +295,6 @@ def get_point_data(run):
                                  calendar=f.variables['ocean_time'].calendar,
                                  only_use_cftime_datetimes=False))
 
-    #river_frc = direct + '/river_frc.nc'
     print('Retrieving %s' % river_frc)
     f_river = netCDF4.Dataset(river_frc, 'r')
     river_time = f_river.variables['river_time'][54120:353761:120]
@@ -322,7 +316,6 @@ def get_point_data(run):
     # river_transport_subset = river_transport[: : 120]
 
     # SWAN wind data
-    #ptsfile = direct + "/tripod_wave.pts"
     print('Retrieving %s' % ptsfile)
     ptsdf = pd.read_fwf(ptsfile, header=4)
     ptsdf.drop([0, 1], axis=0, inplace=True)
@@ -392,15 +385,14 @@ def get_file_paths():
     base = '/matt_backups/Documents/BCO-DMO/Graduate_School/Thesis/COAWST'
     files = {
         'veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/upper_ches_his.nc',
-        'river_frc_veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/river_frc.nc',
         'tripod_pts_veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/tripod_wave.pts',
-        'bry_file_veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/upper_ches_bry.nc',
         'mid_wtr_current_veg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/mid_water_currents.csv',
 
         'noveg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg/upper_ches_his.nc',
-        'river_frc_noveg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg/river_frc.nc',
         'tripod_pts_noveg': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final_noveg/tripod_wave.pts',
-        
+
+        'bry_file': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/upper_ches_bry.nc',
+        'river_frc': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/river_frc.nc',
         'cbibs': base + '/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc',
         'ptsfile': base + '/COAWST_RUNS/COAWST_OUTPUT/SWAN_20130705_20130715_FRICTION_NOVEG_30SEC_KOMAN_pt4+Bathy/tripod_wave.pts',
         'sftripod': base + '/Initialization_data/Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat'

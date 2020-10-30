@@ -112,14 +112,15 @@ for run in runs:
                         cmap='gist_ncar')
 #     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 # #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
-    m.quiver(lon[::5], lat[::5], ubarm[::5], vbarm[::5],
+    m.quiver(lon[::5,::5], lat[::5,::5], ubarm[::5,::5], vbarm[::5,::5],
              latlon=True,
              ax=ax[0, i],
              pivot='mid',
+             units='inches')
              # headaxislength=4,
-             headwidth=6,
-             width=0.003)
-
+             #headwidth=4,
+             #width=0.005)
+    #m.quiver(lon,lat,ubarm,vbarm,latlon=True,ax=ax[0,i])
     ## testing unit vector
     # caxm = m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], np.sqrt(ubarm[::3]**2+vbarm[::3]**2),
     #                 latlon=True, ax=ax[0, i], clim=(0, 2.5), pivot='tail', cmap='gist_ncar',

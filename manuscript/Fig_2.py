@@ -36,9 +36,9 @@ import os
 #     bry_file = dir + '/upper_ches_bry.nc'
 
 inputfile = coawstpy.get_file_paths()['veg']
-river_frc = coawstpy.get_file_paths()['river_frc_veg']
+river_frc = coawstpy.get_file_paths()['river_frc']
 ptsfile = coawstpy.get_file_paths()['tripod_pts_veg']
-bry_file = coawstpy.get_file_paths()['bry_file_veg']
+bry_file = coawstpy.get_file_paths()['bry_file']
 
 # Get SSC data
 #inputfile = dir + '/upper_ches_his.nc'

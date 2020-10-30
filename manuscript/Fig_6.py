@@ -16,7 +16,7 @@ delineation between removal and addition of mass. The scale bar for these panels
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
+#os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -54,6 +54,7 @@ for run in runs:
     f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
+    h = f.variables['h'][:]
     ocean_time = f.variables['ocean_time'][:]
     plant_height = f.variables['mask_rho'][:]
 
@@ -103,7 +104,10 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[0,i])
 
     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[0,i],vmin=0,vmax=0.5)
+    caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[0,i],vmin=0,vmax=0.5,cmap='jet')
+
+    # add 3m isobath
+    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True, ax=ax[0, i])
     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -152,15 +156,18 @@ for run in runs:
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[1, i],
-                        vmin=-1, vmax=0.6)
+                        vmin=-1, vmax=1)
     # post-Lee and Irene vmin=-1,vmax=0.6)
     # Lee vmin=-4,vmax=4)
     # typical vmin=-0.35,vmax=0.15)
-    contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
-                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1, i])
+    # contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
+    #                      colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1, i])
     # cbar0 = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
     # cbar0.add_lines(contour0)
     # cbar0.set_label('mud mass diff [kg/m2]')
+    # add 3m isobath
+    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True, ax=ax[1, i])
+
     ax[1, i].set_title('%s' % (run))
 
     i+=1
@@ -182,7 +189,7 @@ cbar_axb = fig.add_axes([0.125, 0.09, 0.675, 0.02])
 cbarb = fig.colorbar(cax0, cax=cbar_axb, orientation='horizontal')
 #cbar = fig.colorbar(cax, cax=cbar_ax)
 cbarb.set_label('$\\Delta m_{f}$ ($kg$ $m^{-2}$)') # change in mud mass
-cbarb.add_lines(contour0)
+#cbarb.add_lines(contour0)
 #m.colorbar(cax)
 #plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
 
@@ -190,9 +197,9 @@ cbarb.add_lines(contour0)
 
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_6.png'
+#writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+image_name = 'Fig_6_revision.png'
 #image_name = '%s_map.png' % datetime_list
 #outfile = writedir+image_name
 #print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=500)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)
