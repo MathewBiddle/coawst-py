@@ -14,7 +14,7 @@ station FLT.
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
+#os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -23,6 +23,7 @@ import netCDF4
 import coawstpy
 import datetime
 
+files = coawstpy.get_file_paths()
 runs = ['veg','noveg']
 event = 'Lee'
 #point_data = coawstpy.get_point_data(run)
@@ -41,18 +42,20 @@ fig, ax = plt.subplots(ncols=2,nrows=2, figsize=(12, 10),sharey=True,sharex=True
 i=0
 for run in runs:
     print(run)
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
-
-    inputfile = direct + '/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+    # runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    # if run == 'noveg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    # elif run == 'veg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final'
+    #
+    # inputfile = direct + '/upper_ches_his.nc'
+    # f = netCDF4.Dataset(inputfile, 'r')
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
     ocean_time = f.variables['ocean_time'][:]
     plant_height = f.variables['mask_rho'][:]
+    h = f.variables['h'][:]
 
     # build Flats cell locations:
     # This does not include the transect cells themselves. Just all cells between T1 and T2, excluding South River.
@@ -101,11 +104,21 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[0,i])
 
 #     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, curr_mag, latlon=True, ax=ax[0,i],vmin=0,vmax=2.5, cmap='gist_ncar')
+    caxm = m.pcolormesh(lon, lat, curr_mag,
+                        latlon=True,
+                        ax=ax[0, i],
+                        vmin=0,
+                        vmax=2.5,
+                        cmap='gist_ncar')
 #     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 # #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
-    m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], latlon=True, ax=ax[0,i],
-             pivot='tail', headaxislength=4, headwidth=4, width=0.002)
+    m.quiver(lon[::5], lat[::5], ubarm[::5], vbarm[::5],
+             latlon=True,
+             ax=ax[0, i],
+             pivot='mid',
+             # headaxislength=4,
+             headwidth=6,
+             width=0.003)
 
     ## testing unit vector
     # caxm = m.quiver(lon[::3], lat[::3], ubarm[::3], vbarm[::3], np.sqrt(ubarm[::3]**2+vbarm[::3]**2),
@@ -116,6 +129,8 @@ for run in runs:
     # add FLT point
     m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[0, i])
 
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
     #contour = m.contour(lon, lat, data_diff, 0,
     #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
 
@@ -162,11 +177,13 @@ for run in runs:
     # pcolor variable of interest
     cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
                        vmin=-10, vmax=10, cmap='jet', ax=ax[1,i])
-    contour = m.contour(lon, lat, data_diff, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
+    #contour = m.contour(lon, lat, data_diff, 0,
+    #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
 
     #add FLT point
     m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[1, i])
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
 
     i+=1
 fig.subplots_adjust(right=0.8)
@@ -183,10 +200,10 @@ cbar_axb = fig.add_axes([0.125, 0.07, 0.675, 0.02])
 cbar = fig.colorbar(cax, cax=cbar_axb, orientation='horizontal')
 #cbar = fig.colorbar(cax, cax=cbar_ax)
 cbar.set_label('$\\Delta h_b$ ($cm$)')
-cbar.add_lines(contour)
+#cbar.add_lines(contour)
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
 image_name = 'Fig_8.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)
