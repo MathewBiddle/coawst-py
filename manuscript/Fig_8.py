@@ -116,7 +116,8 @@ for run in runs:
              latlon=True,
              ax=ax[0, i],
              pivot='mid',
-             units='inches')
+             units='inches',
+             width=0.015)
              # headaxislength=4,
              #headwidth=4,
              #width=0.005)
@@ -131,7 +132,7 @@ for run in runs:
     m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[0, i])
 
     # add channel contour
-    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True)
     #contour = m.contour(lon, lat, data_diff, 0,
     #                    colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
 
@@ -184,7 +185,7 @@ for run in runs:
     #add FLT point
     m.scatter(flt_lon, flt_lat, latlon=True, s=40, marker='.', color='k', edgecolors='k', linewidths=0.3, ax=ax[1, i])
     # add channel contour
-    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True)
 
     i+=1
 fig.subplots_adjust(right=0.8)

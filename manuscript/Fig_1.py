@@ -77,7 +77,7 @@ m.pcolormesh(lon, lat, plant_height, latlon=True, cmap='binary',vmin=0,vmax=0.3,
 #plant_height_domain = np.delete(plant_height_domain, 100, 0)
 #m.contour(lon, lat, plant_height_domain, 0.305, colors='k', linewidths=.5, latlon=True, corner_mask=False)
 #m.pcolormesh(lon, lat, plant_height_orig, latlon=True, cmap='binary',vmin=0,vmax=0.3, alpha=0.3,linewidth=0)
-m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True)
+m.contour(lon, lat, h, [3], linewidths=0.5, linestyles=':', colors='k', latlon=True)
 ## Do mapping for points
 #lon=list(locs['lon'])
 #lat=list(locs['lat'])

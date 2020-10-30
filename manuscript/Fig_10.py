@@ -14,7 +14,7 @@ included to indicate wind direction and speed at the specified time
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
+#os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -28,6 +28,7 @@ event = 'post-Lee'
 point_data = coawstpy.get_point_data('veg')
 times = coawstpy.get_time_periods()
 transects = coawstpy.get_transect_indexes()
+files = coawstpy.get_file_paths()
 #date = datetime.datetime(2011, 8, 28, 12, 59, 57) # Irene
 date = datetime.datetime(2011, 10, 20, 18, 59, 57) # Post-Lee
 #locs = coawstpy.get_point_locations()
@@ -39,18 +40,20 @@ i=0
 fig, ax = plt.subplots(ncols=2,nrows=2, figsize=(12, 10),sharey=True,sharex=True)
 
 for run in runs:
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
-
-    inputfile = direct + '/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+    # runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    # if run == 'noveg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    # elif run == 'veg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final'
+    #
+    # inputfile = direct + '/upper_ches_his.nc'
+    # f = netCDF4.Dataset(inputfile, 'r')
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
     ocean_time = f.variables['ocean_time'][:]
     plant_height = f.variables['mask_rho'][:]
+    h = f.variables['h'][:]
 
     # build Flats cell locations:
     # This does not include the transect cells themselves. Just all cells between T1 and T2, excluding South River.
@@ -98,7 +101,10 @@ for run in runs:
         resolution='i', projection='merc', ax=ax[0,i])
 
     # pcolor variable of interest
-    caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[0,i],vmin=0,vmax=0.5)
+    caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[0,i],vmin=0,vmax=0.5,cmap='jet')
+
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[0,i])
     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -147,12 +153,15 @@ for run in runs:
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[1, i],
-                        vmin=-1, vmax=0.6)
+                        vmin=-1, vmax=1)
+
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[1,i])
     # post-Lee and Irene vmin=-1,vmax=0.6)
     # Lee vmin=-4,vmax=4)
     # typical vmin=-0.35,vmax=0.15)
-    contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
-                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1, i])
+    # contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
+    #                      colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1, i])
     # cbar0 = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
     # cbar0.add_lines(contour0)
     # cbar0.set_label('mud mass diff [kg/m2]')
@@ -177,7 +186,7 @@ cbar_axb = fig.add_axes([0.125, 0.09, 0.675, 0.02])
 cbarb = fig.colorbar(cax0, cax=cbar_axb, orientation='horizontal')
 #cbar = fig.colorbar(cax, cax=cbar_ax)
 cbarb.set_label('$\\Delta m_{f}$ ($kg$ $m^{-2}$)') # change in mud mass
-cbarb.add_lines(contour0)
+# cbarb.add_lines(contour0)
 #m.colorbar(cax)
 #plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
 
@@ -185,8 +194,8 @@ cbarb.add_lines(contour0)
 
 
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
 image_name = 'Fig_10.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)

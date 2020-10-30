@@ -107,7 +107,7 @@ for run in runs:
     caxm = m.pcolormesh(lon, lat, Hwavem, latlon=True, ax=ax[0,i],vmin=0,vmax=0.5,cmap='jet')
 
     # add 3m isobath
-    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True, ax=ax[0, i])
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[0, i])
     #m.quiver(lon, lat, ubarm, vbarm, latlon=True, ax=ax[i])
 #                        vmin=-0.02,vmax=0.02,cmap='jet', ax=ax[i])
 
@@ -166,7 +166,7 @@ for run in runs:
     # cbar0.add_lines(contour0)
     # cbar0.set_label('mud mass diff [kg/m2]')
     # add 3m isobath
-    m.contour(lon, lat, h, [3], linewidths=.5, linestyles=':', colors='k', latlon=True, ax=ax[1, i])
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[1, i])
 
     ax[1, i].set_title('%s' % (run))
 

@@ -12,7 +12,7 @@ station FLT.
 '''
 
 import os
-os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
+#os.environ["PROJ_LIB"] = "/Users/mbiddle/anaconda3/envs/coawst/share/proj/"
 from mpl_toolkits.basemap import Basemap
 import matplotlib.pyplot as plt
 import coawstpy
@@ -25,6 +25,7 @@ runs = ['veg','noveg']
 event = 'Lee'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
+files = coawstpy.get_file_paths()
 #locs = coawstpy.get_point_locations()
 locs = coawstpy.get_point_locations()
 flt_lon = locs.loc[locs['Site'] == 'FLT', 'lon'].values
@@ -33,13 +34,13 @@ flt_lat = locs.loc[locs['Site'] == 'FLT', 'lat'].values
 fig, (ax) = plt.subplots(nrows=2, ncols=2,sharex=True, sharey=True, figsize=(12, 10))
 i=0
 for run in runs:
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
-    inputfile = direct+'/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+    # runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    # if run == 'noveg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    # elif run == 'veg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final'
+    # inputfile = direct+'/upper_ches_his.nc'
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:][:]
     lat = f.variables['lat_rho'][:][:]
     h = f.variables['h'][:] # at rho points
@@ -141,8 +142,11 @@ for run in runs:
                         # post-Lee and Irene vmin=-1,vmax=0.6)
                         # Lee vmin=-4,vmax=4)
                         # typical vmin=-0.35,vmax=0.15)
-    contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[0,i])
+    # contour0 = m.contour(lon, lat, mud_mass_diff_ma, 0,
+    #                     colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[0,i])
+
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[0,i])
     # cbar0 = m.colorbar(cax0, ax=ax[0, i], location='right', shrink=0.6)
     # cbar0.add_lines(contour0)
     # cbar0.set_label('mud mass diff [kg/m2]')
@@ -161,8 +165,11 @@ for run in runs:
                         # post-Lee and Irene vmin=-6, vmax=6)
                         # Lee vmin=-100,vmax=100)
                         # typical vmin=-1.5,vmax=0.5)
-    contour1 = m.contour(lon, lat, sand_mass_diff_ma, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
+    # contour1 = m.contour(lon, lat, sand_mass_diff_ma, 0,
+    #                     colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
+
+    # add channel contour
+    m.contour(lon, lat, h, [3], linewidths=1, linestyles=':', colors='k', latlon=True, ax=ax[1,i])
 
     # cbar1 = m.colorbar(cax1, ax=ax[1, i], location='right', shrink=0.6)
     # cbar1.add_lines(contour1)
@@ -190,15 +197,15 @@ fig.subplots_adjust(right=0.8)
 cbar_ax0 = fig.add_axes([0.125, 0.51, 0.675, 0.02])
 cbar0 = fig.colorbar(cax0, cax=cbar_ax0, orientation='horizontal', extend='max')
 cbar0.set_label('$\\Delta$ $m_f$ ($kg$ $m^{-2}$)')
-cbar0.add_lines(contour0)
+# cbar0.add_lines(contour0)
 
 cbar_ax1 = fig.add_axes([0.125, 0.07, 0.675, 0.02])
 cbar1 = fig.colorbar(cax1, cax=cbar_ax1, orientation='horizontal', extend='both')
 cbar1.set_label('$\\Delta$ $m_c$ ($kg$ $m^{-2}$)')
-cbar1.add_lines(contour1)
+# cbar1.add_lines(contour1)
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
 image_name = 'Fig_9.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)
