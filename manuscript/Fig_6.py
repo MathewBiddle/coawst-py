@@ -25,6 +25,9 @@ import netCDF4
 import coawstpy
 import datetime
 
+files = coawstpy.get_file_paths()
+#f = netCDF4.Dataset(inputfile, 'r')
+
 runs = ['veg','noveg']
 event = 'Irene'
 point_data = coawstpy.get_point_data('veg')
@@ -41,14 +44,14 @@ i=0
 fig, ax = plt.subplots(ncols=2,nrows=2, figsize=(12, 10),sharey=True,sharex=True)
 
 for run in runs:
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
+    #runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    #if run == 'noveg':
+    #    direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    #elif run == 'veg':
+    #    direct = runs_dir + 'Full_20110719T23_20111101_final'
 
-    inputfile = direct + '/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+    #inputfile = direct + '/upper_ches_his.nc'
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
     ocean_time = f.variables['ocean_time'][:]
@@ -190,6 +193,6 @@ cbarb.add_lines(contour0)
 writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
 image_name = 'Fig_6.png'
 #image_name = '%s_map.png' % datetime_list
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+#outfile = writedir+image_name
+#print("Saving image to %s" % outfile)
+#plt.savefig(outfile, bbox_inches='tight', dpi=500)
