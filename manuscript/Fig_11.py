@@ -16,23 +16,27 @@ import matplotlib.dates as mdates
 import numpy as np
 import datetime
 
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final'
+
+files = coawstpy.get_file_paths()
 
 # Get SSC data
-inputfile = dir + '/upper_ches_his.nc'
-f = netCDF4.Dataset(inputfile, 'r')
-print("Retrieving %s" % (inputfile.split("/")[-1]))
+#inputfile = dir + '/upper_ches_his.nc'
+f = netCDF4.Dataset(files['veg'], 'r')
+print("Retrieving %s" % (files['veg']))
 ocean_time = f.variables['ocean_time'][:]
 datetime_list = []
 for sec in ocean_time:
     if sec == 0.0:
         datetime_list.append(
             netCDF4.num2date(sec + 0.0000000000000001, units=f.variables['ocean_time'].units,
-                             calendar=f.variables['ocean_time'].calendar))
+                             calendar=f.variables['ocean_time'].calendar,
+                             only_use_cftime_datetimes=False))
     else:
         datetime_list.append(
             netCDF4.num2date(sec, units=f.variables['ocean_time'].units,
-                             calendar=f.variables['ocean_time'].calendar))
+                             calendar=f.variables['ocean_time'].calendar,
+                             only_use_cftime_datetimes=False))
 lat = f.variables['lat_rho'][:]
 lon = f.variables['lon_rho'][:]
 point_data = dict()
@@ -49,8 +53,9 @@ for site in locs['Site']:
 
 ## river data
 print("Reading river data...")
-river_frc = dir+'/river_frc.nc'
-f_river = netCDF4.Dataset(river_frc, 'r')
+#river_frc = dir+'/river_frc.nc'
+#files['river_frc']
+f_river = netCDF4.Dataset(files['river_frc'], 'r')
 river_time = f_river.variables['river_time'][:]
 river_transport = f_river.variables['river_transport'][:, 0]
 river_datetime_list=[]
@@ -60,8 +65,8 @@ for sec in river_time:
 
 ## wind data
 print("Reading wind data...")
-ptsfile = dir+"/tripod_wave.pts"
-ptsdf = pd.read_fwf(ptsfile, header=4)
+#ptsfile = dir+"/tripod_wave.pts"
+ptsdf = pd.read_fwf(files['tripod_pts_veg'], header=4)
 ptsdf.drop([0,1],axis=0,inplace=True)
 ptsdf.rename(columns={'%       Time':'Time'},inplace=True)
 ptsdf['Yp'] = ptsdf['Yp            Hsig'].astype(str).str.split("    ",expand=True)[0].astype(float)
@@ -84,8 +89,8 @@ ptsdf['Y-Windv']=ptsdf['Y-Windv'].astype(float)
 
 # EOTB data
 print('Reading EOTB data...')
-eotb_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/Eyes_on_the_bay/EOTBData_HavredeGrace_Flats_01Jul11_TO_01Nov11.csv'
-feotb = pd.read_csv(eotb_file, header=0, parse_dates=['DateTime'], infer_datetime_format=True)
+#eotb_file = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/Initialization_data/Eyes_on_the_bay/EOTBData_HavredeGrace_Flats_01Jul11_TO_01Nov11.csv'
+feotb = pd.read_csv(files['eotb'], header=0, parse_dates=['DateTime'], infer_datetime_format=True)
 # eotb_turb = feotb['Turb_NTU'].values
 tshift = pd.DateOffset(hours=0)
 feotb['DateTimeUTC'] = feotb['DateTime']-tshift
@@ -107,7 +112,7 @@ eotb_depth = 1.0
 print("Creating plots...")
 fig, (ax) = plt.subplots(nrows=4, ncols=1, sharex=True, figsize=(12, 8))
 fig.subplots_adjust(hspace=0.1)
-myFmt = mdates.DateFormatter("%b")
+myFmt = mdates.DateFormatter("%Y-%m-%d")
 months = mdates.MonthLocator()  # every month
 
 dayint=10
@@ -215,8 +220,8 @@ ax[0].text('2011-07-21',0.035,'a',fontsize=18)
 
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-image_name = 'Fig_11.png'
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
+# image_name = 'Fig_11.png'
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+# plt.savefig(outfile, bbox_inches='tight', dpi=500)

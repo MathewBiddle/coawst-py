@@ -395,7 +395,8 @@ def get_file_paths():
         'river_frc': base + '/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101_final/river_frc.nc',
         'cbibs': base + '/Initialization_data/CBIBS_insitu_obs/NCEI_copy/S_2011.nc',
         'ptsfile': base + '/COAWST_RUNS/COAWST_OUTPUT/SWAN_20130705_20130715_FRICTION_NOVEG_30SEC_KOMAN_pt4+Bathy/tripod_wave.pts',
-        'sftripod': base + '/Initialization_data/Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat'
+        'sftripod': base + '/Initialization_data/Larry_Flats_data_2013/SF2013JulyData4Matt/sftripod1_advo_diwasp_MKS_LWT_lowpass_results.mat',
+        'eotb': base + '/Initialization_data/Eyes_on_the_bay/EOTBData_HavredeGrace_Flats_01Jul11_TO_01Nov11.csv'
     }
 
     if machine == 'MATT-LENOVO':
