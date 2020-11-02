@@ -138,7 +138,7 @@ for run in runs:
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[0,i],
-                        vmin=-4, vmax=4)
+                        vmin=-1, vmax=1)
                         # post-Lee and Irene vmin=-1,vmax=0.6)
                         # Lee vmin=-4,vmax=4)
                         # typical vmin=-0.35,vmax=0.15)
@@ -195,7 +195,7 @@ for run in runs:
     #cbar = m.colorbar(cax0, ax=ax[i,0], location='bottom')
 fig.subplots_adjust(right=0.8)
 cbar_ax0 = fig.add_axes([0.125, 0.51, 0.675, 0.02])
-cbar0 = fig.colorbar(cax0, cax=cbar_ax0, orientation='horizontal', extend='max')
+cbar0 = fig.colorbar(cax0, cax=cbar_ax0, orientation='horizontal', extend='both')
 cbar0.set_label('$\\Delta$ $m_f$ ($kg$ $m^{-2}$)')
 # cbar0.add_lines(contour0)
 

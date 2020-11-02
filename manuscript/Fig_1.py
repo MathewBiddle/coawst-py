@@ -36,8 +36,16 @@ m = Basemap(llcrnrlon=lon_min, llcrnrlat=lat_min, urcrnrlon=lon_max, urcrnrlat=l
     resolution='i', projection='merc', lat_ts=locs.loc[locs['Site'] == '3', 'lat'], epsg=3395)
 
 # add background
-#m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000)
-
+# arcgisimage function doesn't work
+# image_url = m.arcgisimage(service="Canvas/World_Light_Gray_Base", xpixels=3000, verbose=True)
+# import urllib.request
+# urllib.request.urlretrieve(image_url,'map.png')
+#
+# Download image, load it, and display it on the map
+#image_url = 'http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/export?bbox=-8488667.770441078,4722963.927554283,-8453713.45033199,4791541.555979901&bboxSR=3395&imageSR=3395&size=3000,5885&dpi=96&format=png32&transparent=true&f=image'
+import matplotlib.image as mpimg
+img = mpimg.imread('C:\\Users\\Mathew.Biddle\\Documents\\GitProjects\\Thesis_data\\map.png')
+m.imshow(np.flipud(img))
 #mount_point = 'Z:\matt_backups' # windows mapping of external drive
 #mount_point = '/Users/mbiddle' # local on mac machine
 #root = '\matt_backups\Documents\BCO-DMO\Graduate_School\Thesis\COAWST\COAWST_RUNS\COAWST_OUTPUT\Full_20110719T23_20111102_final'

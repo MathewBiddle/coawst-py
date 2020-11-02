@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 #import matplotlib
 #matplotlib.use('MacOSX')
 import numpy as np
+import datetime
 
 
 run = 'veg'
@@ -63,6 +64,10 @@ for site in point_data_veg:
                   #ax[i].set_ylabel(alpha,rotation=0,labelpad=5)
                   ax[i].tick_params(labelsize=6)
                   alpha = chr(ord(alpha) + 1)
+
+                  # add dateline for reference to figure 8
+                  date = datetime.datetime(2011, 9, 9, 4, 12)  # Lee
+                  ax[i].axvline(date, linestyle='-.',linewidth=0.25,color='k')
                   i+=1
               print('')
               #writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/for_larry_20191007/'
