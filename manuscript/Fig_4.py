@@ -83,21 +83,21 @@ ax[2].set_ylabel('$T_p$ ($s$)')
 q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[0])
 ax[0].set_ylabel('$U_{10}$ (m $s^{-1}$)')
 ref = 10
-ax[0].quiverkey(q, 0.06, 0.15, ref,
+ax[0].quiverkey(q, 0.95, 0.05, ref,
                   "%s m $s^{-1}$" % ref,
                   labelpos='N', coordinates='axes', fontproperties={'size': 'medium'})
 ax[0].text('2013-07-14 20:00',0.043,'N',fontsize=12,color='grey')
 ax[0].text('2013-07-14 20:00',-0.050,'S',fontsize=12,color='grey')
 
 # add letting for panels
-ax[0].text(datetime.datetime(2013,7,5,3,00),0.037,'a',fontdict=dict(size=18))
-ax[1].text(datetime.datetime(2013,7,5,3,00),0.32,'b',fontdict=dict(size=18))
-ax[2].text(datetime.datetime(2013,7,5,3,00),5,'c',fontdict=dict(size=18))
+ax[0].text(datetime.datetime(2013,7,7,23,00),0.037,'a',fontdict=dict(size=18))
+ax[1].text(datetime.datetime(2013,7,7,23,00),0.32,'b',fontdict=dict(size=18))
+ax[2].text(datetime.datetime(2013,7,7,23,00),5,'c',fontdict=dict(size=18))
 
-ax[2].set_xlabel('day in July 2013')
+#ax[2].set_xlabel('day in July 2013')
 
-ax[2].set_xlim([SWAN_df['Time'].min(),SWAN_df['Time'].max()])
-myFmt = mdates.DateFormatter('%d') # here you can format your datetick labels as desired
+ax[2].set_xlim([obs_df['mtime'].min(),obs_df['mtime'].max()])
+myFmt = mdates.DateFormatter('%Y-%m-%d') # here you can format your datetick labels as desired
 plt.gca().xaxis.set_major_formatter(myFmt)
 #plt.xlabel(plt.rcParams['timezone'])
 #triplon = metadata.location[1]
