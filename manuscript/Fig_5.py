@@ -48,9 +48,9 @@ for site in point_data_veg:
               print("\nveg:\n",point_data_veg[site][vars2plot][start:end].describe().T[['min','max','mean','std']])
               print("\nnoveg:\n", point_data_noveg[site][vars2plot][start:end].describe().T[['min', 'max', 'mean','std']])
               ax = point_data_veg[site][vars2plot][start:end].plot(subplots=True, sharex=True, linewidth=0.5,
-                                                                   legend=False, linestyle='-')
+                                                                   legend=False, linestyle='-', color='black')
               point_data_noveg[site][vars2plot][start:end].plot(ax=ax, subplots=True, sharex=True, linestyle='--',
-                                                                linewidth=0.5, legend=False)
+                                                                linewidth=0.5, legend=False, color='black')
               ax[0].legend(['veg','noveg'],loc=3,ncol=2, bbox_to_anchor=(.25,1.05,.5,.102), mode='expand',borderaxespad=0)
               plt.suptitle('%s %s' % (event, site))
               evnt=event
