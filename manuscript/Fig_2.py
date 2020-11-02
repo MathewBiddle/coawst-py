@@ -196,4 +196,5 @@ ax[0].text('2011-10-14',0.045,'post-Lee')
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/defense/forcings_hl_Irene_post-Lee.png'
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_2.png'
-#plt.savefig(outfile, bbox_inches='tight', dpi=500)
+filename = 'Fig_2.png'
+plt.savefig(filename, bbox_inches='tight', dpi=500)

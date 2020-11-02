@@ -83,11 +83,11 @@ ax[2].set_ylabel('$T_p$ ($s$)')
 q = coawstpy.stick_plot(SWAN_df['Time'],SWAN_df['X-Windv'],SWAN_df['Y-Windv'], ax=ax[0])
 ax[0].set_ylabel('$U_{10}$ (m $s^{-1}$)')
 ref = 10
-ax[0].quiverkey(q, 0.95, 0.05, ref,
+ax[0].quiverkey(q, 0.05, 0.05, ref,
                   "%s m $s^{-1}$" % ref,
                   labelpos='N', coordinates='axes', fontproperties={'size': 'medium'})
-ax[0].text('2013-07-14 20:00',0.043,'N',fontsize=12,color='grey')
-ax[0].text('2013-07-14 20:00',-0.050,'S',fontsize=12,color='grey')
+ax[0].text('2013-07-13 10:00',0.043,'N',fontsize=12,color='grey')
+ax[0].text('2013-07-13 10:00',-0.050,'S',fontsize=12,color='grey')
 
 # add letting for panels
 ax[0].text(datetime.datetime(2013,7,7,23,00),0.037,'a',fontdict=dict(size=18))
@@ -108,5 +108,6 @@ plt.gca().xaxis.set_major_formatter(myFmt)
 #plt.subplots_adjust(hspace=0.05)
 
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_4.png'
-#plt.savefig(outfile, bbox_inches='tight', dpi = 500)
+filename = 'Fig_4.png'
+plt.savefig(filename, bbox_inches='tight', dpi=500)
 print("Done")

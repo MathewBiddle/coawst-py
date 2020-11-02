@@ -110,8 +110,15 @@ plt.subplots_adjust(hspace=0.2)
 #        point_data[site][vars2plot][start:end].plot()
 #        plt.suptitle('%s %s' % (event, site))
 
+import datetime
+# set xlim
+ax[5].set_xlim(point_data_veg[site][vars2plot][start:end].index.min(),
+               point_data_veg[site][vars2plot][start:end].index.max()+datetime.timedelta(minutes=1))
+
 # writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-# image_name = 'Fig_7.png'
+image_name = 'Fig_7.png'
 # outfile = writedir+image_name
 # print("Saving image to %s" % outfile)
-# plt.savefig(outfile, bbox_inches='tight', dpi=500)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)
+
+# adjust xlim

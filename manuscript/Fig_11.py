@@ -221,7 +221,7 @@ ax[0].text('2011-07-21',0.035,'a',fontsize=18)
 #ax[4].set_xlim(time_periods['post-Lee'][0],time_periods['post-Lee'][1])
 
 # writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-# image_name = 'Fig_11.png'
+image_name = 'Fig_11.png'
 # outfile = writedir+image_name
 # print("Saving image to %s" % outfile)
-# plt.savefig(outfile, bbox_inches='tight', dpi=500)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)

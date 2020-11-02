@@ -108,7 +108,8 @@ ax1.xaxis.set_major_locator(mdates.DayLocator(interval=15))
 ax1.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
 
 ax1.set_ylim([0, 2.5])
-ax1.set_xlim(xlim)
+#ax1.set_xlim(xlim)
+ax1.set_xlim(datetime_list[0],datetime_list[-1])
 ax1.set_ylabel('Water Velocity ($m$ $s^{-1}$)')
 ax1.legend(loc='upper left')
 #a = ax2.scatter(x=df.loc[start_date:end_date, 'COAWST_Vbar'], y=df.loc[start_date:end_date,'CBIBS_V'],
@@ -169,9 +170,11 @@ ax2.legend(bbox_to_anchor=(1.1, 1), loc='upper left', borderaxespad=0.)
 #cb = fig.colorbar(smap,format=DateFormatter('%d %b %y'))
 
 # writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
-# image_name = 'Fig_3.png'
+image_name = 'Fig_3.png'
 # outfile = writedir+image_name
 # print("Saving image to %s" % outfile)
-#plt.savefig(outfile, bbox_inches='tight', dpi=500)
+plt.savefig(image_name, bbox_inches='tight', dpi=500)
 
 print("Done")
+
+# adjust xlim
