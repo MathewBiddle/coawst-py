@@ -108,7 +108,7 @@ for sec in bry_time:
 print("Creating plots...")
 fig, (ax) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(12, 6))
 fig.subplots_adjust(hspace=0.1)
-myFmt = mdates.DateFormatter("%b")
+myFmt = mdates.DateFormatter("%Y-%m-%d")
 months = mdates.MonthLocator()  # every month
 
 dayint=10

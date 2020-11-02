@@ -156,7 +156,7 @@ for run in runs:
     # pcolor variable of interest
     cax0 = m.pcolormesh(lon, lat, mud_mass_diff_ma, latlon=True,
                         cmap='jet', ax=ax[1, i],
-                        vmin=-1, vmax=1)
+                        vmin=-0.6, vmax=0.6)
     # post-Lee and Irene vmin=-1,vmax=0.6)
     # Lee vmin=-4,vmax=4)
     # typical vmin=-0.35,vmax=0.15)
@@ -202,4 +202,4 @@ image_name = 'Fig_6_revision.png'
 #image_name = '%s_map.png' % datetime_list
 #outfile = writedir+image_name
 #print("Saving image to %s" % outfile)
-plt.savefig(image_name, bbox_inches='tight', dpi=500)
+#plt.savefig(image_name, bbox_inches='tight', dpi=500)
