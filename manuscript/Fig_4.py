@@ -108,6 +108,6 @@ plt.gca().xaxis.set_major_formatter(myFmt)
 #plt.subplots_adjust(hspace=0.05)
 
 #outfile = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/Fig_4.png'
-filename = 'Fig_4.png'
-plt.savefig(filename, bbox_inches='tight', dpi=500)
-print("Done")
+# filename = 'Fig_4.png'
+# plt.savefig(filename, bbox_inches='tight', dpi=500)
+# print("Done")

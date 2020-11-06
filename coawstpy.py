@@ -413,9 +413,21 @@ def get_file_paths():
 
 
 def skill_score(predicted, reference):
+    # Check that dimensions of predicted and reference fields match
     # from https://github.com/PeterRochford/SkillMetrics/blob/master/skill_metrics/skill_score_murphy.py
+    pdims = predicted.shape
+    rdims = reference.shape
+    if not np.array_equal(pdims,rdims):
+        message = 'predicted and reference field dimensions do not' + \
+            ' match.\n' + \
+            'shape(predicted)= ' + str(pdims) + ', ' + \
+            'shape(reference)= ' + str(rdims) + \
+            '\npredicted type: ' + str(type(predicted))
+        raise ValueError(message)
+
     # Calculate the RMSE
-    rmse2 = np.sqrt(np.sum(np.square(predicted - reference)) / len(predicted))
+    rmse = np.sqrt(np.sum(np.square(predicted - reference)) / len(predicted))
+    rmse2 = rmse**2
     # Calculate standard deviation
     sdev2 = np.std(reference, ddof=1)**2
 
