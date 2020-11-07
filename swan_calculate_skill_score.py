@@ -56,9 +56,9 @@ obs_df['mtime'] = obs_df['mtime'].dt.tz_convert('UTC')
 swan_hsig = SWAN_df.loc[
     (SWAN_df['Time'] > obs_df['mtime'].min() - datetime.timedelta(minutes=1,seconds=7)) &
     (SWAN_df['Time'] < obs_df['mtime'].max()),
-    ['Time','Hsig']]
+    ['Time','Hsig']].reset_index(drop=True)
 
-obs_hsig = obs_df[['mtime','Hsig']]
+obs_hsig = obs_df[['mtime','Hsig']].reset_index(drop=True)
 
 skill_score = coawstpy.skill_score(swan_hsig['Hsig'], obs_hsig['Hsig'])
-
+print('skill score: %f' % skill_score)

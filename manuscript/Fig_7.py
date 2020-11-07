@@ -62,7 +62,7 @@ for site in point_data_veg:
                   #ax[i].yaxis.set_label_position("right")
                   ax[i].set_ylabel(labels[i],size=6)
                   #ax[i].set_ylabel(alpha,rotation=0,labelpad=5)
-                  ax[i].tick_params(labelsize=6)
+                  ax[i].tick_params(labelsize=8)
                   alpha = chr(ord(alpha) + 1)
 
                   # add dateline for reference to figure 8
