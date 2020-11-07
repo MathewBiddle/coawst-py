@@ -52,23 +52,28 @@ for run in runs:
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
     ocean_time = f.variables['ocean_time'][:]
-    plant_height = f.variables['mask_rho'][:]
+    basin_mask = f.variables['mask_rho'][:]
     h = f.variables['h'][:]
+
+    if run == 'veg':
+        plant_height_raw = f.variables['plant_height'][0, 0, :, :]
+
+    plant_mask = np.ma.masked_not_equal(plant_height_raw, 0.3048)
 
     # build Flats cell locations:
     # This does not include the transect cells themselves. Just all cells between T1 and T2, excluding South River.
     # 5 = good points
-    plant_height = np.ma.masked_less(plant_height, 1)
-    plant_height.harden_mask()  # makes the mask immutable
-    plant_height[:, 10:58] = 5  ## Southern Boundary
-    plant_height[78:100, 41:59] = 0  # Remove Elk River
-    plant_height[72:78, 55:59] = 0  # Remove Elk River
+    basin_mask = np.ma.masked_less(basin_mask, 1)
+    basin_mask.harden_mask()  # makes the mask immutable
+    basin_mask[:, 10:58] = 5  ## Southern Boundary
+    basin_mask[78:100, 41:59] = 0  # Remove Elk River
+    basin_mask[72:78, 55:59] = 0  # Remove Elk River
     ## Northern Boundary
-    plant_height[48:64, 0:14] = 5  # add mill creek/Furnace Bay
+    basin_mask[48:64, 0:14] = 5  # add mill creek/Furnace Bay
     # dealing with angled transect boundary here
-    # plant_height[30:50, 13] = 5
-    # plant_height[31:37, 12] = 5
-    # plant_height[32:35, 11] = 5
+    # basin_mask[30:50, 13] = 5
+    # basin_mask[31:37, 12] = 5
+    # basin_mask[32:35, 11] = 5
 
 
     ## Do some date conversions ##
@@ -84,17 +89,21 @@ for run in runs:
     datetime_list = datetime_list[time]
     #dvar = 'bed_thickness'
     Hwave = f.variables['Hwave'][time, :, :]
+    bstrcwmax = f.variables['bstrcwmax'][time, :, :]
 
-    Hwavem = np.ma.masked_where(plant_height != 5,Hwave)
+    Hwavem = np.ma.masked_where(basin_mask != 5, Hwave)
 
-    #curr_mag = np.sqrt((ubarm**2)+(vbrm**2))
-    print(run)
-    print('Maximum wave: %f' % Hwavem.max())
-#    data_diff = (data_final-data_init)*100 # cm
-    # set up figure
+    Hwave_flats = np.ma.masked_where(plant_mask != 0.3048, Hwave)
+    bstrcwmax_flats = np.ma.masked_where(plant_mask != 0.3048, bstrcwmax)
 
-    lonm = np.ma.masked_where(plant_height != 5, lon)
-    latm = np.ma.masked_where(plant_height != 5, lat)
+    # curr_mag = np.sqrt((ubarm**2)+(vbrm**2))
+    print('\n%s' % run)
+    print('Maximum wave over region: %f' % Hwavem.max())
+    print('Mean wave over flats (veg) region: %f ± %f' % (Hwave_flats.mean(), Hwave_flats.std()))
+    print('Mean wave and current bottom-stress magnitude: %f ± %f' % (bstrcwmax_flats.mean(), bstrcwmax_flats.std()))
+
+    lonm = np.ma.masked_where(basin_mask != 5, lon)
+    latm = np.ma.masked_where(basin_mask != 5, lat)
 
     #set up map
     m = Basemap(llcrnrlon=lonm.min()-0.01, llcrnrlat=latm.min()-0.01, urcrnrlon=lonm.max()+0.01, urcrnrlat=latm.max()+0.01,
@@ -132,15 +141,15 @@ for run in runs:
     mud_mass_diff = mud_mass_final - mud_mass_init  # kg/m2
 
     # Susquehanna River mouth
-    plant_height[transects['T1']['x'], transects['T1']['y']] = 10
+    basin_mask[transects['T1']['x'], transects['T1']['y']] = 10
     # Turkey Point to Sandy Point
-    plant_height[transects['T1']['x'], transects['T1']['y']] = 10
+    basin_mask[transects['T1']['x'], transects['T1']['y']] = 10
 
     ## Plotting
     # apply the mask
-    # plant_height = 5 is where the region of interest is.
+    # basin_mask = 5 is where the region of interest is.
     # so apply a mask to everything not 5 to the bed thick matrix
-    mud_mass_diff_ma = np.ma.masked_where(plant_height != 5, mud_mass_diff)
+    mud_mass_diff_ma = np.ma.masked_where(basin_mask != 5, mud_mass_diff)
 
     ## Plotting
     # set up figure
