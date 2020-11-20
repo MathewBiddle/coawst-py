@@ -427,6 +427,7 @@ def skill_score(predicted, reference):
 
     # Calculate the RMSE
     # mse = np.sum(np.square(predicted - reference)) / len(predicted)
+    # Try https://github.com/pyoceans/ioos_tools/tree/master/ioos_tools
     rmse = np.sqrt(np.sum(np.square(predicted - reference)) / len(predicted))
     rmse2 = rmse**2
     # Calculate standard deviation
