@@ -10,7 +10,7 @@ critical shear stress of 0.049 N/m2.
 @author: Mathew Biddle
 '''
 
-#import os
+import os
 #os.environ["PROJ_LIB"] = "/User/mbiddle/anaconda3/envs/coawst/share/proj/"
 import coawstpy
 import matplotlib.pyplot as plt
@@ -60,10 +60,11 @@ for site in point_data_veg:
               for v in vars2plot:
 
                   #ax[i].set_ylabel(v,rotation=0,labelpad=40)
-                  #ax[i].yaxis.set_label_position("right")
+                  ax[i].yaxis.set_label_position("right")
                   ax[i].set_ylabel(labels[i],size=6)
                   #ax[i].set_ylabel(alpha,rotation=0,labelpad=5)
-                  ax[i].tick_params(labelsize=8)
+                  ax[i].tick_params(labelsize=6)
+                  ax[i].ticklabel_format(axis='y',useOffset=False)
                   alpha = chr(ord(alpha) + 1)
                   i+=1
               print('')
@@ -84,7 +85,7 @@ for site in point_data_veg:
               # writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/Manuscript/figures/'
               image_name = '%s.png' % event
               # outfile = writedir+image_name
-              print("Saving image to %s" % image_name)
+              print("Saving image to %s %s" % (os.getcwd(), image_name))
               plt.savefig(image_name, bbox_inches='tight', dpi=500)
 
        print("Done.")

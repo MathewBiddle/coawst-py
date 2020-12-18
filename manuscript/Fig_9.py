@@ -96,12 +96,16 @@ for run in runs:
     # time indexes: 1202 - 1466 for event
     # see https://www.myroms.org/forum/viewtopic.php?f=20&t=4447
 
-    mud_mass_init = np.sum(mud_mass[start,:,:,:],axis=0) # total from all 3 bed layers
-    mud_mass_final = np.sum(mud_mass[end,:,:,:],axis=0) # total from all 3 bed layers
+    #mud_mass_init = np.sum(mud_mass[start,0,:,:],axis=0) # total from all 3 bed layers [t,z,x,y] z = 0 surface
+    #mud_mass_final = np.sum(mud_mass[end,0,:,:],axis=0) # total from all 3 bed layers
+    mud_mass_init = mud_mass[start, 0, :, :]  # [t,z,x,y] z = 0 surface
+    mud_mass_final = mud_mass[end,0,:,:]
     mud_mass_diff = mud_mass_final - mud_mass_init # kg/m2
 
-    sand_mass_init = np.sum(sand_mass[start,:,:,:],axis=0) # total from all 3 bed layers
-    sand_mass_final = np.sum(sand_mass[end,:,:,:],axis=0) # total from all 3 bed layers
+    #sand_mass_init = np.sum(sand_mass[start,0,:,:],axis=0) # total from all 3 bed layers
+    #sand_mass_final = np.sum(sand_mass[end,0,:,:],axis=0) # total from all 3 bed layers
+    sand_mass_init = sand_mass[start, 0, :, :]  # surface
+    sand_mass_final = sand_mass[end,0,:,:] # surface
     sand_mass_diff = sand_mass_final - sand_mass_init # kg/m2
 
     # Susquehanna River mouth
@@ -208,4 +212,4 @@ cbar1.set_label('$\\Delta$ $m_c$ ($kg$ $m^{-2}$)')
 image_name = 'Fig_9.png'
 # outfile = writedir+image_name
 # print("Saving image to %s" % outfile)
-plt.savefig(image_name, bbox_inches='tight', dpi=500)
+#plt.savefig(image_name, bbox_inches='tight', dpi=500)
