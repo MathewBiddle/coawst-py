@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import netCDF4
 import matplotlib.animation as animation
+import coawstpy
 
 # bring in the data
-dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
-inputfile = dir+'/upper_ches_his.nc'
-f = netCDF4.Dataset(inputfile, 'r')
+files = coawstpy.get_file_paths()
+#dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/Full_20110719T23_20111101'
+#inputfile = dir+'/upper_ches_his.nc'
+f = netCDF4.Dataset(files['veg'], 'r')
 
 ocean_time = f.variables['ocean_time'][:]
 ## Do some date conversions ##
