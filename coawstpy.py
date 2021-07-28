@@ -170,7 +170,29 @@ def get_point_locations():
         ['FLT', 39.5053, -76.0414, 'Eyes on the Bay Susquehann Flats station'],
         ['SUS', 39.5478, -76.0848, 'Eyes on the Bay Havre de Grace'],
         ['TOL', 39.2133, -76.2450, 'Tolchester Beach Tide point'],
-        ['SHAD', 39.3600375, -76.1448925, 'Shad Battery CBOFS Tide point']
+        ['SHAD', 39.3600375, -76.1448925, 'Shad Battery CBOFS Tide point'],
+        ['6B1DI',    39.51503825, -76.07961414, ''],
+        ['14B2CI',    39.51340272, -76.07207611, ''],
+        ['23B3FI',   39.49490393, -76.06131032, ''],
+        ['32B5AI',    39.49246884, -76.07977923, ''],
+        ['43B6BI',    39.51579751, -76.08958068, ''],
+        ['47B7AI',    39.51095641, -76.08937194, ''],
+        ['55B8BI',    39.50665804, -76.08821108, ''],
+        ['59B9AI',    39.50545832, -76.06957142, ''],
+        ['66B10BI',    39.49418538, -76.0811066, ''],
+        ['80B12CI',    39.49035203, -76.05792763, ''],
+        ['86B13BI',    39.49367458, -76.04452877, ''],
+        ['7B1CO',    39.505854, -76.08044814, ''],
+        ['15B2CO',    39.51337898, -76.07178088, ''],
+        ['22B3BO',    39.49531062, -76.06098601, ''],
+        ['31B5AO',    39.492815, -76.07919619, ''],
+        ['45B6CO',    39.51563115, -76.08952575, ''],
+        ['46B7AO',    39.51097408, -76.08931005, ''],
+        ['52B8CO',    39.50669, -76.08823682, ''],
+        ['63B9BO',    39.50494153, -76.06977276, ''],
+        ['64B10AO',    39.49426946, -76.08108385, ''],
+        ['81B12CO',    39.48941133, -76.05791338, ''],
+        ['84B13CO',    39.49377208, -76.04438943, ''],
     ]
 
     i = 0
@@ -266,7 +288,7 @@ def get_sed_flux_data(run, transect_indexes):
     return transect
 
 
-def get_point_data(run):
+def get_point_data(run, sites=['CBIBS', '3', 'S', 'FLT', 'SUS']):
     # bring in the data
     river_frc = get_file_paths()['river_frc']
     if run == 'noveg':
@@ -332,7 +354,6 @@ def get_point_data(run):
     locs = get_point_locations()
 
     # collect data for site of choice
-    sites = ['CBIBS', '3', 'S', 'FLT', 'SUS']
     for site in sites:
         point_data[site] = pd.DataFrame()#columns=['X-Windv', 'Y-Windv',
                                           #              'Pwave_Top', 'Hwave', 'mud_bar','sand_bar', 'bed_thickness',
@@ -340,12 +361,13 @@ def get_point_data(run):
                                           #              'river_transport','bstress_mag','Uwave_rms'])
 
         lat_pt, lon_pt = locs.loc[locs['Site'] == site, ['lat', 'lon']].values[0]
-        print("Using geo-coords lat, lon = (%f, %f)" % (lat_pt, lon_pt))
+        print("Using geo-coords for site: %s lat, lon = (%f, %f)" % (site, lat_pt, lon_pt))
         x = np.abs(lon[:, 1] - lon_pt).argmin()
         y = np.abs(lat[1, :] - lat_pt).argmin()
 
         # point_data[event][site].index=datetime_list[start:end]
         # point_data[event][site]['swan_time'] = ptsdf['Time'][start:end]
+
         point_data[site]['X-Windv'] = ptsdf['X-Windv'][:]
         point_data[site]['Y-Windv'] = ptsdf['Y-Windv'][:]
         point_data[site]['Windv'] = np.sqrt(
@@ -353,10 +375,13 @@ def get_point_data(run):
         # point_data[event][site]['river_time'] = river_datetime_list[start:end]
         point_data[site]['river_transport'] = river_transport[:]
         # point_data[event][site]['ocean_time'] = datetime_list[start:end]
+
         point_data[site]['Pwave_Top'] = f.variables['Pwave_top'][:, x, y]
         point_data[site]['Hwave'] = f.variables['Hwave'][:, x, y]
         point_data[site]['mud_bar'] = np.average(f.variables['mud_01'][:, :, x, y], axis=1)
         point_data[site]['sand_bar'] = np.average(f.variables['sand_01'][:, :, x, y], axis=1)
+        point_data[site]['sandmass_sum'] = np.sum(f.variables['sandmass_01'][:, :, x, y], axis=1)
+        point_data[site]['mudmass_sum'] = np.sum(f.variables['mudmass_01'][:, :, x, y], axis=1)
         point_data[site]['bed_thickness'] = np.sum(f.variables['bed_thickness'][:, :, x, y], axis=1)
         point_data[site]['depth'] = f.variables['zeta'][:, x, y] + f.variables['h'][x, y]
         point_data[site]['ubar_eastward'] = f.variables['ubar_eastward'][:, x, y]
@@ -368,6 +393,8 @@ def get_point_data(run):
         point_data[site].index = pd.to_datetime(datetime_list[:])
         point_data[site]['X_index'] = x
         point_data[site]['Y_index'] = y
+        point_data[site]['Latitude'] = f.variables['lat_rho'][x, y]
+        point_data[site]['Longitude'] = f.variables['lon_rho'][x, y]
         # Verify point location
         # plant_height = f.variables['plant_height'][0, 0, :, :]
         # plant_height = np.ma.masked_greater(plant_height, 1)

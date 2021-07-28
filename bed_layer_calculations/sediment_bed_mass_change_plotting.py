@@ -12,22 +12,29 @@ import netCDF4
 import scipy.integrate as integrate
 
 ## Read COAWST data
-runs = ['veg','noveg']
+runs = ['veg']
 event = 'Irene'
 transects = coawstpy.get_transect_indexes()
 times = coawstpy.get_time_periods()
-#locs = coawstpy.get_point_locations()
+#point_data = coawstpy.get_point_data(run)
+locs = coawstpy.get_point_locations()
+files = coawstpy.get_file_paths()
+#f = netCDF4.Dataset(inputfile, 'r')
 
-fig, (ax) = plt.subplots(nrows=2, ncols=2,sharex=True, sharey=True, figsize=(10, 10))
+point_data = coawstpy.get_point_data('veg')
+
+
+fig, (ax) = plt.subplots(nrows=2, ncols=len(runs),sharex=True, sharey=True, figsize=(10, 5))
 i=0
 for run in runs:
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
-    inputfile = direct+'/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+    # runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    # if run == 'noveg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    # elif run == 'veg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final'
+    # inputfile = direct+'/upper_ches_his.nc'
+    # f = netCDF4.Dataset(inputfile, 'r')
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:][:]
     lat = f.variables['lat_rho'][:][:]
     h = f.variables['h'][:] # at rho points
@@ -150,6 +157,13 @@ for run in runs:
     contour1 = m.contour(lon, lat, sand_mass_diff_ma, 0,
                         colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[1,i])
 
+    for label in locs['Site']:
+        #if label in ['1', '2', '3', '4', '5']:
+        lon = locs.loc[locs['Site'] == label, 'lon'].values
+        lat = locs.loc[locs['Site'] == label, 'lat'].values
+        x, y = m(lon, lat)
+        plt.scatter(x, y, s=80, marker='.', color='k', edgecolors='k', linewidths=0.3)
+        plt.text(x+500, y-200, label, fontdict=dict(size=12))
     # cbar1 = m.colorbar(cax1, ax=ax[1, i], location='right', shrink=0.6)
     # cbar1.add_lines(contour1)
     # cbar1.set_label('sand mass diff [kg/m$^{2}$]')

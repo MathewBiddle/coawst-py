@@ -7,23 +7,29 @@ import numpy as np
 import netCDF4
 import coawstpy
 
-runs = ['veg','noveg']
-event = 'post-Lee'
+runs = ['veg']
+event = 'Lee'
 #point_data = coawstpy.get_point_data(run)
 times = coawstpy.get_time_periods()
 locs = coawstpy.get_point_locations()
+files = coawstpy.get_file_paths()
+#f = netCDF4.Dataset(inputfile, 'r')
+
+point_data = coawstpy.get_point_data('veg')
+transects = coawstpy.get_transect_indexes()
 
 i=0
-fig, ax = plt.subplots(ncols=2,figsize=(20, 6),sharey=True,sharex=True)
+fig, ax = plt.subplots(ncols=len(runs),figsize=(10, 10),sharey=True,sharex=True)
 for run in runs:
-    runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
-    if run == 'noveg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
-    elif run == 'veg':
-        direct = runs_dir + 'Full_20110719T23_20111101_final'
+    # runs_dir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/COAWST/COAWST_RUNS/COAWST_OUTPUT/'
+    # if run == 'noveg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final_noveg'
+    # elif run == 'veg':
+    #     direct = runs_dir + 'Full_20110719T23_20111101_final'
 
-    inputfile = direct + '/upper_ches_his.nc'
-    f = netCDF4.Dataset(inputfile, 'r')
+#    inputfile = direct + '/upper_ches_his.nc'
+#    f = netCDF4.Dataset(inputfile, 'r')
+    f = netCDF4.Dataset(files[run], 'r')
     lon = f.variables['lon_rho'][:]
     lat = f.variables['lat_rho'][:]
     ocean_time = f.variables['ocean_time'][:]
@@ -63,7 +69,7 @@ for run in runs:
     data_init = np.ma.masked_where(plant_height != 5,data_init)
 
     data_final=np.sum(data[-1,:,:,:],axis=0) # total from all layers
-    data_final = np.ma.masked_where(plant_height != 5,data_final)
+    data_final = np.ma.masked_where(plant_height != 5, data_final)
 
     data_diff = (data_final-data_init)*100 # cm
     # set up figure
@@ -74,7 +80,7 @@ for run in runs:
     # set up map
     m = Basemap(llcrnrlon=lonm.min() - 0.01, llcrnrlat=latm.min() - 0.01, urcrnrlon=lonm.max() + 0.01,
                 urcrnrlat=latm.max() + 0.01,
-                resolution='i', projection='merc', ax=ax[i])
+                resolution='i', projection='merc', ax=ax)
     #set up map
     #m = Basemap(llcrnrlon=lon.min(), llcrnrlat=lat.min(), urcrnrlon=lon.max(), urcrnrlat=lat.max(),
     #    resolution='i', projection='merc', ax=ax[i])
@@ -84,14 +90,30 @@ for run in runs:
 
     # pcolor variable of interest
     cax = m.pcolormesh(lon, lat, data_diff, latlon=True,
-                        vmin=-0.7,vmax=0.7,cmap='jet', ax=ax[i])
+                        vmin=-10,vmax=10,cmap='jet', ax=ax)
     contour = m.contour(lon, lat, data_diff, 0,
-                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax[i])
+                        colors='k', linestyles='dashed', linewidths=0.5, latlon=True, ax=ax)
     #cbar = fig.colorbar(cax)
     #cbar.set_label('Bed evolution [cm]')
+    for label in locs['Site']:
+        if label not in ['Tripod', 'CBIBS', 'FLT', 'SUS', 'S']:
+            lon = locs.loc[locs['Site'] == label, 'lon'].values
+            lat = locs.loc[locs['Site'] == label, 'lat'].values
+            x, y = m(lon, lat)
+            plt.scatter(x, y, s=80, marker='.', color='k', edgecolors='k', linewidths=0.3)
+            #plt.text(x-550, y, label, fontdict=dict(size=7))
+            # if label == 'Tripod':
+            #     plt.text(x + 500, y - 200, label, fontdict=dict(size=5))
+            # elif label == 'SUS':
+            #     plt.text(x - 2500, y - 500, label, fontdict=dict(size=5))
+            # elif label == 'SHAD':
+            #     plt.text(x + 500, y - 500, label, fontdict=dict(size=5))
+            # else:
+            #     plt.text(x + 500, y, label, fontdict=dict(size=5))
+
     #m.scatter(-76.079,39.414,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
     #m.scatter(-76.088,39.380,marker='o',color='k',alpha=0.4,edgecolors='k',linewidths=0.3,latlon=True)
-    ax[i].set_title("%s" % run)
+    ax.set_title("%s" % run)
     i+=1
 fig.subplots_adjust(right=0.8)
 #cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
@@ -103,8 +125,8 @@ cbar.add_lines(contour)
 #m.colorbar(cax)
 plt.suptitle("%s %s through %s" % (event, datetime_list[0],datetime_list[-1]))
 
-writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
-image_name = '%s_elevation_map.png' % event
-outfile = writedir+image_name
-print("Saving image to %s" % outfile)
-plt.savefig(outfile, bbox_inches='tight', dpi=500)
+# writedir = '/Users/mbiddle/Documents/Personal_Documents/Graduate_School/Thesis/Paper/figures/elevation_change_maps/'
+# image_name = '%s_elevation_map.png' % event
+# outfile = writedir+image_name
+# print("Saving image to %s" % outfile)
+# plt.savefig(outfile, bbox_inches='tight', dpi=500)
