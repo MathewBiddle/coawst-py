@@ -96,12 +96,12 @@ for run in runs:
     #cbar = fig.colorbar(cax)
     #cbar.set_label('Bed evolution [cm]')
     for label in locs['Site']:
-        if label not in ['Tripod', 'CBIBS', 'FLT', 'SUS', 'S']:
+        if label in ['1', '2', '3', '4', '5']: #if label not in ['Tripod', 'CBIBS', 'FLT', 'SUS', 'S']:
             lon = locs.loc[locs['Site'] == label, 'lon'].values
             lat = locs.loc[locs['Site'] == label, 'lat'].values
             x, y = m(lon, lat)
             plt.scatter(x, y, s=80, marker='.', color='k', edgecolors='k', linewidths=0.3)
-            #plt.text(x-550, y, label, fontdict=dict(size=7))
+            plt.text(x-550, y, label, fontdict=dict(size=7))
             # if label == 'Tripod':
             #     plt.text(x + 500, y - 200, label, fontdict=dict(size=5))
             # elif label == 'SUS':
